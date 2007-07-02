@@ -322,12 +322,15 @@ class Canvas(object):
 
     reversible_method(request_update, reverse=request_update)
 
+    @observed
     def request_matrix_update(self, item):
         """
         Schedule only the matrix to be updated.
         """
         self._dirty_matrix_items.add(item)
         self.update()
+
+    reversible_method(request_matrix_update, reverse=request_matrix_update)
 
     def require_update(self):
         """
@@ -465,6 +468,12 @@ class Canvas(object):
         # It's nice to have the W2I matrix present too:
         item._canvas_matrix_w2i = Matrix(*item._canvas_matrix_i2w)
         item._canvas_matrix_w2i.invert()
+
+        # Make sure handles are marked (for constraint solving)
+        request_resolve = self._solver.request_resolve
+        for h in item.handles():
+            request_resolve(h.x)
+            request_resolve(h.y)
 
         if recursive:
             for child in self._tree.get_children(item):
