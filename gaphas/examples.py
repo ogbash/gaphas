@@ -128,7 +128,7 @@ class Circle(Item):
 
     def _set_radius(self, height):
         h1, h2 = self._handles
-        return h1.y + height
+        h2.y = h1.y + height
 
 
     def _get_radius(self):
