@@ -89,7 +89,7 @@ class FatLine(Item):
 
     def _set_height(self, height):
         h1, h2 = self._handles
-        return h2.y + height
+        h2.y = h1.y + height
 
 
     def _get_height(self):

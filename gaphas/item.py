@@ -354,13 +354,6 @@ class Element(Item):
         h_sw = handles[SW]
         h_se = handles[SE]
 
-        w, h = self.width, self.height
-        x0, y0 = self._canvas.get_matrix_i2w(self, calculate=True).transform_point(0, 0)
-        h_nw.x = x0
-        h_nw.y = y0
-        h_se.x = x0 + w
-        h_se.y = y0 + h
-
         add = self.canvas.solver.add_constraint
         self._constraints = [
             add(eq(a=h_nw.y, b=h_ne.y)),
