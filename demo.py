@@ -300,27 +300,25 @@ def main():
     h.y = 20
     b.min_width = 20
     b.min_height = 30
+    b.width = b.height = 40
     b.matrix=(1.0, 0.0, 0.0, 1, 20,20)
-    b.width=b.height = 40
     c.add(b)
 
     fl = FatLine()
     h1, h2 = fl.handles()
-    h1.x = 50
-    h1.y = 50
-    fl.matrix.translate(50, 50)
+    h1.x = 100
+    h1.y = 100
     fl.height = 50
+    fl.matrix.translate(100, 100)
     c.add(fl)
 
 
     circle = Circle()
     h1, h2 = circle.handles()
     h1.x = 50
-    h1.y = 150
-    h2.x = 50
-    h2.y = 80
-    circle.radius = 10
-    circle.matrix.translate(50, 150)
+    h1.y = 100
+    circle.radius = 20
+    circle.matrix.translate(50, 100)
     c.add(circle)
 
 #   bb=Box()
@@ -352,11 +350,9 @@ def main():
     h[1].x += h[0].x + 30
     h[1].y += h[0].y + 30
     l.split_segment(0, 3)
-    l.matrix.translate(30, 60)
-    print l, h[0].x, h[0].y, h[1].x, h[1].y
+    l.matrix.translate(30, 30)
     c.add(l)
-    print l, h[0].x, h[0].y, h[1].x, h[1].y
-    #l.orthogonal = True
+    l.orthogonal = True
 
     off_y = 0
     for align_x in (-1, 0, 1):
