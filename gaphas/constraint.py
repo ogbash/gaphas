@@ -302,126 +302,50 @@ class EquationConstraint(Constraint):
         return x1
 
 
-class LineConstraint(Constraint):
+
+class BalanceConstraint(Constraint):
     """
-    Ensure a point is kept on a line, taking into account item
-    specific coordinates.
+    Ensure that a variable @v is between values specified by @band
+    and in distance proportional from @band[0].
 
-    #>>> from solver import Variable
-    #>>> a, b = Variable(3.0), Variable(2.0)
-    #>>> lt = LessThanConstraint(smaller=a, bigger=b)
-    #>>> lt.solve_for('smaller')
-    #>>> a, b
-    #(Variable(3, 20), Variable(3, 20))
-    #>>> b.value = 0.8
-    #>>> lt.solve_for('bigger')
-    #>>> a, b
-    #(Variable(0.8, 20), Variable(0.8, 20))
+    Consider
+    >>> from solver import Variable, WEAK
+    >>> a, b, c = Variable(2.0), Variable(3.0), Variable(2.3, WEAK)
+    >>> bc = BalanceConstraint(band=(a,b), v=c)
+    >>> c.value = 2.4
+    >>> c
+    Variable(2.4, 10)
+    >>> bc.solve_for(c)
+    >>> a, b, c
+    (Variable(2, 20), Variable(3, 20), Variable(2.3, 10))
+
+    Band does not have to be band[0] < band[1]
+    >>> a, b, c = Variable(3.0), Variable(2.0), Variable(2.45, WEAK)
+    >>> bc = BalanceConstraint(band=(a,b), v=c)
+    >>> c.value = 2.50
+    >>> c
+    Variable(2.5, 10)
+    >>> bc.solve_for(c)
+    >>> a, b, c
+    (Variable(3, 20), Variable(2, 20), Variable(2.45, 10))
     """
 
-    def __init__(self, canvas, connect_to_item, handle_1, handle_2,
-                 connected_item, connected_handle):
-        super(LineConstraint, self).__init__(handle_1.x,
-                handle_1.y,
-                handle_2.x,
-                handle_2.y,
-                connected_handle.x,
-                connected_handle.y)
+    def __init__(self, band=None, v=None):
+        super(BalanceConstraint, self).__init__(band[0], band[1], v)
+        self.band = band
+        b1, b2 = self.band
+        w = b2 - b1
+        if w != 0:
+            self.balance = (v - b1) / w
+        else:
+            self.balance = 0
+        self.v = v
+        print 'b', self.balance
 
-        self._canvas = canvas
-        self._connect_to_item = connect_to_item
-        self._handle_1 = handle_1
-        self._handle_2 = handle_2
-        self._connected_item = connected_item
-        self._connected_handle = connected_handle
-        self.update_ratio()
-
-
-    def update_ratio(self):
-        """
-        >>> from item import Handle, Item
-        >>> from canvas import Canvas
-        >>> c = Canvas()
-        >>> i1, i2 = Item(), Item()
-        >>> c.add(i1)
-        >>> c.add(i2)
-        >>> c.update_now()
-        >>> h1, h2, h3 = Handle(0, 0), Handle(30, 20), Handle(15, 4)
-        >>> eq = LineConstraint(c, i1, h1, h2, i2, h3)
-        >>> eq.ratio_x, eq.ratio_y
-        (0.5, 0.20000000000000001)
-        >>> h2.pos = 40, 30
-        >>> eq.solve_for(h3.x)
-        >>> eq.ratio_x, eq.ratio_y
-        (0.5, 0.20000000000000001)
-        >>> h3.pos
-        (Variable(20, 20), Variable(6, 20))
-        """
-        start = self._handle_1
-        end = self._handle_2
-        point = self._connected_handle
-
-        get_i2w = self._canvas.get_matrix_i2w
-
-        sx, sy = get_i2w(self._connect_to_item, calculate=True).transform_point(start.x, start.y)
-        ex, ey = get_i2w(self._connect_to_item).transform_point(end.x, end.y)
-        px, py = get_i2w(self._connected_item, calculate=True).transform_point(point.x, point.y)
-
-        try:
-            self.ratio_x = float(px - sx) / float(ex - sx)
-        except ZeroDivisionError:
-            self.ratio_x = 0.0
-        try:
-            self.ratio_y = float(py - sy) / float(ey - sy)
-        except ZeroDivisionError:
-            self.ratio_y = 0.0
-        
-    def solve_for(self, var=None):
-        self._solve()
-
-    def _solve(self):
-        """
-        Solve the equation for the connected_handle.
-        >>> from item import Handle, Item
-        >>> from canvas import Canvas
-        >>> c = Canvas()
-        >>> i1, i2 = Item(), Item()
-        >>> c.add(i1)
-        >>> c.add(i2)
-        >>> c.update_now()
-        >>> h1, h2, h3 = Handle(0, 0), Handle(30, 20), Handle(15, 4)
-        >>> eq = LineConstraint(c, i1, h1, h2, i2, h3)
-        >>> eq.solve_for(h3.x)
-        >>> h3.pos
-        (Variable(15, 20), Variable(4, 20))
-        >>> h2.pos = 40, 30
-        >>> eq.solve_for(h3.x)
-        >>> h3.pos
-        (Variable(20, 20), Variable(6, 20))
-        >>> i2.matrix.translate(5,5)
-        >>> i2.request_update()
-        >>> c.update_now()
-        >>> eq.solve_for(h3.x)
-        >>> h3.pos
-        (Variable(15, 20), Variable(1, 20))
-        """
-        start = self._handle_1
-        end = self._handle_2
-        point = self._connected_handle
-
-        get_i2w = self._canvas.get_matrix_i2w
-        get_w2i = self._canvas.get_matrix_w2i
-
-        sx, sy = get_i2w(self._connect_to_item).transform_point(start.x, start.y)
-        ex, ey = get_i2w(self._connect_to_item).transform_point(end.x, end.y)
-
-        px = sx + (ex - sx) * self.ratio_x
-        py = sy + (ey - sy) * self.ratio_y
-
-        point.x.value, point.y.value = \
-            get_w2i(self._connected_item).transform_point(px, py)
-        # Need to queue a redraw of the manipulated item.
-        self._canvas.request_update(self._connected_item)
+    def solve_for(self, var):
+        b1, b2 = self.band
+        w = b2 - b1
+        var.value = b1 + w * self.balance
 
 
 if __name__ == '__main__':

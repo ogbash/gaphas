@@ -338,6 +338,9 @@ class ItemTool(Tool):
             for i in self._movable_items:
                 # Move the item and schedule it for an update
                 i.matrix.translate(*get_matrix_w2i(i).transform_distance(dx, dy))
+                for h in i.handles():
+                    h.x += dx
+                    h.y += dy
                 canvas.request_matrix_update(i)
 
             self.last_x, self.last_y = event.x, event.y
@@ -376,7 +379,8 @@ class HandleTool(Tool):
         for h in item.handles():
             if not h.movable:
                 continue
-            wx, wy = view.canvas.get_matrix_i2w(item).transform_point(h.x, h.y)
+            #wx, wy = view.canvas.get_matrix_i2w(item).transform_point(h.x, h.y)
+            wx, wy = h.x, h.y
             x, y = view.transform_point_w2c(wx, wy)
             if abs(x - event.x) < 6 and abs(y - event.y) < 6:
                 return h
@@ -425,32 +429,20 @@ class HandleTool(Tool):
 
     def move(self, view, item, handle, x, y):
         """
-        Move the handle to position (x,y).
-        This version already has some special behavior implemented for
-        gaphas.item.Element. The min_width and min_height properties of
-        Element are used to restrict the handles from overlapping each other.
+        Move the handle to position (x,y). If handle changed the position
+        of an item, then move the item, too.
         """
-        # Special behavior for Elements:
-        if isinstance(item, Element):
-            index = list(item.handles()).index(handle)
-            opposite = item.handles()[(index + 2) % 4]
+        handle.x += x
+        handle.y += y
 
-            if index == 0 or index == 3:
-                if opposite.x - x < item.min_width:
-                    x = opposite.x - item.min_width
-            else:
-                if x - opposite.x < item.min_width:
-                    x = opposite.x + item.min_width
+        # calculate current position
+        matrix_w2i = view.canvas.get_matrix_w2i(item)
+        x1 = min(h.x for h in item.handles())
+        y1 = min(h.y for h in item.handles())
+        dx, dy = matrix_w2i.transform_point(x1, y1)
+        item.matrix.translate(dx, dy)
 
-            if index == 0 or index == 1:
-                if opposite.y - y < item.min_height:
-                    y = opposite.y - item.min_height
-            else:
-                if y - opposite.y < item.min_height:
-                    y = opposite.y + item.min_height
 
-        handle.x = x
-        handle.y = y
 
     def glue(self, view, item, handle, wx, wy):
         """
@@ -477,6 +469,7 @@ class HandleTool(Tool):
         view = context.view
         item, handle = self.find_handle(view, event)
         if handle:
+            self.last_x, self.last_y = event.x, event.y
             # Deselect all items unless CTRL or SHIFT is pressed
             # or the item is already selected.
             if not (event.state & (gtk.gdk.CONTROL_MASK | gtk.gdk.SHIFT_MASK)
@@ -529,12 +522,12 @@ class HandleTool(Tool):
             # positions of handles around.
             view.queue_draw_item(item)
 
-            # Calculate the distance the item has to be moved
+            dx, dy = view.transform_distance_c2w(event.x - self.last_x,
+                                                 event.y - self.last_y)
             wx, wy = view.transform_point_c2w(event.x, event.y)
-            x, y = canvas.get_matrix_w2i(item).transform_point(wx, wy)
 
             # Do the actual move:
-            self.move(view, item, handle, x, y)
+            self.move(view, item, handle, dx, dy)
             
             item.request_update()
             canvas.update_matrix(item)
@@ -543,6 +536,7 @@ class HandleTool(Tool):
                     self.glue(view, item, handle, wx, wy)
             finally:
                 pass
+            self.last_x, self.last_y = event.x, event.y
             return True
         else:
             # Make the item who's handle we hover over the hovered_item:
@@ -623,6 +617,9 @@ class PlacementTool(Tool):
         item = self._factory()
         x, y = view.transform_point_c2w(x, y)
         item.matrix.translate(x, y)
+        h = item.handles()[0]
+        h.x = x
+        h.y = y
         return item
 
     def on_button_release(self, context, event):

@@ -260,10 +260,12 @@ class BoundingBoxPainter(ItemPainter):
             for h in item.handles():
                 cairo.identity_matrix()
                 cairo.translate(*m.transform_point(h.x, h.y))
+                cairo.translate(h.x, h.y)
                 cairo.rectangle(-4, -4, 9, 9)
                 cairo.fill()
         finally:
             cairo.restore()
+
 
     def _draw_item(self, item, view, cairo, area=None):
         cairo = CairoBoundingBoxContext(cairo)
@@ -316,7 +318,7 @@ class HandlePainter(Painter):
 
             cairo.identity_matrix()
             cairo.set_antialias(ANTIALIAS_NONE)
-            cairo.translate(*m.transform_point(h.x, h.y))
+            cairo.translate(h.x, h.y)
             cairo.rectangle(-4, -4, 8, 8)
             cairo.set_source_rgba(r, g, b, opacity)
             cairo.fill_preserve()

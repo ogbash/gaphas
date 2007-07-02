@@ -466,11 +466,6 @@ class Canvas(object):
         item._canvas_matrix_w2i = Matrix(*item._canvas_matrix_i2w)
         item._canvas_matrix_w2i.invert()
 
-        # Make sure handles are marked (for constraint solving)
-        for h in item.handles():
-            h.x.dirty()
-            h.y.dirty()
-
         if recursive:
             for child in self._tree.get_children(item):
                 self.update_matrix(child)

@@ -347,24 +347,39 @@ class Element(Item):
         """
         eq = EqualsConstraint
         lt = LessThanConstraint
-        h = self._handles
+
+        handles = self._handles
+        h_nw = handles[NW]
+        h_ne = handles[NE]
+        h_sw = handles[SW]
+        h_se = handles[SE]
+
+        w, h = self.width, self.height
+        x0, y0 = self._canvas.get_matrix_i2w(self, calculate=True).transform_point(0, 0)
+        h_nw.x = x0
+        h_nw.y = y0
+        h_se.x = x0 + w
+        h_se.y = y0 + h
+
         add = self.canvas.solver.add_constraint
         self._constraints = [
-            add(eq(a=h[NW].y, b=h[NE].y)),
-            add(eq(a=h[SW].y, b=h[SE].y)),
-            add(eq(a=h[NW].x, b=h[SW].x)),
-            add(eq(a=h[NE].x, b=h[SE].x)),
-            # set h[NW] < h[SE] constraints, h[NE] and h[SW] positions will
-            # follow thanks to equality constraints above
-            # TODO: use LessThanConstraint.delta to calculate minimal size
-            add(lt(smaller=h[NW].x, bigger=h[SE].x)),
-            add(lt(smaller=h[NW].y, bigger=h[SE].y)),
-            ]
+            add(eq(a=h_nw.y, b=h_ne.y)),
+            add(eq(a=h_sw.y, b=h_se.y)),
+            add(eq(a=h_nw.x, b=h_sw.x)),
+            add(eq(a=h_ne.x, b=h_se.x)),
+            # set h_nw < h_se and h_sw < h_ne constraints
+            # with minimal size functionality
+            add(lt(smaller=h_nw.x, bigger=h_se.x, delta=10)),
+            add(lt(smaller=h_nw.y, bigger=h_se.y, delta=10)),
+            add(lt(smaller=h_sw.x, bigger=h_ne.x, delta=10)),
+            add(lt(smaller=h_ne.y, bigger=h_sw.y, delta=10)),
+        ]
 
         # Immediately solve the constraints, ensuring the box is drawn okay
-        solve_for = (h[NE].y, h[SW].y, h[SW].x, h[NE].x)
+        solve_for = (h_ne.y, h_sw.y, h_sw.x, h_ne.x)
         for c, v in zip(self._constraints, solve_for):
             c.solve_for(v)
+
         
     def teardown_canvas(self):
         """
@@ -387,56 +402,6 @@ class Element(Item):
         for c in self._constraints:
             self.canvas.solver.remove_constraint(c)
 
-
-    def pre_update(self, context):
-        """
-        Make sure handles do not overlap during movement.
-        Make sure the first handle (normally NW) is located at (0, 0).
-
-        >>> from canvas import Canvas
-        >>> c = Canvas()
-        >>> e = Element()
-        >>> c.add(e)
-        >>> e.min_width = e.min_height = 0
-        >>> c.update_now()
-        >>> e._handles
-        [<Handle object on (0, 0)>, <Handle object on (10, 0)>, <Handle object on (10, 10)>, <Handle object on (0, 10)>]
-        >>> e._handles[0].x += 1
-        >>> map(float, e._handles[0].pos)
-        [1.0, 0.0]
-        >>> e.pre_update(None)
-        >>> e._handles
-        [<Handle object on (0, 0)>, <Handle object on (9, 0)>, <Handle object on (9, 10)>, <Handle object on (-1, 10)>]
-        """
-        h_nw = self._handles[NW]
-        x, y = map(float, h_nw.pos)
-        if not x:
-            x = float(self._handles[SW].x)
-        if x:
-            self.matrix.translate(x, 0)
-            self._canvas.request_matrix_update(self)
-            h_nw.x = 0
-            for h in self._handles[1:4]:
-                h.x -= x
-        if not y:
-            y = float(self._handles[NE].y)
-        if y:
-            self.matrix.translate(0, y)
-            self._canvas.request_matrix_update(self)
-            h_nw.y = 0
-            for h in self._handles[1:4]:
-                h.y -= y
-
-        if self.width < self.min_width:
-            self.width = self.min_width
-        if self.height < self.min_height:
-            self.height = self.min_height
-
-    def update(self, context):
-        """
-        Do nothing during update.
-        """
-        pass
 
     def point(self, x, y):
         """
@@ -542,6 +507,7 @@ class Line(Item):
         """
         Setup constraints. In this case orthogonal.
         """
+        super(Line, self).setup_canvas()
         self.orthogonal = self.orthogonal
 
     def teardown_canvas(self):
@@ -698,20 +664,25 @@ class Line(Item):
         Draw the line itself.
         See Item.draw(context).
         """
+        m = self._canvas.get_matrix_w2i(self)
+
         def draw_line_end(handle, angle, draw):
             cr = context.cairo
             cr.save()
             try:
-                cr.translate(handle.x, handle.y)
+                cr.translate(*m.transform_point(handle.x, handle.y))
                 cr.rotate(angle)
                 draw(context)
             finally:
                 cr.restore()
+
         cr = context.cairo
         cr.set_line_width(self.line_width)
         draw_line_end(self._handles[0], self._head_angle, self.draw_head)
-        for h in self._handles[1:-1]:
-            cr.line_to(float(h.x), float(h.y))
+        h = self._handles[0]
+        cr.move_to(*m.transform_point(h.x, h.y))
+        for h in self._handles[1:]:
+            cr.line_to(*m.transform_point(h.x, h.y))
         h0, h1 = self._handles[-2:]
         draw_line_end(self._handles[-1], self._tail_angle, self.draw_tail)
         cr.stroke()

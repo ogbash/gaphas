@@ -24,7 +24,7 @@ import math
 import gtk
 import cairo
 from gaphas import Canvas, GtkView, View
-from gaphas.examples import Box, Text, DefaultExampleTool
+from gaphas.examples import Box, Text, FatLine, DefaultExampleTool
 from gaphas.item import Line, NW, SE
 from gaphas.tool import PlacementTool, HandleTool
 from gaphas.painter import ItemPainter
@@ -295,40 +295,58 @@ def main():
     # Add stuff to the canvas:
 
     b=MyBox()
+    h = b.handles()[0]
+    h.x = 20
+    h.y = 20
     b.min_width = 20
     b.min_height = 30
-    print 'box', b
     b.matrix=(1.0, 0.0, 0.0, 1, 20,20)
     b.width=b.height = 40
     c.add(b)
 
-    bb=Box()
-    print 'box', bb
-    bb.matrix=(1.0, 0.0, 0.0, 1, 10,10)
-    c.add(bb, parent=b)
-    #v.selected_items = bb
+    fl = FatLine()
+    h1, h2 = fl.handles()
+    h1.x = 50
+    h1.y = 50
+    fl.matrix.translate(50, 50)
+    c.add(fl)
+    fl.height = 50
+    fl.request_update()
 
-    # AJM: extra boxes:
-    bb=Box()
-    print 'box', bb
-    bb.matrix.rotate(math.pi/4.)
-    c.add(bb, parent=b)
-    for i in xrange(10):
-        bb=Box()
-        print 'box', bb
-        bb.matrix.rotate(math.pi/4.0 * i / 10.0)
-        c.add(bb, parent=b)
+#   bb=Box()
+#   print 'box', bb
+#   bb.matrix=(1.0, 0.0, 0.0, 1, 10,10)
+#   c.add(bb, parent=b)
+#   #v.selected_items = bb
+
+#   # AJM: extra boxes:
+#   bb=Box()
+#   print 'box', bb
+#   bb.matrix.rotate(math.pi/4.)
+#   c.add(bb, parent=b)
+#   for i in xrange(1):
+#       bb=Box()
+#       print 'box', bb
+#       bb.matrix.rotate(math.pi/4.0 * i / 10.0)
+#       c.add(bb, parent=b)
 
     t=MyText('Single line')
     t.matrix.translate(70,70)
     c.add(t)
 
     l=MyLine()
-    l.handles()[1].pos = (30, 30)
+    h = l.handles()
+    x, y = h[0].pos
+    h[0].x = 30
+    h[0].y = 30
+    h[1].x += h[0].x + 30
+    h[1].y += h[0].y + 30
     l.split_segment(0, 3)
     l.matrix.translate(30, 60)
+    print l, h[0].x, h[0].y, h[1].x, h[1].y
     c.add(l)
-    l.orthogonal = True
+    print l, h[0].x, h[0].y, h[1].x, h[1].y
+    #l.orthogonal = True
 
     off_y = 0
     for align_x in (-1, 0, 1):
