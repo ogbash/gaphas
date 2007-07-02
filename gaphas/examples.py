@@ -12,7 +12,7 @@ from solver import solvable
 import tool
 from constraint import BalanceConstraint, LessThanConstraint, EqualsConstraint
 from geometry import point_on_rectangle, distance_rectangle_point
-from util import text_extents, text_align, text_multiline
+from util import text_extents, text_align, text_multiline, path_ellipse
 
 class Box(Element):
     """ A Box has 4 handles (for a start):
@@ -116,6 +116,52 @@ class FatLine(Item):
         cr.set_line_width(10)
         cr.move_to(0, 0)
         cr.line_to(0, self.height)
+        cr.stroke()
+
+
+
+class Circle(Item):
+    def __init__(self):
+        super(Circle, self).__init__()
+        self._handles.extend((Handle(), Handle()))
+
+
+    def _set_radius(self, height):
+        h1, h2 = self._handles
+        return h1.y + height
+
+
+    def _get_radius(self):
+        h1, h2 = self._handles
+        return ((h2.x - h1.x) ** 2 + (h2.y - h1.y) ** 2) ** 0.5
+
+
+    radius = property(_get_radius, _set_radius)
+
+
+    def _get_pos(self):
+        h1, h2 = self._handles
+        x, y = h2.x - h1.x, h2.y - h1.y
+        if x > 0:
+            x = 0
+        if y > 0:
+            y = 0
+        return abs(x), abs(y)
+
+
+    pos = property(_get_pos)
+
+
+    def setup_canvas(self):
+        super(Circle, self).setup_canvas()
+        h1, h2 = self._handles
+        h1.movable = False
+
+
+    def draw(self, context):
+        cr = context.cairo
+        x, y = self.pos
+        path_ellipse(cr, x, y, 2 * self.radius, 2 * self.radius)
         cr.stroke()
 
 
