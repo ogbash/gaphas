@@ -126,9 +126,10 @@ class Circle(Item):
         self._handles.extend((Handle(), Handle()))
 
 
-    def _set_radius(self, height):
+    def _set_radius(self, r):
         h1, h2 = self._handles
-        h2.y = h1.y + height
+        h2.x = h1.x + r
+        h2.y = h1.y + r
 
 
     def _get_radius(self):
