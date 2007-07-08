@@ -364,21 +364,22 @@ class Canvas(object):
         Peform an update of the items that requested an update.
         """
         self._in_update = True
-        dirty_items = []
+
+        # Order the dirty items, so they are updated bottom to top
+        dirty_items = [ item for item in reversed(self._tree.nodes) \
+                             if item in self._dirty_items ]
+
         # dirty_items is a subset of dirty_matrix_items
         dirty_matrix_items = set(self._dirty_matrix_items)
         try:
             cairo_context = self._obtain_cairo_context()
 
-            # Order the dirty items, so they are updated bottom to top
-            dirty_items = ( item for item in reversed(self._tree.nodes) \
-                                 if item in self._dirty_items )
+            for item in dirty_matrix_items:
+                self._update_handles(item)
 
             context_map = dict()
             for item in dirty_items:
-                c = Context(parent=self._tree.get_parent(item),
-                            children=self._tree.get_children(item),
-                            cairo=cairo_context)
+                c = Context(cairo=cairo_context)
                 context_map[item] = c
                 try:
                     item.pre_update(c)
@@ -391,10 +392,6 @@ class Canvas(object):
 
             self._solver.solve()
 
-            # Order the dirty items, so they are updated bottom to top
-            dirty_items = ( item for item in reversed(self._tree.nodes) \
-                                 if item in self._dirty_items )
-
             dirty_matrix_items.update(self._dirty_matrix_items)
             self.update_matrices()
 
@@ -402,9 +399,7 @@ class Canvas(object):
                 try:
                     c = context_map[item]
                 except KeyError:
-                    c = Context(parent=self._tree.get_parent(item),
-                                children=self._tree.get_children(item),
-                                cairo=cairo_context)
+                    c = Context(cairo=cairo_context)
                 try:
                     item.update(c)
                 except Exception, e:
@@ -474,10 +469,52 @@ class Canvas(object):
         for h in item.handles():
             request_resolve(h.x)
             request_resolve(h.y)
+            
 
         if recursive:
             for child in self._tree.get_children(item):
                 self.update_matrix(child)
+
+    def _update_handles(self, item):
+        """
+        Update handle positions so the first handle is always located at (0, 0).
+
+        >>> from item import Element
+        >>> c = Canvas()
+        >>> e = Element()
+        >>> c.add(e)
+        >>> e.min_width = e.min_height = 0
+        >>> c.update_now()
+        >>> e.handles()
+        [<Handle object on (0, 0)>, <Handle object on (10, 0)>, <Handle object on (10, 10)>, <Handle object on (0, 10)>]
+
+        >>> e.handles()[0].x += 1
+        >>> map(float, e.handles()[0].pos)
+        [1.0, 0.0]
+        >>> c._update_handles(e)
+        >>> e.handles()
+        [<Handle object on (0, 0)>, <Handle object on (9, 0)>, <Handle object on (9, 10)>, <Handle object on (-1, 10)>]
+
+        >>> e.handles()[0].x += 1
+        >>> e.handles()
+        [<Handle object on (1, 0)>, <Handle object on (9, 0)>, <Handle object on (9, 10)>, <Handle object on (-1, 10)>]
+        >>> c._update_handles(e)
+        >>> e.handles()
+        [<Handle object on (0, 0)>, <Handle object on (8, 0)>, <Handle object on (8, 10)>, <Handle object on (-2, 10)>]
+
+        """
+        handles = item.handles()
+        if not handles:
+            return
+        x, y = map(float, handles[0].pos)
+        if x:
+            item.matrix.translate(x, 0)
+            for h in handles:
+                h.x._value -= x
+        if y:
+            item.matrix.translate(0, y)
+            for h in handles:
+                h.y -= y
 
     def register_view(self, view):
         """

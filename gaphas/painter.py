@@ -80,7 +80,7 @@ class DrawContext(Context):
         Extra helper method for drawing child items from within
         the Item.draw() method.
         """
-        self.painter._draw_items(self.children,
+        self.painter._draw_items(self._item.canvas.get_children(self._item),
                                  self.view,
                                  self.cairo,
                                  self._area)
@@ -100,8 +100,7 @@ class ItemPainter(Painter):
                                   view=view,
                                   cairo=cairo,
                                   _area=area,
-                                  parent=view.canvas.get_parent(item),
-                                  children=view.canvas.get_children(item),
+                                  _item=item,
                                   selected=(item in view.selected_items),
                                   focused=(item is view.focused_item),
                                   hovered=(item is view.hovered_item),
@@ -270,8 +269,18 @@ class BoundingBoxPainter(ItemPainter):
     def _draw_item(self, item, view, cairo, area=None):
         cairo = CairoBoundingBoxContext(cairo)
         super(BoundingBoxPainter, self)._draw_item(item, view, cairo)
-        self._draw_handles(item, view, cairo)
-        view.set_item_bounding_box(item, cairo.get_bounds())
+        bounds = cairo.get_bounds()
+  
+        # Update bounding box with handles.
+        #transform_i2c = (view.canvas.get_matrix_i2w(item) * view._matrix).transform_point
+        transform_i2c = view.canvas.get_matrix_i2w(item).transform_point
+        for h in item.handles():
+            cx, cy = transform_i2c(h.x, h.y)
+            bounds += (cx - 5, cy - 5, 9, 9)
+
+        bounds.expand(1)
+        view.set_item_bounding_box(item, bounds)
+
 
     def _draw_items(self, items, view, cairo, area=None):
         """

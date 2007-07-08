@@ -176,6 +176,14 @@ def main():
         bb.matrix.rotate(math.pi/4.0 * i / 10.0)
         c.add(bb, parent=b)
 
+    for i in range(count):
+        bb = MyBox()
+        bb.width = bb.height = 15
+        x = int(i % 4) * 20
+        y = int(i / 4) * 20
+        bb.matrix.translate(5 + x, 100 + y)
+        c.add(bb)
+
     t=MyText('Single line')
     t.matrix.translate(70,70)
     c.add(t)

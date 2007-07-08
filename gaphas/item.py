@@ -9,7 +9,7 @@ from math import atan2
 
 from matrix import Matrix
 from geometry import distance_line_point, distance_rectangle_point
-from solver import solvable, WEAK, NORMAL, STRONG
+from solver import solvable, WEAK, NORMAL, STRONG, VERY_STRONG
 from constraint import EqualsConstraint, LessThanConstraint
 from state import observed, reversible_pair, reversible_property, disable_dispatching
 
@@ -236,7 +236,7 @@ class Element(Item):
 
     def __init__(self, width=10, height=10):
         super(Element, self).__init__()
-        self._handles = [ h(strength=STRONG) for h in [Handle]*4 ]
+        self._handles = [ h(strength=VERY_STRONG) for h in [Handle]*4 ]
         self._constraints = []
         self._min_width = 10
         self._min_height = 10
@@ -250,9 +250,9 @@ class Element(Item):
         >>> b.width
         20.0
         >>> b._handles[NW].x
-        Variable(0, 30)
+        Variable(0, 40)
         >>> b._handles[SE].x
-        Variable(20, 30)
+        Variable(20, 40)
         """
         if width < self.min_width:
             width = self.min_width
@@ -279,9 +279,9 @@ class Element(Item):
         >>> b.height
         10.0
         >>> b._handles[NW].y
-        Variable(0, 30)
+        Variable(0, 40)
         >>> b._handles[SE].y
-        Variable(10, 30)
+        Variable(10, 40)
         """
         if height < self.min_height:
             height = self.min_height
@@ -328,12 +328,12 @@ class Element(Item):
         >>> b.canvas is c
         True
         >>> len(c.solver._constraints)
-        6
+        8
         >>> len(c.solver._marked_cons)
         0
         >>> c.solver.solve()
         >>> len(c.solver._constraints)
-        6
+        8
         >>> len(c.solver._marked_cons)
         0
         >>> b._handles[SE].pos = (25,30)
@@ -386,7 +386,7 @@ class Element(Item):
         >>> b.canvas is c
         True
         >>> len(c.solver._constraints)
-        6
+        8
         >>> b.teardown_canvas()
         >>> len(c.solver._constraints)
         0

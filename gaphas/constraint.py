@@ -125,6 +125,40 @@ class EqualsConstraint(Constraint):
             self.b.value = self.a.value
 
 
+class CenterConstraint(Constraint):
+    """
+    Simple Constraint, takes three arguments: 'a', 'b' and center.
+    When solved, the constraint ensures 'center' is located in the middle
+    of 'a' and 'b'.
+
+    >>> from solver import Variable
+    >>> a, b, center = Variable(1.0), Variable(3.0), Variable()
+    >>> eq = CenterConstraint(a, b, center)
+    >>> eq.solve_for(a)
+    >>> a
+    Variable(1, 20)
+    >>> center
+    Variable(2, 20)
+    >>> a.value = 10
+    >>> eq.solve_for(b)
+    >>> b
+    Variable(3, 20)
+    >>> center
+    Variable(6.5, 20)
+    """
+
+    def __init__(self, a=None, b=None, center=None):
+        super(CenterConstraint, self).__init__(a, b, center)
+        self.a = a
+        self.b = b
+        self.center = center
+
+    def solve_for(self, var):
+        assert var in (self.a, self.b, self.center)
+
+        self.center.value = (self.a.value + self.b.value) / 2.0
+
+
 class LessThanConstraint(Constraint):
     """
     Ensure @smaller is less than @bigger. The variable that is passed
@@ -346,6 +380,53 @@ class BalanceConstraint(Constraint):
         b1, b2 = self.band
         w = b2 - b1
         var.value = b1 + w * self.balance
+
+
+
+class BalanceConstraint(Constraint):
+    """
+    Ensure that a variable @v is between values specified by @band
+    and in distance proportional from @band[0].
+
+    Consider
+    >>> from solver import Variable, WEAK
+    >>> a, b, c = Variable(2.0), Variable(3.0), Variable(2.3, WEAK)
+    >>> bc = BalanceConstraint(band=(a,b), v=c)
+    >>> c.value = 2.4
+    >>> c
+    Variable(2.4, 10)
+    >>> bc.solve_for(c)
+    >>> a, b, c
+    (Variable(2, 20), Variable(3, 20), Variable(2.3, 10))
+
+    Band does not have to be band[0] < band[1]
+    >>> a, b, c = Variable(3.0), Variable(2.0), Variable(2.45, WEAK)
+    >>> bc = BalanceConstraint(band=(a,b), v=c)
+    >>> c.value = 2.50
+    >>> c
+    Variable(2.5, 10)
+    >>> bc.solve_for(c)
+    >>> a, b, c
+    (Variable(3, 20), Variable(2, 20), Variable(2.45, 10))
+    """
+
+    def __init__(self, band=None, v=None):
+        super(BalanceConstraint, self).__init__(band[0], band[1], v)
+        self.band = band
+        b1, b2 = self.band
+        w = b2 - b1
+        if w != 0:
+            self.balance = (v - b1) / w
+        else:
+            self.balance = 0
+        self.v = v
+
+
+    def solve_for(self, var):
+        b1, b2 = self.band
+        w = b2 - b1
+        var.value = b1 + w * self.balance
+
 
 
 if __name__ == '__main__':

@@ -376,13 +376,15 @@ class HandleTool(Tool):
         """
         Find item's handle at (event.x, event.y)
         """
+        transform_point = view.canvas.get_matrix_i2w(item).transform_point
+        e_x, e_y = view.transform_point_c2w(event.x, event.y)
+        dx, dy = view.transform_distance_c2w(6, 6)
         for h in item.handles():
             if not h.movable:
                 continue
-            #wx, wy = view.canvas.get_matrix_i2w(item).transform_point(h.x, h.y)
+            #wx, wy = transform_point(h.x, h.y)
             wx, wy = h.x, h.y
-            x, y = view.transform_point_w2c(wx, wy)
-            if abs(x - event.x) < 6 and abs(y - event.y) < 6:
+            if -dx < (wx - e_x) < dx and -dy < (wy - e_y) < dy:
                 return h
         return None
 
@@ -530,7 +532,7 @@ class HandleTool(Tool):
             self.move(view, item, handle, dx, dy)
             
             item.request_update()
-            canvas.update_matrix(item)
+            #canvas.update_matrix(item)
             try:
                 if self._grabbed_handle.connectable:
                     self.glue(view, item, handle, wx, wy)

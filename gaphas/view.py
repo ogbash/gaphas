@@ -389,6 +389,11 @@ class GtkView(gtk.DrawingArea, View):
         self._tool = DefaultTool()
         self.canvas = canvas
 
+        # Set background to white.
+        self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse('#FFF'))
+
+        self._update_bounding_box = set()
+
     def emit(self, *args, **kwargs):
         """
         Delegate signal emissions to the DrawingArea (=GTK+)
@@ -490,6 +495,10 @@ class GtkView(gtk.DrawingArea, View):
                                 canvas_size=h,
                                 viewport_size=allocation.height)
 
+    @async(single=False, priority=PRIORITY_HIGH_IDLE)
+    def _idle_queue_draw_item(self, *items):
+        self.queue_draw_item(*items)
+
     def queue_draw_item(self, *items):
         """
         Like DrawingArea.queue_draw_area, but use the bounds of the
@@ -503,11 +512,6 @@ class GtkView(gtk.DrawingArea, View):
                 queue_draw_area(*get_item_bounding_box(item))
             except KeyError:
                 pass # No bounds calculated yet? bummer.
-            #else:
-            #    #self.queue_draw_area(b.x - 1, b.y - 1,
-            #    #                     b.width + 2, b.height + 2)
-            #    self.queue_draw_area(b.x, b.y,
-            #                         b.width, b.height)
 
     def queue_draw_area(self, x, y, w, h):
         """
@@ -544,8 +548,6 @@ class GtkView(gtk.DrawingArea, View):
 
         # Do not update items that require a full update (or are removed)
         dirty_matrix_items = dirty_matrix_items.difference(dirty_items)
-        #dirty_items.update(dirty_matrix_items)
-        #dirty_matrix_items.clear()
 
         removed_items = dirty_items.difference(self._canvas.get_all_items())
         
@@ -582,17 +584,10 @@ class GtkView(gtk.DrawingArea, View):
             if self.dropzone_item in removed_items:
                 self.dropzone_item = None
 
-            # Pseudo-draw
-            cr = self.window.cairo_create()
-            cr.rectangle(0,0,0,0)
-            cr.clip()
-
-            self.update_bounding_box(cr, dirty_items)
-
-            for i in dirty_items:
-                self.queue_draw_item(i)
-
             self.update_adjustments()
+
+            self._update_bounding_box.update(dirty_items)
+
         finally:
             self._dirty_items.clear()
             self._dirty_matrix_items.clear()
@@ -622,14 +617,26 @@ class GtkView(gtk.DrawingArea, View):
 
         area = event.area
         x, y, w, h = area.x, area.y, area.width, area.height
-        self.window.draw_rectangle(self.style.white_gc, True,
-                                   x, y, w, h)
-
         cr = self.window.cairo_create()
 
         # Draw no more than nessesary.
         cr.rectangle(x, y, w, h)
+        #print 'clip to', x, y, w, h
         cr.clip()
+
+        update_bounding_box = self._update_bounding_box
+        if update_bounding_box:
+            try:
+                cr.save()
+                cr.rectangle(0, 0, 0, 0)
+                cr.clip()
+                try:
+                    self.update_bounding_box(cr, update_bounding_box)
+                finally:
+                    cr.restore()
+                self._idle_queue_draw_item(*update_bounding_box)
+            finally:
+                update_bounding_box.clear()
 
         self._painter.paint(Context(view=self,
                                     cairo=cr,
