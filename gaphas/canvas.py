@@ -6,12 +6,13 @@ and a constraint solver.
 __version__ = "$Revision$"
 # $HeadURL$
 
+from weakref import WeakKeyDictionary
 
 import cairo
 from cairo import Matrix
 from gaphas import tree
 from gaphas import solver
-from gaphas.decorators import async, PRIORITY_HIGH_IDLE
+from gaphas.decorators import nonrecursive, async, PRIORITY_HIGH_IDLE
 from state import observed, reversible_method, reversible_pair
 
 
@@ -35,9 +36,30 @@ class Context(object):
         raise AttributeError, 'context is not writable'
 
 
+class ViewBucket(object):
+    __slots__ = ('matrix_v2i', 'matrix_i2v', 'handles')
+    def __init__(self):
+        self.matrix_v2i = None
+        self.matrix_i2v = None
+        self.handles = []
+
+
+class CanvasBucket(object):
+    __slots__ = ('matrix_c2i', 'matrix_i2c', 'view', 'handles')
+    def __init__(self):
+        self.matrix_c2i = None
+        self.matrix_i2c = None
+        self.view = {}
+        self.handles = []
+
+
+
 class Canvas(object):
     """
     Container class for Items.
+
+    Attributes:
+     - _cache: additional cache of item data
     """
 
     def __init__(self):
@@ -45,9 +67,9 @@ class Canvas(object):
         self._solver = solver.Solver()
         self._dirty_items = set()
         self._dirty_matrix_items = set()
-        self._in_update = False
 
         self._registered_views = set()
+        self._cache = WeakKeyDictionary()
 
     solver = property(lambda s: s._solver)
 
@@ -68,8 +90,15 @@ class Canvas(object):
         assert item not in self._tree.nodes, 'Adding already added node %s' % item
         item.canvas = self
         self._tree.add(item, parent)
+
+        self._cache[item] = CanvasBucket()
+        for v in self._registered_views:
+            self._cache[item].view[v] = ViewBucket()
+            v.update_matrix(item)
+
         self.request_update(item)
         self._update_views((item,))
+
 
     @observed
     def remove(self, item):
@@ -258,7 +287,7 @@ class Canvas(object):
                     connected_items.add((i, h))
         return connected_items
 
-    def get_matrix_i2w(self, item, calculate=False):
+    def get_matrix_i2c(self, item, calculate=False):
         """
         Get the Item to World matrix for @item.
 
@@ -268,30 +297,22 @@ class Canvas(object):
               in stead of raising an AttributeError when no matrix is present
               yet. Note that out-of-date matrices are not recalculated.
         """
-        try:
-            return item._canvas_matrix_i2w
-        except AttributeError, e:
-            if calculate:
-                self.update_matrix(item, recursive=False)
-                return item._canvas_matrix_i2w
-            else:
-                self.request_matrix_update(item)
-                raise e
+        data = self._cache[item]
+        if data.matrix_i2c is None or calculate:
+            self.update_matrix(item, recursive=False)
+        return data.matrix_i2c
 
-    def get_matrix_w2i(self, item, calculate=False):
+
+    def get_matrix_c2i(self, item, calculate=False):
         """
         Get the World to Item matrix for @item.
         See get_matrix_i2w().
         """
-        try:
-            return item._canvas_matrix_w2i
-        except AttributeError, e:
-            if calculate:
-                self.update_matrix(item, recursive=False)
-                return item._canvas_matrix_w2i
-            else:
-                self.request_matrix_update(item)
-                raise e
+        data = self._cache[item]
+        if data.matrix_c2i is None or calculate:
+            self.update_matrix(item, recursive=False)
+        return data.matrix_c2i
+
 
     @observed
     def request_update(self, item):
@@ -356,15 +377,13 @@ class Canvas(object):
         Update the canvas, if called from within a gtk-mainloop, the
         update job is scheduled as idle job.
         """
-        if not self._in_update:
-            self.update_now()
+        self.update_now()
 
+    @nonrecursive
     def update_now(self):
         """
         Peform an update of the items that requested an update.
         """
-        self._in_update = True
-
         # Order the dirty items, so they are updated bottom to top
         dirty_items = [ item for item in reversed(self._tree.nodes) \
                              if item in self._dirty_items ]
@@ -395,6 +414,11 @@ class Canvas(object):
             dirty_matrix_items.update(self._dirty_matrix_items)
             self.update_matrices()
 
+            # Also need to set up the dirty_items list here, since items
+            # may be marked as dirty during maxtrix update or solving.
+            dirty_items = [ item for item in reversed(self._tree.nodes) \
+                                 if item in self._dirty_items ]
+
             for item in dirty_items:
                 try:
                     c = context_map[item]
@@ -410,7 +434,6 @@ class Canvas(object):
         finally:
             self._update_views(self._dirty_items, dirty_matrix_items)
             self._dirty_items.clear()
-            self._in_update = False
 
     def update_matrices(self):
         """
@@ -449,20 +472,23 @@ class Canvas(object):
         # First remove from the to-be-updated set.
         self._dirty_matrix_items.discard(item)
 
+        data = self._cache[item]
         if parent:
             if parent in self._dirty_matrix_items:
                 # Parent takes care of updating the child, including current
                 self.update_matrix(parent)
                 return
             else:
-                item._canvas_matrix_i2w = Matrix(*item.matrix)
-                item._canvas_matrix_i2w *= parent._canvas_matrix_i2w
+                data.matrix_i2c = Matrix(*item.matrix)
+                data.matrix_i2c *= self.get_matrix_i2c(parent)
         else:
-            item._canvas_matrix_i2w = Matrix(*item.matrix)
+            data.matrix_i2c = Matrix(*item.matrix)
 
         # It's nice to have the W2I matrix present too:
-        item._canvas_matrix_w2i = Matrix(*item._canvas_matrix_i2w)
-        item._canvas_matrix_w2i.invert()
+        data.matrix_c2i = Matrix(*data.matrix_i2c)
+        data.matrix_c2i.invert()
+        for v in self._registered_views:
+            v.update_matrix(item)
 
         # Make sure handles are marked (for constraint solving)
         request_resolve = self._solver.request_resolve
@@ -470,10 +496,10 @@ class Canvas(object):
             request_resolve(h.x)
             request_resolve(h.y)
             
-
         if recursive:
             for child in self._tree.get_children(item):
                 self.update_matrix(child)
+
 
     def _update_handles(self, item):
         """
@@ -514,7 +540,8 @@ class Canvas(object):
         if y:
             item.matrix.translate(0, y)
             for h in handles:
-                h.y -= y
+                h.y._value -= y
+
 
     def register_view(self, view):
         """
@@ -522,6 +549,11 @@ class Canvas(object):
         a canvas on a view and should not be called directly from user code.
         """
         self._registered_views.add(view)
+        for item in self.get_all_items():
+            data = ViewBucket()
+            self._cache[item].view[view] = data
+            view.update_matrix(item)
+
 
     def unregister_view(self, view):
         """

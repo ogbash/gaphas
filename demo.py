@@ -320,10 +320,10 @@ def main():
 #   #v.selected_items = bb
 
 #   # AJM: extra boxes:
-#   bb=Box()
-#   print 'box', bb
-#   bb.matrix.rotate(math.pi/4.)
-#   c.add(bb, parent=b)
+    bb=Box()
+    print 'box', bb
+    bb.matrix.rotate(math.pi/4.)
+    c.add(bb, parent=b)
 #   for i in xrange(1):
 #       bb=Box()
 #       print 'box', bb
@@ -335,12 +335,6 @@ def main():
     c.add(t)
 
     l=MyLine()
-    h = l.handles()
-    x, y = h[0].pos
-    h[0].x = 30
-    h[0].y = 30
-    h[1].x += h[0].x + 30
-    h[1].y += h[0].y + 30
     l.split_segment(0, 3)
     l.matrix.translate(30, 30)
     c.add(l)

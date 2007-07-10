@@ -357,15 +357,15 @@ class Element(Item):
         add = self.canvas.solver.add_constraint
         self._constraints = [
             add(eq(a=h_nw.y, b=h_ne.y)),
-            add(eq(a=h_sw.y, b=h_se.y)),
             add(eq(a=h_nw.x, b=h_sw.x)),
-            add(eq(a=h_ne.x, b=h_se.x)),
+            add(eq(a=h_se.y, b=h_sw.y)),
+            add(eq(a=h_se.x, b=h_ne.x)),
             # set h_nw < h_se and h_sw < h_ne constraints
             # with minimal size functionality
-            add(lt(smaller=h_nw.x, bigger=h_se.x, delta=10)),
-            add(lt(smaller=h_nw.y, bigger=h_se.y, delta=10)),
-            add(lt(smaller=h_sw.x, bigger=h_ne.x, delta=10)),
-            add(lt(smaller=h_ne.y, bigger=h_sw.y, delta=10)),
+            add(lt(smaller=h_nw.y, bigger=h_se.y, delta=30)),
+#            add(lt(smaller=h_ne.y, bigger=h_sw.y, delta=30)),
+            add(lt(smaller=h_nw.x, bigger=h_se.x, delta=30)),
+#            add(lt(smaller=h_sw.x, bigger=h_ne.x, delta=30)),
         ]
 
         # Immediately solve the constraints, ensuring the box is drawn okay
@@ -657,13 +657,11 @@ class Line(Item):
         Draw the line itself.
         See Item.draw(context).
         """
-        m = self._canvas.get_matrix_w2i(self)
-
         def draw_line_end(handle, angle, draw):
             cr = context.cairo
             cr.save()
             try:
-                cr.translate(*m.transform_point(handle.x, handle.y))
+                cr.translate(handle.x, handle.y)
                 cr.rotate(angle)
                 draw(context)
             finally:
@@ -673,9 +671,9 @@ class Line(Item):
         cr.set_line_width(self.line_width)
         draw_line_end(self._handles[0], self._head_angle, self.draw_head)
         h = self._handles[0]
-        cr.move_to(*m.transform_point(h.x, h.y))
+        cr.move_to(h.x, h.y)
         for h in self._handles[1:]:
-            cr.line_to(*m.transform_point(h.x, h.y))
+            cr.line_to(h.x, h.y)
         h0, h1 = self._handles[-2:]
         draw_line_end(self._handles[-1], self._tail_angle, self.draw_tail)
         cr.stroke()

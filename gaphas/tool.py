@@ -329,18 +329,13 @@ class ItemTool(Tool):
             view.queue_draw_item(*self._movable_items)
 
             # Calculate the distance the item has to be moved
-            dx, dy = view.transform_distance_c2w(event.x - self.last_x,
-                                                 event.y - self.last_y)
-
-            get_matrix_w2i = canvas.get_matrix_w2i
+            dx, dy = event.x - self.last_x, event.y - self.last_y
 
             # Now do the actual moving.
             for i in self._movable_items:
                 # Move the item and schedule it for an update
-                i.matrix.translate(*get_matrix_w2i(i).transform_distance(dx, dy))
-                for h in i.handles():
-                    h.x += dx
-                    h.y += dy
+                v2i = view.get_matrix_v2i(i)
+                i.matrix.translate(*v2i.transform_distance(dx, dy))
                 canvas.request_matrix_update(i)
 
             self.last_x, self.last_y = event.x, event.y
@@ -376,15 +371,13 @@ class HandleTool(Tool):
         """
         Find item's handle at (event.x, event.y)
         """
-        transform_point = view.canvas.get_matrix_i2w(item).transform_point
-        e_x, e_y = view.transform_point_c2w(event.x, event.y)
-        dx, dy = view.transform_distance_c2w(6, 6)
+        i2v = view.get_matrix_i2v(item).transform_point
+        x, y = event.x, event.y
         for h in item.handles():
             if not h.movable:
                 continue
-            #wx, wy = transform_point(h.x, h.y)
-            wx, wy = h.x, h.y
-            if -dx < (wx - e_x) < dx and -dy < (wy - e_y) < dy:
+            wx, wy = i2v(h.x, h.y)
+            if -6 < (wx - x) < 6 and -6 < (wy - y) < 6:
                 return h
         return None
 
@@ -431,19 +424,10 @@ class HandleTool(Tool):
 
     def move(self, view, item, handle, x, y):
         """
-        Move the handle to position (x,y). If handle changed the position
-        of an item, then move the item, too.
+        Move the handle to position (x,y).
         """
-        handle.x += x
-        handle.y += y
-
-        # calculate current position
-        matrix_w2i = view.canvas.get_matrix_w2i(item)
-        x1 = min(h.x for h in item.handles())
-        y1 = min(h.y for h in item.handles())
-        dx, dy = matrix_w2i.transform_point(x1, y1)
-        item.matrix.translate(dx, dy)
-
+        handle.x = x
+        handle.y = y
 
 
     def glue(self, view, item, handle, wx, wy):
@@ -471,7 +455,6 @@ class HandleTool(Tool):
         view = context.view
         item, handle = self.find_handle(view, event)
         if handle:
-            self.last_x, self.last_y = event.x, event.y
             # Deselect all items unless CTRL or SHIFT is pressed
             # or the item is already selected.
             if not (event.state & (gtk.gdk.CONTROL_MASK | gtk.gdk.SHIFT_MASK)
@@ -524,21 +507,19 @@ class HandleTool(Tool):
             # positions of handles around.
             view.queue_draw_item(item)
 
-            dx, dy = view.transform_distance_c2w(event.x - self.last_x,
-                                                 event.y - self.last_y)
-            wx, wy = view.transform_point_c2w(event.x, event.y)
+            v2i = view.get_matrix_v2i(item)
+            x, y = v2i.transform_point(event.x, event.y)
 
             # Do the actual move:
-            self.move(view, item, handle, dx, dy)
+            self.move(view, item, handle, x, y)
             
             item.request_update()
             #canvas.update_matrix(item)
             try:
                 if self._grabbed_handle.connectable:
-                    self.glue(view, item, handle, wx, wy)
+                    self.glue(view, item, handle, x, y)
             finally:
                 pass
-            self.last_x, self.last_y = event.x, event.y
             return True
         else:
             # Make the item who's handle we hover over the hovered_item:
@@ -619,9 +600,6 @@ class PlacementTool(Tool):
         item = self._factory()
         x, y = view.transform_point_c2w(x, y)
         item.matrix.translate(x, y)
-        h = item.handles()[0]
-        h.x = x
-        h.y = y
         return item
 
     def on_button_release(self, context, event):
