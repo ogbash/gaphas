@@ -238,10 +238,18 @@ class Element(Item):
         super(Element, self).__init__()
         self._handles = [ h(strength=VERY_STRONG) for h in [Handle]*4 ]
         self._constraints = []
-        self._min_width = 10
-        self._min_height = 10
+
+        # create minimal size constraints
+        handles = self._handles
+        h_nw = handles[NW]
+        h_se = handles[SE]
+        self._c_min_w = LessThanConstraint(smaller=h_nw.y, bigger=h_se.y, delta=10)
+        self._c_min_h = LessThanConstraint(smaller=h_nw.x, bigger=h_se.x, delta=10)
+
+        # set width/height when minimal size constraints exist
         self.width = width
         self.height = height
+
 
     def _set_width(self, width):
         """
@@ -300,22 +308,32 @@ class Element(Item):
     @observed
     def _set_min_width(self, min_width):
         """
+        Set minimal width.
         """
-        self._min_width = max(0, min_width)
+        if min_width < 0:
+            raise ValueError, 'Minimal width cannot be less than 0'
+
+        self._c_min_w.delta = min_width
+
         if min_width > self.width:
             self.width = min_width
 
-    min_width = reversible_property(lambda s: s._min_width, _set_min_width)
+    min_width = reversible_property(lambda s: s._c_min_w.delta, _set_min_width)
 
     @observed
     def _set_min_height(self, min_height):
         """
+        Set minimal height.
         """
-        self._min_height = max(0, min_height)
+        if min_height < 0:
+            raise ValueError, 'Minimal height cannot be less than 0'
+
+        self._c_min_h.delta = min_height
+
         if min_height > self.height:
             self.height = min_height
 
-    min_height = reversible_property(lambda s: s._min_height, _set_min_height)
+    min_height = reversible_property(lambda s: s._c_min_h.delta, _set_min_height)
 
     def setup_canvas(self):
         """
@@ -360,10 +378,10 @@ class Element(Item):
             add(eq(a=h_nw.x, b=h_sw.x)),
             add(eq(a=h_se.y, b=h_sw.y)),
             add(eq(a=h_se.x, b=h_ne.x)),
-            # set h_nw < h_se constraint
+            # set h_nw < h_se constraints
             # with minimal size functionality
-            add(lt(smaller=h_nw.y, bigger=h_se.y, delta=10)),
-            add(lt(smaller=h_nw.x, bigger=h_se.x, delta=10)),
+            add(self._c_min_w),
+            add(self._c_min_h),
         ]
 
         # Immediately solve the constraints, ensuring the box is drawn okay
