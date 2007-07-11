@@ -477,8 +477,8 @@ class HandleTool(Tool):
         # queue extra redraw to make sure the item is drawn properly
         try:
             view = context.view
-            wx, wy = view.transform_point_c2w(event.x, event.y)
             if self._grabbed_handle and self._grabbed_handle.connectable:
+                wx, wy = view.get_matrix_v2i(self._grabbed_item).transform_point(event.x, event.y)
                 self.connect(view, self._grabbed_item, self._grabbed_handle, wx, wy)
         finally:
             # Decrement handle strength, previously incremented on button press
