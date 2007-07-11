@@ -254,7 +254,6 @@ class BoundingBoxPainter(ItemPainter):
 
         # Update bounding box with handles.
         i2v = view.get_matrix_i2v(item).transform_point
-        i2v = (view.canvas.get_matrix_i2c(item) * view._matrix).transform_point
         for h in item.handles():
             cx, cy = i2v(h.x, h.y)
             bounds += (cx - 5, cy - 5, 9, 9)
