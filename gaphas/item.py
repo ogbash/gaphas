@@ -360,12 +360,10 @@ class Element(Item):
             add(eq(a=h_nw.x, b=h_sw.x)),
             add(eq(a=h_se.y, b=h_sw.y)),
             add(eq(a=h_se.x, b=h_ne.x)),
-            # set h_nw < h_se and h_sw < h_ne constraints
+            # set h_nw < h_se constraint
             # with minimal size functionality
-            add(lt(smaller=h_nw.y, bigger=h_se.y, delta=30)),
-#            add(lt(smaller=h_ne.y, bigger=h_sw.y, delta=30)),
-            add(lt(smaller=h_nw.x, bigger=h_se.x, delta=30)),
-#            add(lt(smaller=h_sw.x, bigger=h_ne.x, delta=30)),
+            add(lt(smaller=h_nw.y, bigger=h_se.y, delta=10)),
+            add(lt(smaller=h_nw.x, bigger=h_se.x, delta=10)),
         ]
 
         # Immediately solve the constraints, ensuring the box is drawn okay

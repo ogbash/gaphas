@@ -342,7 +342,7 @@ class Solver(object):
                     if c in self._marked_cons:
                         self._marked_cons.remove(c)
                     self._marked_cons.append(c)
-                elif c not in self._marked_cons:
+                else:
                     self._marked_cons.append(c)
 
     def request_resolve(self, variable):

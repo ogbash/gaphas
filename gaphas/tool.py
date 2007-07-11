@@ -362,10 +362,6 @@ class HandleTool(Tool):
         self._grabbed_item = item
         self._grabbed_handle = handle
 
-        # Increment handle strength for the duration of the grab action
-        self._grabbed_handle.x.strength += 1
-        self._grabbed_handle.y.strength += 1
-
 
     def _find_handle(self, view, event, item):
         """
@@ -481,10 +477,6 @@ class HandleTool(Tool):
                 wx, wy = view.get_matrix_v2i(self._grabbed_item).transform_point(event.x, event.y)
                 self.connect(view, self._grabbed_item, self._grabbed_handle, wx, wy)
         finally:
-            # Decrement handle strength, previously incremented on button press
-            if self._grabbed_handle:
-                self._grabbed_handle.x.strength -= 1
-                self._grabbed_handle.y.strength -= 1
             context.view.queue_draw_item(context.view.hovered_item)
             context.ungrab()
         if self._grabbed_handle:

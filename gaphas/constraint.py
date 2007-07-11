@@ -119,10 +119,11 @@ class EqualsConstraint(Constraint):
     def solve_for(self, var):
         assert var in (self.a, self.b)
 
-        if var is self.a:
-            self.a.value = self.b.value
-        else:
-            self.b.value = self.a.value
+        if self.a.value != self.b.value:
+            if var is self.a:
+                self.a.value = self.b.value
+            else:
+                self.b.value = self.a.value
 
 
 class CenterConstraint(Constraint):
