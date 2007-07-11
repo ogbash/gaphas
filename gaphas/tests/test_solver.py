@@ -6,7 +6,8 @@ import unittest
 from timeit import Timer
 
 from gaphas.solver import Solver, Variable
-from gaphas.constraint import EquationConstraint
+from gaphas.constraint import EquationConstraint, EqualsConstraint, \
+    LessThanConstraint
 
 
 SETUP = """
