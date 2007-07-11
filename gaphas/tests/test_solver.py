@@ -98,11 +98,9 @@ class SizeTestCase(unittest.TestCase):
         v2 = Variable(10)
         v3 = Variable(10)
         c1 = EqualsConstraint(a=v2, b=v3)
-        c3 = EqualsConstraint(a=v3, b=v2)
         c2 = LessThanConstraint(smaller=v1, bigger=v3, delta=10)
         solver.add_constraint(c1)
         solver.add_constraint(c2)
-        #solver.add_constraint(c3)
 
         # check everyting is ok on start
         solver.solve()
