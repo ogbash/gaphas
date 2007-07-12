@@ -84,13 +84,10 @@ def create_window(canvas, title, zoom=1.0):
     def on_clicked(button):
         global movable_item
         item = movable_item
-        handles = item.handles()
         import time
         t1 = time.time()
         for i in range(20):
-            for h in handles:
-                h.x += 1
-                h.y += 1
+            item.matrix.translate(1, 1)
             item.request_update()
             canvas.update_matrix(item)
             # visualize each event:
@@ -213,6 +210,8 @@ def main():
 
 if __name__ == '__main__':
     import hotshot, hotshot.stats
+    import gc
+    gc.set_debug(gc.DEBUG_COLLECTABLE)
     prof = hotshot.Profile('demo-gaphas.prof')
     prof.runcall(main)
     prof.close()
