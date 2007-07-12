@@ -27,7 +27,8 @@ class Box(Element):
     def draw(self, context):
         #print 'Box.draw', self
         c = context.cairo
-        c.rectangle(0, 0, self.width, self.height)
+        nw = self._handles[NW]
+        c.rectangle(nw.x, nw.y, self.width, self.height)
         if context.hovered:
             c.set_source_rgba(.8,.8,1, .8)
         else:
