@@ -236,9 +236,9 @@ class View(object):
         # since items should take into account their child objects when
         # bounding boxes are calculated. Now, the child objects should not
         # be hindered by their own matrix settings.
-        c2i = self._canvas.get_matrix_c2i(item).transform_point
-        ix0, iy0 = c2i(bounds.x, bounds.y)
-        ix1, iy1 = c2i(bounds.x1, bounds.y1)
+        v2i = self.get_matrix_v2i(item).transform_point
+        ix0, iy0 = v2i(bounds.x, bounds.y)
+        ix1, iy1 = v2i(bounds.x1, bounds.y1)
         self._item_bounds[item] = bounds, Rectangle(ix0, iy0, x1=ix1, y1=iy1)
 
         # Update bounding box of parent items where appropriate (only extent)
@@ -537,9 +537,9 @@ class GtkView(gtk.DrawingArea, View):
                 else:
                     self.queue_draw_item(i)
 
-                    i2c = self._canvas.get_matrix_i2c(i).transform_point
-                    x0, y0 = i2c(bounds.x, bounds.y)
-                    x1, y1 = i2c(bounds.x1, bounds.y1)
+                    i2v = self.get_matrix_i2v(i).transform_point
+                    x0, y0 = i2v(bounds.x, bounds.y)
+                    x1, y1 = i2v(bounds.x1, bounds.y1)
                     cbounds = Rectangle(x0, y0, x1=x1, y1=y1)
                     self._item_bounds[i] = cbounds, bounds
 
