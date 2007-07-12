@@ -46,7 +46,8 @@ class View(object):
         self._dirty_items = set()
         self._dirty_matrix_items = set()
 
-    matrix = property(lambda s: s._matrix)
+    matrix = property(lambda s: s._matrix,
+                      doc="Canvas to view transformation matrix")
 
     def _set_canvas(self, canvas):
         """

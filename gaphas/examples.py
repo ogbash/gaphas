@@ -13,6 +13,7 @@ import tool
 from constraint import BalanceConstraint, LessThanConstraint, EqualsConstraint
 from geometry import point_on_rectangle, distance_rectangle_point
 from util import text_extents, text_align, text_multiline, path_ellipse
+from cairo import Matrix
 
 class Box(Element):
     """ A Box has 4 handles (for a start):
@@ -167,7 +168,9 @@ class ConnectingHandleTool(tool.HandleTool):
             return
 
         # Make glue distance depend on the zoom ratio (should be about 10 pixels)
-        glue_distance, dummy = view.transform_distance_c2w(10, 0)
+        inverse = Matrix(*view.matrix)
+        inverse.invert()
+        glue_distance, dummy = inverse.transform_distance(10, 0)
         glue_point = None
         glue_item = None
         for i in view.canvas.get_all_items():
