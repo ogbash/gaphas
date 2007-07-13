@@ -288,7 +288,10 @@ class EquationConstraint(Constraint):
         for nm, v in self._args.items():
             args[nm] = v.value
             if v is var: arg = nm
-        var.value = self._solve_for(arg, args)
+        v = self._solve_for(arg, args) 
+        if var != v:
+            var.value = v
+
 
     def _solve_for(self, arg, args):
         """
