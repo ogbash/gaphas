@@ -344,6 +344,10 @@ class Solver(object):
                     self._marked_cons.append(c)
                 else:
                     self._marked_cons.append(c)
+                    if __debug__:
+                        if self._marked_cons.count(c) > 100:
+                            raise JuggleError, 'Variable juggling detected, constraint %s' % c
+
 
     def request_resolve(self, variable):
         """
@@ -533,6 +537,15 @@ class solvable(object):
             v = Variable(strength=self._strength)
             setattr(obj, self._varname, v)
             v.value = value
+
+
+
+
+class JuggleError(AssertionError):
+    """
+    Variable juggling exception. Raised when constraint's variables are
+    marking each other dirty forever.
+    """
 
 
 __test__ = {

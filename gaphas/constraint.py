@@ -29,7 +29,6 @@ __version__ = "$Revision$"
 
 
 import operator
-from decorators import recursive
 
 
 class Constraint(object):
@@ -120,7 +119,6 @@ class EqualsConstraint(Constraint):
         self.a = a
         self.b = b
 
-    @recursive(limit=5)
     def solve_for(self, var):
         assert var in (self.a, self.b)
 
@@ -159,7 +157,6 @@ class CenterConstraint(Constraint):
         self.b = b
         self.center = center
 
-    @recursive(limit=5)
     def solve_for(self, var):
         assert var in (self.a, self.b, self.center)
 
@@ -197,7 +194,6 @@ class LessThanConstraint(Constraint):
         self.bigger = bigger
         self.delta = delta
 
-    @recursive(limit=5)
     def solve_for(self, var):
         if self.smaller.value > self.bigger.value - self.delta:
             if var is self.smaller:
@@ -283,7 +279,6 @@ class EquationConstraint(Constraint):
             setattr(self, arg, args[arg])
 
 
-    @recursive(limit=5)
     def solve_for(self, var):
         """
         Solve this constraint for the variable named 'arg' in the
@@ -385,7 +380,6 @@ class BalanceConstraint(Constraint):
         self.v = v
         print 'b', self.balance
 
-    @recursive(limit=5)
     def solve_for(self, var):
         b1, b2 = self.band
         w = b2 - b1
@@ -432,7 +426,6 @@ class BalanceConstraint(Constraint):
         self.v = v
 
 
-    @recursive(limit=5)
     def solve_for(self, var):
         b1, b2 = self.band
         w = b2 - b1
