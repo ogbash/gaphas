@@ -417,16 +417,19 @@ class BalanceConstraint(Constraint):
     (Variable(3, 20), Variable(2, 20), Variable(2.45, 10))
     """
 
-    def __init__(self, band=None, v=None):
+    def __init__(self, band=None, v=None, balance=None):
         super(BalanceConstraint, self).__init__(band[0], band[1], v)
         self.band = band
-        b1, b2 = self.band
-        w = b2 - b1
-        if w != 0:
-            self.balance = (v - b1) / w
-        else:
-            self.balance = 0
+        self.balance = balance
         self.v = v
+
+        if self.balance is None:
+            b1, b2 = self.band
+            w = b2 - b1
+            if w != 0:
+                self.balance = (v - b1) / w
+            else:
+                self.balance = 0
 
 
     def solve_for(self, var):
@@ -435,6 +438,69 @@ class BalanceConstraint(Constraint):
         value = b1 + w * self.balance
         if var.value != value:
             var.value = value
+
+
+
+class Projector(object):
+    """
+    Base class for variable space projectors.
+
+    Variable space projectors allow to convert variables' values to common
+    space before constraint solving.
+
+    Consider two geometrical objects defined by their position (x0, y0)
+    and object's affine information (see gaphas.sexample module)
+    >>> from solver import Variable
+    >>> from gaphas.sexamples import Rectangle, Vector, AffineProjector
+    >>> r = Rectangle(5, 5, 20, 20)
+    >>> v = Vector(5, 50, 5, -25)
+
+    To keep vector's terminal point on a rectangle's bottom side create
+    affine projector and appropriate constraints
+    >>> proj = AffineProjector()
+    >>> zero = Variable(0)  # used for balance constraint band
+    >>> bc = BalanceConstraint(band=(zero, r.width), v=v.x, balance=0.25)
+    >>> eq = EqualsConstraint(a=r.height, b=v.y)
+    >>> proj(bc, {v.x: v.x0, r.width: r.x0, zero: r.x0})
+    >>> proj(eq, {v.y: v.y0, r.height: r.y0})
+    
+    Let's change rectangle dimensions
+    >>> r.width.value = 24
+    >>> r.height.value = 25
+
+    and use constraints to keep vector's terminal point on rectangle bottom
+    side
+    >>> bc.solve_for(v.x)
+    >>> eq.solve_for(v.y)
+    >>> v.x, v.y
+    (Variable(6, 20), Variable(-20, 20))
+    """
+    def _cproj(self):
+        """
+        Perform projection to common space.
+        """
+        raise NotImplemented
+
+
+    def _iproj(self):
+        """
+        Perform projection to internal space.
+        """
+        raise NotImplemented
+
+
+    def __call__(self, c, data):
+        """
+        Decorator for Constraint.solve_for method to perform
+        projection to common space before variable solving and later
+        project to internal variable space.
+        """
+        f = c.solve_for
+        def wrapper(var):
+            self._cproj(c, data)
+            f(var)
+            self._iproj(c, data)
+        c.solve_for = wrapper
 
 
 
