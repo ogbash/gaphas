@@ -606,27 +606,42 @@ class CanvasProjector(Projector):
 
 
     def _cproj(self, c, x=None, y=None, xy=None, **kw):
-        if x is not None:
+        if xy is not None:
+            for point, item in xy.items():
+                x, y = point
+                i2c = self._canvas.get_matrix_i2c(item).transform_point
+                x._value, y._value = i2c(x._value, y._value)
+        elif x is not None:
             for v, item in x.items():
                 i2c = self._canvas.get_matrix_i2c(item).transform_point
                 v._value, _ = i2c(v._value, 0)
-        if y is not None:
+        elif y is not None:
             for v, item in y.items():
                 i2c = self._canvas.get_matrix_i2c(item).transform_point
                 _, v._value = i2c(0, v._value)
+        else:
+            raise AttributeError('Projection data not specified')
 
 
     def _iproj(self, c, x=None, y=None, xy=None, **kw):
-        if x is not None:
+        if xy is not None:
+            for point, item in xy.items():
+                x, y = point
+                c2i = self._canvas.get_matrix_c2i(item).transform_point
+                x._value, y._value = c2i(x._value, y._value)
+                item.request_update()
+        elif x is not None:
             for v, item in x.items():
                 c2i = self._canvas.get_matrix_c2i(item).transform_point
                 v._value, _ = c2i(v._value, 0)
                 item.request_update()
-        if y is not None:
+        elif y is not None:
             for v, item in y.items():
                 c2i = self._canvas.get_matrix_c2i(item).transform_point
                 _, v._value = c2i(0, v._value)
                 item.request_update()
+        else:
+            raise AttributeError('Projection data not specified')
 
 
 # Additional tests in @observed methods
