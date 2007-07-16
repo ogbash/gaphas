@@ -208,13 +208,13 @@ class ConnectingHandleTool(tool.HandleTool):
             bx, by = view.get_matrix_i2v(glued).transform_point(handles[SE].x, handles[SE].y)
 
             if abs(hx - ax) < 0.01:
-                return handles[NW], handles[SW], (hy - ay) / (by - ay)
+                return handles[NW], handles[SW]
             elif abs(hy - ay) < 0.01:
-                return handles[NW], handles[NE], (hx - ax) / (bx - ax)
+                return handles[NW], handles[NE]
             elif abs(hx - bx) < 0.01:
-                return handles[NE], handles[SE],  (hy - ay) / (by - ay)
+                return handles[NE], handles[SE]
             else:
-                return handles[SW], handles[SE], (hx - ax) / (bx - ax)
+                return handles[SW], handles[SE]
             assert False
 
 
@@ -223,7 +223,6 @@ class ConnectingHandleTool(tool.HandleTool):
                 item.remove_iconstraint(handle)
             except KeyError:
                 pass # constraint was alreasy removed
-            handle._connect_constraint = None
             handle.connected_to = None
             # Remove disconnect handler:
             handle.disconnect = lambda: 0
@@ -232,18 +231,23 @@ class ConnectingHandleTool(tool.HandleTool):
         glue_item = self.glue(view, item, handle, wx, wy)
         if glue_item and glue_item is handle.connected_to:
             try:
-                view.canvas.solver.remove_constraint(handle._c1)
-                view.canvas.solver.remove_constraint(handle._c2)
+                item.remove_iconstraint(handle)
             except KeyError:
                 pass # constraint was already removed
 
+            h1, h2 = side(handle, glue_item)
+            lc = LineConstraint(line=(h1.pos, h2.pos), point=handle.pos)
+            pdata = {
+                h1.pos: glue_item,
+                h2.pos: glue_item,
+                handle.pos: item,
+            }
 
-            assert False, 'not now!'
-            h1, h2, b = side(handle, glue_item)
-            handle._c1 = BalanceConstraint(band=(h1.x, h1.x), v=handle.x)
-            handle._c2 = BalanceConstraint(band=(h2.y, h2.y), v=handle.y)
-            view.canvas.solver.add_constraint(handle._c1)
-            view.canvas.solver.add_constraint(handle._c2)
+            view.canvas.proj(lc, xy=pdata)
+            view.canvas.proj(lc, xy=pdata, f=lc.update_ratio)
+            lc.update_ratio()
+            item.add_iconstraint(handle, lc)
+
             handle.disconnect = handle_disconnect
             return
 
@@ -253,7 +257,7 @@ class ConnectingHandleTool(tool.HandleTool):
 
         if glue_item:
             if isinstance(glue_item, Box):
-                h1, h2, b = side(handle, glue_item)
+                h1, h2 = side(handle, glue_item)
 
                 # Make a constraint that keeps into account item coordinates.
                 lc = LineConstraint(line=(h1.pos, h2.pos), point=handle.pos)
