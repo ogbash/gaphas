@@ -440,6 +440,83 @@ class BalanceConstraint(Constraint):
             var.value = value
 
 
+class LineConstraint(Constraint):
+    """
+    Ensure a point is kept on a line.
+
+    Attributes:
+     - _line: line defined by tuple ((x1, y1), (x2, y2))
+     - _point: point defined by tuple (x, y)
+    """
+
+    def __init__(self, line, point):
+        super(LineConstraint, self).__init__(*(line[0] + line[1] + point))
+
+        self._line = line
+        self._point = point
+
+        self.update_ratio()
+
+
+    def update_ratio(self):
+        """
+        >>> from gaphas.solver import Variable
+        >>> line = (Variable(0), Variable(0)), (Variable(30), Variable(20))
+        >>> point = (Variable(15), Variable(4))
+        >>> lc = LineConstraint(line=line, point=point)
+        >>> lc.ratio_x, lc.ratio_y
+        (0.5, 0.20000000000000001)
+        >>> line[1][0].value = 40
+        >>> line[1][1].value = 30
+        >>> lc.solve_for(point[0])
+        >>> lc.ratio_x, lc.ratio_y
+        (0.5, 0.20000000000000001)
+        >>> point
+        (Variable(20, 20), Variable(6, 20))
+        """
+        sx, sy = self._line[0]
+        ex, ey = self._line[1]
+        px, py = self._point
+
+        try:
+            self.ratio_x = float(px - sx) / float(ex - sx)
+        except ZeroDivisionError:
+            self.ratio_x = 0.0
+        try:
+            self.ratio_y = float(py - sy) / float(ey - sy)
+        except ZeroDivisionError:
+            self.ratio_y = 0.0
+
+        
+    def solve_for(self, var=None):
+        self._solve()
+
+    def _solve(self):
+        """
+        Solve the equation for the connected_handle.
+        >>> from gaphas.solver import Variable
+        >>> line = (Variable(0), Variable(0)), (Variable(30), Variable(20))
+        >>> point = (Variable(15), Variable(4))
+        >>> lc = LineConstraint(line=line, point=point)
+        >>> lc.solve_for(point[0])
+        >>> point
+        (Variable(15, 20), Variable(4, 20))
+        >>> line[1][0].value = 40
+        >>> line[1][1].value =  30
+        >>> lc.solve_for(point[0])
+        >>> point
+        (Variable(20, 20), Variable(6, 20))
+        """
+        sx, sy = self._line[0]
+        ex, ey = self._line[1]
+        px, py = self._point
+
+        x = sx + (ex - sx) * self.ratio_x
+        y = sy + (ey - sy) * self.ratio_y
+
+        px.value, py.value = x, y
+
+
 
 class Projector(object):
     """
