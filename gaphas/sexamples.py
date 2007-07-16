@@ -20,13 +20,15 @@ class AffineProjector(Projector):
 
         Vector(5, 50, 5, -25) -> A=(5, 50), B=(10, 25)
     """
-    def _cproj(self, c, data):
+    def _cproj(self, c, *args, **kw):
+        data = kw['data']
         for v in c.variables():
             v0 = data[v]
             v._value = v._value + v0
 
 
-    def _iproj(self, c, data):
+    def _iproj(self, c, *args, **kw):
+        data = kw['data']
         for v in c.variables():
             v0 = data[v]
             v._value = v._value - v0
