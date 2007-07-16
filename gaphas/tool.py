@@ -474,8 +474,8 @@ class HandleTool(Tool):
         try:
             view = context.view
             if self._grabbed_handle and self._grabbed_handle.connectable:
-                wx, wy = view.get_matrix_v2i(self._grabbed_item).transform_point(event.x, event.y)
-                self.connect(view, self._grabbed_item, self._grabbed_handle, wx, wy)
+                x, y = event.x, event.y
+                self.connect(view, self._grabbed_item, self._grabbed_handle, x, y)
         finally:
             context.view.queue_draw_item(context.view.hovered_item)
             context.ungrab()
@@ -506,10 +506,9 @@ class HandleTool(Tool):
             self.move(view, item, handle, x, y)
             
             item.request_update()
-            #canvas.update_matrix(item)
             try:
                 if self._grabbed_handle.connectable:
-                    self.glue(view, item, handle, x, y)
+                    self.glue(view, item, handle, event.x, event.y)
             finally:
                 pass
             return True

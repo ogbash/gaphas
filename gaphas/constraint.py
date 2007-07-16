@@ -489,7 +489,7 @@ class Projector(object):
         raise NotImplemented
 
 
-    def __call__(self, c, data):
+    def __call__(self, c, *args, **kw):
         """
         Decorator for Constraint.solve_for method to perform
         projection to common space before variable solving and later
@@ -497,9 +497,9 @@ class Projector(object):
         """
         f = c.solve_for
         def wrapper(var):
-            self._cproj(c, data)
+            self._cproj(c, *args, **kw)
             f(var)
-            self._iproj(c, data)
+            self._iproj(c, *args, **kw)
         c.solve_for = wrapper
 
 

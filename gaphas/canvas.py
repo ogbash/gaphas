@@ -14,6 +14,7 @@ from gaphas import tree
 from gaphas import solver
 from gaphas.decorators import nonrecursive, async, PRIORITY_HIGH_IDLE
 from state import observed, reversible_method, reversible_pair
+from gaphas.constraint import Projector
 
 
 class Context(object):
@@ -70,6 +71,8 @@ class Canvas(object):
 
         self._registered_views = set()
         self._cache = WeakKeyDictionary()
+
+        self.proj = CanvasProjector(self)
 
     solver = property(lambda s: s._solver)
 
@@ -496,9 +499,8 @@ class Canvas(object):
 
         # Make sure handles are marked (for constraint solving)
         request_resolve = self._solver.request_resolve
-        for h in item.handles():
-            request_resolve(h.x)
-            request_resolve(h.y)
+        for c in item.iconstraints():
+            request_resolve(c)
             
         if recursive:
             for child in self._tree.get_children(item):
@@ -594,6 +596,37 @@ class Canvas(object):
         else:
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 0, 0)
             return cairo.Context(surface)
+
+
+
+class CanvasProjector(Projector):
+    def __init__(self, canvas):
+        super(CanvasProjector, self).__init__()
+        self._canvas = canvas
+
+
+    def _cproj(self, c, x=None, y=None, xy=None, **kw):
+        if x is not None:
+            for v, item in x.items():
+                i2c = self._canvas.get_matrix_i2c(item).transform_point
+                v._value, _ = i2c(v._value, 0)
+        if y is not None:
+            for v, item in y.items():
+                i2c = self._canvas.get_matrix_i2c(item).transform_point
+                _, v._value = i2c(0, v._value)
+
+
+    def _iproj(self, c, x=None, y=None, xy=None, **kw):
+        if x is not None:
+            for v, item in x.items():
+                c2i = self._canvas.get_matrix_c2i(item).transform_point
+                v._value, _ = c2i(v._value, 0)
+                item.request_update()
+        if y is not None:
+            for v, item in y.items():
+                c2i = self._canvas.get_matrix_c2i(item).transform_point
+                _, v._value = c2i(0, v._value)
+                item.request_update()
 
 
 # Additional tests in @observed methods

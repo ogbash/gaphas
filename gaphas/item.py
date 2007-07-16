@@ -125,6 +125,34 @@ class Item(object):
         self._canvas = None
         self._matrix = Matrix()
         self._handles = []
+        self._constraints = []
+        self._iconstraints = {}
+
+
+    def add_iconstraint(self, h, c):
+        if h not in self._iconstraints:
+            self._iconstraints[h] = set()
+        self._iconstraints[h].add(c)
+        self._canvas.solver.add_constraint(c)
+
+
+    def remove_iconstraint(self, h, c=None):
+        if c is None: # remove all handle's constraints
+            cons = self._iconstraints[h]
+            for c in cons:
+                self._canvas.solver.remove_constraint(c)
+            cons.clear()
+        else:
+            # remove specific constraint
+            self._canvas.solver.remove_constraint(c)
+            self._iconstraints[h].remove(c)
+
+
+    def iconstraints(self):
+        for cons in self._iconstraints.values():
+            for c in cons:
+                yield c
+
 
     @observed
     def _set_canvas(self, canvas):
@@ -148,20 +176,29 @@ class Item(object):
                 doc="Set canvas for the item. Application should use " + \
                     "Canvas.add() and Canvas.remove().")
 
+
     def setup_canvas(self):
         """
         Called when the canvas is set for the item.
         This method can be used to create constraints.
         """
-        pass
+        add = self.canvas.solver.add_constraint
+        for c in self._constraints:
+            add(c)
+
 
     def teardown_canvas(self):
         """
         Called when the canvas is unset for the item.
         This method can be used to dispose constraints.
         """
+        super(Item, self).teardown_canvas()
         for h in self.handles():
             h.disconnect()
+
+        for c in self._constraints:
+            self.canvas.solver.remove_constraint(c)
+
 
     @observed
     def _set_matrix(self, matrix):
@@ -237,18 +274,39 @@ class Element(Item):
     def __init__(self, width=10, height=10):
         super(Element, self).__init__()
         self._handles = [ h(strength=VERY_STRONG) for h in [Handle]*4 ]
-        self._constraints = []
 
-        # create minimal size constraints
+        eq = EqualsConstraint
+        lt = LessThanConstraint
         handles = self._handles
         h_nw = handles[NW]
+        h_ne = handles[NE]
+        h_sw = handles[SW]
         h_se = handles[SE]
+
+        # create minimal size constraints
         self._c_min_w = LessThanConstraint(smaller=h_nw.y, bigger=h_se.y, delta=10)
         self._c_min_h = LessThanConstraint(smaller=h_nw.x, bigger=h_se.x, delta=10)
+
+        # setup constraints
+        self._constraints.extend([
+            eq(a=h_nw.y, b=h_ne.y),
+            eq(a=h_nw.x, b=h_sw.x),
+            eq(a=h_se.y, b=h_sw.y),
+            eq(a=h_se.x, b=h_ne.x),
+            # set h_nw < h_se constraints
+            # with minimal size functionality
+            self._c_min_w,
+            self._c_min_h,
+        ])
 
         # set width/height when minimal size constraints exist
         self.width = width
         self.height = height
+
+        # immediately solve the constraints, ensuring the box is drawn okay
+        solve_for = (h_ne.y, h_sw.y, h_sw.x, h_ne.x)
+        for c, v in zip(self._constraints, solve_for):
+            c.solve_for(v)
 
 
     def _set_width(self, width):
@@ -335,83 +393,7 @@ class Element(Item):
 
     min_height = reversible_property(lambda s: s._c_min_h.delta, _set_min_height)
 
-    def setup_canvas(self):
-        """
-        >>> from canvas import Canvas
-        >>> c=Canvas()
-        >>> c.solver._constraints
-        set([])
-        >>> b = Element()
-        >>> c.add(b)
-        >>> b.canvas is c
-        True
-        >>> len(c.solver._constraints)
-        8
-        >>> len(c.solver._marked_cons)
-        0
-        >>> c.solver.solve()
-        >>> len(c.solver._constraints)
-        8
-        >>> len(c.solver._marked_cons)
-        0
-        >>> b._handles[SE].pos = (25,30)
-        >>> len(c.solver._marked_cons)
-        4
-        >>> c.solver.solve()
-        >>> float(b._handles[NE].x)
-        25.0
-        >>> float(b._handles[SW].y)
-        30.0
-        """
-        eq = EqualsConstraint
-        lt = LessThanConstraint
-
-        handles = self._handles
-        h_nw = handles[NW]
-        h_ne = handles[NE]
-        h_sw = handles[SW]
-        h_se = handles[SE]
-
-        add = self.canvas.solver.add_constraint
-        self._constraints = [
-            add(eq(a=h_nw.y, b=h_ne.y)),
-            add(eq(a=h_nw.x, b=h_sw.x)),
-            add(eq(a=h_se.y, b=h_sw.y)),
-            add(eq(a=h_se.x, b=h_ne.x)),
-            # set h_nw < h_se constraints
-            # with minimal size functionality
-            add(self._c_min_w),
-            add(self._c_min_h),
-        ]
-
-        # Immediately solve the constraints, ensuring the box is drawn okay
-        solve_for = (h_ne.y, h_sw.y, h_sw.x, h_ne.x)
-        for c, v in zip(self._constraints, solve_for):
-            c.solve_for(v)
-
         
-    def teardown_canvas(self):
-        """
-        Remove constraints created in setup_canvas().
-        >>> from canvas import Canvas
-        >>> c=Canvas()
-        >>> c.solver._constraints
-        set([])
-        >>> b = Element()
-        >>> c.add(b)
-        >>> b.canvas is c
-        True
-        >>> len(c.solver._constraints)
-        8
-        >>> b.teardown_canvas()
-        >>> len(c.solver._constraints)
-        0
-        """
-        super(Element, self).teardown_canvas()
-        for c in self._constraints:
-            self.canvas.solver.remove_constraint(c)
-
-
     def point(self, x, y):
         """
         Distance from the point (x, y) to the item.

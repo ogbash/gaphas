@@ -349,14 +349,12 @@ class Solver(object):
                             raise JuggleError, 'Variable juggling detected, constraint %s' % c
 
 
-    def request_resolve(self, variable):
+    def request_resolve(self, c):
         """
-        Request resolving of the constraints for a variable. This does not
-        mark the variable itself as dirty.
+        Request resolving of the constraint.
         """
-        for c in variable._constraints:
-            if c not in self._marked_cons:
-                self._marked_cons.append(c)
+        self._marked_cons.append(c)
+
 
     @observed
     def add_constraint(self, constraint):

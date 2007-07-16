@@ -44,11 +44,8 @@ class Box(Element):
         a connection point.
         """
         h = self._handles
-        hnw = h[NW]
-        hse = h[SE]
-        x0, y0 = float(hnw.x), float(hnw.y)
-        x1, y1 = float(hse.x), float(hse.y)
-        r = (x0, y0, x1 - x0, y1 - y0)
+        h_se = h[SE]
+        r = (0, 0, h_se.x, h_se.y)
         por = point_on_rectangle(r, (x, y), border=True)
         p = distance_rectangle_point(r, (x, y))
         return p, por
@@ -171,26 +168,28 @@ class ConnectingHandleTool(tool.HandleTool):
         # Make glue distance depend on the zoom ratio (should be about 10 pixels)
         inverse = Matrix(*view.matrix)
         inverse.invert()
-        glue_distance, dummy = inverse.transform_distance(10, 0)
+        #glue_distance, dummy = inverse.transform_distance(10, 0)
+        glue_distance = 10
         glue_point = None
         glue_item = None
         for i in view.canvas.get_all_items():
             if not i is item:
-                #ix, iy = matrix_w2i(i).transform_point(wx, wy)
-                ix, iy = wx, wy
+                v2i = view.get_matrix_v2i(i).transform_point
+                ix, iy = v2i(wx, wy)
                 try:
                     distance, point = i.glue(item, handle, ix, iy)
                     # Transform distance to world coordinates
                     #distance, dumy = matrix_i2w(i).transform_distance(distance, 0)
                     if distance <= glue_distance:
                         glue_distance = distance
-                        glue_point = point
+                        i2v = view.get_matrix_i2v(i).transform_point
+                        glue_point = i2v(*point)
                         glue_item = i
                 except AttributeError:
                     pass
         if glue_point:
-            x, y = glue_point
-            handle.x, handle.y = glue_point
+            v2i = view.get_matrix_v2i(item).transform_point
+            handle.x, handle.y = v2i(*glue_point)
         return glue_item
 
     def connect(self, view, item, handle, wx, wy):
@@ -204,24 +203,24 @@ class ConnectingHandleTool(tool.HandleTool):
         """
         def side(handle, glued):
             handles = glued.handles()
-            hx, hy = handle.x, handle.y
-            ax, ay = handles[NW].x, handles[NW].y
-            bx, by = handles[SE].x, handles[SE].y
+            hx, hy = view.get_matrix_i2v(item).transform_point(handle.x, handle.y)
+            ax, ay = view.get_matrix_i2v(glued).transform_point(handles[NW].x, handles[NW].y)
+            bx, by = view.get_matrix_i2v(glued).transform_point(handles[SE].x, handles[SE].y)
+
             if abs(hx - ax) < 0.01:
-                return handles[NW], handles[SW]
+                return handles[NW], handles[SW], (hy - ay) / (by - ay)
             elif abs(hy - ay) < 0.01:
-                return handles[NW], handles[NE]
+                return handles[NW], handles[NE], (hx - ax) / (bx - ax)
             elif abs(hx - bx) < 0.01:
-                return handles[NE], handles[SE]
+                return handles[NE], handles[SE],  (hy - ay) / (by - ay)
             else:
-                return handles[SW], handles[SE]
+                return handles[SW], handles[SE], (hx - ax) / (bx - ax)
             assert False
 
 
         def handle_disconnect():
             try:
-                view.canvas.solver.remove_constraint(handle._c1)
-                view.canvas.solver.remove_constraint(handle._c2)
+                item.remove_iconstraint(handle)
             except KeyError:
                 pass # constraint was alreasy removed
             handle._connect_constraint = None
@@ -239,7 +238,8 @@ class ConnectingHandleTool(tool.HandleTool):
                 pass # constraint was already removed
 
 
-            h1, h2 = side(handle, glue_item)
+            assert False, 'not now!'
+            h1, h2, b = side(handle, glue_item)
             handle._c1 = BalanceConstraint(band=(h1.x, h1.x), v=handle.x)
             handle._c2 = BalanceConstraint(band=(h2.y, h2.y), v=handle.y)
             view.canvas.solver.add_constraint(handle._c1)
@@ -253,13 +253,15 @@ class ConnectingHandleTool(tool.HandleTool):
 
         if glue_item:
             if isinstance(glue_item, Box):
-                h1, h2 = side(handle, glue_item)
+                h1, h2, b = side(handle, glue_item)
 
                 # Make a constraint that keeps into account item coordinates.
-                handle._c1 = BalanceConstraint(band=(h1.x, h2.x), v=handle.x)
-                handle._c2 = BalanceConstraint(band=(h1.y, h2.y), v=handle.y)
-                view.canvas.solver.add_constraint(handle._c1)
-                view.canvas.solver.add_constraint(handle._c2)
+                c1 = BalanceConstraint(band=(h1.x, h2.x), v=handle.x, balance=b)
+                c2 = BalanceConstraint(band=(h1.y, h2.y), v=handle.y, balance=b)
+                view.canvas.proj(c1, x={h1.x: glue_item, h2.x: glue_item, handle.x: item})
+                view.canvas.proj(c2, y={h1.y: glue_item, h2.y: glue_item, handle.y: item})
+                item.add_iconstraint(handle, c1)
+                item.add_iconstraint(handle, c2)
 
                 handle.connected_to = glue_item
                 handle.disconnect = handle_disconnect
@@ -267,8 +269,7 @@ class ConnectingHandleTool(tool.HandleTool):
     def disconnect(self, view, item, handle):
         if handle.connected_to:
             #print 'Handle.disconnect', view, item, handle
-            view.canvas.solver.remove_constraint(handle._c1)
-            view.canvas.solver.remove_constraint(handle._c2)
+            item.remove_iconstraint(handle)
 
 
 def DefaultExampleTool():
