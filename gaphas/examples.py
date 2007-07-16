@@ -10,7 +10,7 @@ from item import Handle, Element, Item
 from item import NW, NE,SW, SE
 from solver import solvable
 import tool
-from constraint import BalanceConstraint, LessThanConstraint, EqualsConstraint
+from constraint import LineConstraint, LessThanConstraint, EqualsConstraint
 from geometry import point_on_rectangle, distance_rectangle_point
 from util import text_extents, text_align, text_multiline, path_ellipse
 from cairo import Matrix
@@ -153,7 +153,7 @@ class Circle(Item):
 class ConnectingHandleTool(tool.HandleTool):
     """
     This is a HandleTool which supports a simple connection algorithm,
-    using BalanceConstraint.
+    using LineConstraint.
     """
 
     def glue(self, view, item, handle, wx, wy):
@@ -256,12 +256,17 @@ class ConnectingHandleTool(tool.HandleTool):
                 h1, h2, b = side(handle, glue_item)
 
                 # Make a constraint that keeps into account item coordinates.
-                c1 = BalanceConstraint(band=(h1.x, h2.x), v=handle.x, balance=b)
-                c2 = BalanceConstraint(band=(h1.y, h2.y), v=handle.y, balance=b)
-                view.canvas.proj(c1, x={h1.x: glue_item, h2.x: glue_item, handle.x: item})
-                view.canvas.proj(c2, y={h1.y: glue_item, h2.y: glue_item, handle.y: item})
-                item.add_iconstraint(handle, c1)
-                item.add_iconstraint(handle, c2)
+                lc = LineConstraint(line=(h1.pos, h2.pos), point=handle.pos)
+                pdata = {
+                    h1.pos: glue_item,
+                    h2.pos: glue_item,
+                    handle.pos: item,
+                }
+
+                view.canvas.proj(lc, xy=pdata)
+                view.canvas.proj(lc, xy=pdata, f=lc.update_ratio)
+                lc.update_ratio()
+                item.add_iconstraint(handle, lc)
 
                 handle.connected_to = glue_item
                 handle.disconnect = handle_disconnect
