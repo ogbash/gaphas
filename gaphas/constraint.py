@@ -424,12 +424,16 @@ class BalanceConstraint(Constraint):
         self.v = v
 
         if self.balance is None:
-            b1, b2 = self.band
-            w = b2 - b1
-            if w != 0:
-                self.balance = (v - b1) / w
-            else:
-                self.balance = 0
+            self.update_balance()
+
+
+    def update_balance(self):
+        b1, b2 = self.band
+        w = b2 - b1
+        if w != 0:
+            self.balance = (self.v - b1) / w
+        else:
+            self.balance = 0
 
 
     def solve_for(self, var):
@@ -455,8 +459,6 @@ class LineConstraint(Constraint):
         self._line = line
         self._point = point
 
-        self.update_ratio()
-
 
     def update_ratio(self):
         """
@@ -464,6 +466,7 @@ class LineConstraint(Constraint):
         >>> line = (Variable(0), Variable(0)), (Variable(30), Variable(20))
         >>> point = (Variable(15), Variable(4))
         >>> lc = LineConstraint(line=line, point=point)
+        >>> lc.update_ratio()
         >>> lc.ratio_x, lc.ratio_y
         (0.5, 0.20000000000000001)
         >>> line[1][0].value = 40
@@ -498,6 +501,7 @@ class LineConstraint(Constraint):
         >>> line = (Variable(0), Variable(0)), (Variable(30), Variable(20))
         >>> point = (Variable(15), Variable(4))
         >>> lc = LineConstraint(line=line, point=point)
+        >>> lc.update_ratio()
         >>> lc.solve_for(point[0])
         >>> point
         (Variable(15, 20), Variable(4, 20))
@@ -514,7 +518,10 @@ class LineConstraint(Constraint):
         x = sx + (ex - sx) * self.ratio_x
         y = sy + (ey - sy) * self.ratio_y
 
-        px.value, py.value = x, y
+        if px.value != x:
+            px.value = x
+        if py.value != y:
+            py.value = y
 
 
 
@@ -538,8 +545,8 @@ class Projector(object):
     >>> zero = Variable(0)  # used for balance constraint band
     >>> bc = BalanceConstraint(band=(zero, r.width), v=v.x, balance=0.25)
     >>> eq = EqualsConstraint(a=r.height, b=v.y)
-    >>> proj(bc, {v.x: v.x0, r.width: r.x0, zero: r.x0})
-    >>> proj(eq, {v.y: v.y0, r.height: r.y0})
+    >>> proj(bc, data={v.x: v.x0, r.width: r.x0, zero: r.x0})
+    >>> proj(eq, data={v.y: v.y0, r.height: r.y0})
     
     Let's change rectangle dimensions
     >>> r.width.value = 24
@@ -551,6 +558,17 @@ class Projector(object):
     >>> eq.solve_for(v.y)
     >>> v.x, v.y
     (Variable(6, 20), Variable(-20, 20))
+
+    It is also possible to use projection in case of other constraint's
+    methods than 'solve_for'
+    >>> r = Rectangle(5, 5, 20, 20)
+    >>> v = Vector(10, 50, 5, -25)
+    >>> zero = Variable(0)
+    >>> bc = BalanceConstraint(band=(zero, r.width), v=v.x)
+    >>> proj(bc, data={v.x: v.x0, r.width: r.x0, zero: r.x0}, f=bc.update_balance)
+    >>> bc.update_balance()
+    >>> bc.balance
+    0.5
     """
     def _cproj(self):
         """
@@ -568,16 +586,23 @@ class Projector(object):
 
     def __call__(self, c, *args, **kw):
         """
-        Decorator for Constraint.solve_for method to perform
-        projection to common space before variable solving and later
-        project to internal variable space.
+        Decorator for Constraint.solve_for method to perform projection to
+        common space before variable solving and later project to internal
+        variable space.
         """
-        f = c.solve_for
-        def wrapper(var):
+        if 'f' in kw:
+            f = kw['f']
+            fn = f.__name__
+        else:
+            f = c.solve_for
+            fn = 'solve_for'
+
+        def wrapper(*fargs):
             self._cproj(c, *args, **kw)
-            f(var)
+            f(*fargs)
             self._iproj(c, *args, **kw)
-        c.solve_for = wrapper
+
+        setattr(c, fn, wrapper)
 
 
 
