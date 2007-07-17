@@ -456,9 +456,9 @@ class Canvas(object):
             >>> ii.matrix = (1.0, 0.0, 0.0, 1.0, 0.0, 8.0)
             >>> c.add(ii, i)
             >>> c.update_matrices()
-            >>> i._canvas_matrix_i2w
+            >>> c.get_matrix_i2c(i)
             cairo.Matrix(1, 0, 0, 1, 5, 0)
-            >>> ii._canvas_matrix_i2w
+            >>> c.get_matrix_i2c(ii)
             cairo.Matrix(1, 0, 0, 1, 5, 8)
             >>> len(c._dirty_items)
             0
