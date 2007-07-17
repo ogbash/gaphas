@@ -84,6 +84,11 @@ class FatLine(Item):
         super(FatLine, self).__init__()
         self._handles.extend((Handle(), Handle()))
 
+        h1, h2 = self._handles
+        cons = self._constraints
+        cons.append(EqualsConstraint(a=h1.x, b=h2.x))
+        cons.append(LessThanConstraint(smaller=h1.y, bigger=h2.y, delta=20))
+
 
     def _set_height(self, height):
         h1, h2 = self._handles
@@ -96,17 +101,6 @@ class FatLine(Item):
 
 
     height = property(_get_height, _set_height)
-
-
-    def setup_canvas(self):
-        super(FatLine, self).setup_canvas()
-        h1, h2 = self._handles
-        h2.x = h1.x
-        add = self.canvas.solver.add_constraint
-        self._c1 = EqualsConstraint(a=h1.x, b=h2.x)
-        self._c2 = LessThanConstraint(smaller=h1.y, bigger=h2.y, delta=20)
-        add(self._c1)
-        add(self._c2)
 
 
     def draw(self, context):
