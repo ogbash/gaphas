@@ -268,8 +268,8 @@ class Element(Item):
         h_se = handles[SE]
 
         # create minimal size constraints
-        self._c_min_w = LessThanConstraint(smaller=h_nw.y, bigger=h_se.y, delta=10)
-        self._c_min_h = LessThanConstraint(smaller=h_nw.x, bigger=h_se.x, delta=10)
+        self._c_min_w = LessThanConstraint(smaller=h_nw.x, bigger=h_se.x, delta=10)
+        self._c_min_h = LessThanConstraint(smaller=h_nw.y, bigger=h_se.y, delta=10)
 
         # setup constraints
         self._constraints.extend([
