@@ -29,11 +29,11 @@ class ConstraintProjectionTestCase(unittest.TestCase):
         h2.x, h2.y = 5, -20
 
         bc = BalanceConstraint(band=(h_sw.x, h_se.x), v=h2.x, balance=0.25)
-        canvas.proj(bc, x={h_sw.x: box, h_se.x: box, h2.x: line})
+        canvas.projector(bc, x={h_sw.x: box, h_se.x: box, h2.x: line})
         canvas._solver.add_constraint(bc)
 
         eq = EqualsConstraint(a=h_se.y, b=h2.y)
-        canvas.proj(eq, y={h_se.y: box, h2.y: line})
+        canvas.projector(eq, y={h_se.y: box, h2.y: line})
         canvas._solver.add_constraint(eq)
 
         box.request_update()

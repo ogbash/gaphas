@@ -73,7 +73,7 @@ class Canvas(object):
         self._registered_views = set()
         self._cache = WeakKeyDictionary()
 
-        self.proj = CanvasProjector(self)
+        self.projector = CanvasProjector(self)
 
         self._canvas_constraints = {}
 

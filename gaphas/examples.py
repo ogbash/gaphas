@@ -237,8 +237,8 @@ class ConnectingHandleTool(tool.HandleTool):
                 handle.pos: item,
             }
 
-            view.canvas.proj(lc, xy=pdata)
-            view.canvas.proj(lc, xy=pdata, f=lc.update_ratio)
+            view.canvas.projector(lc, xy=pdata)
+            view.canvas.projector(lc, xy=pdata, f=lc.update_ratio)
             lc.update_ratio()
             view.canvas.add_canvas_constraint(item, handle, lc)
 
@@ -261,8 +261,8 @@ class ConnectingHandleTool(tool.HandleTool):
                     handle.pos: item,
                 }
 
-                view.canvas.proj(lc, xy=pdata)
-                view.canvas.proj(lc, xy=pdata, f=lc.update_ratio)
+                view.canvas.projector(lc, xy=pdata)
+                view.canvas.projector(lc, xy=pdata, f=lc.update_ratio)
                 lc.update_ratio()
                 view.canvas.add_canvas_constraint(item, handle, lc)
 
