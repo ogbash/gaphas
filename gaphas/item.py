@@ -287,11 +287,6 @@ class Element(Item):
         self.width = width
         self.height = height
 
-        # immediately solve the constraints, ensuring the box is drawn okay
-        solve_for = (h_ne.y, h_sw.y, h_sw.x, h_ne.x)
-        for c, v in zip(self._constraints, solve_for):
-            c.solve_for(v)
-
 
     def _set_width(self, width):
         """
@@ -307,7 +302,8 @@ class Element(Item):
         if width < self.min_width:
             width = self.min_width
         h = self._handles
-        h[SE].x = h[NW].x + width
+        h[NE].x = h[NW].x + width
+
 
     def _get_width(self):
         """
@@ -315,7 +311,7 @@ class Element(Item):
         right handle.
         """
         h = self._handles
-        return float(h[SE].x) - float(h[NW].x)
+        return float(h[NE].x) - float(h[NW].x)
 
     width = property(_get_width, _set_width)
 
@@ -336,7 +332,7 @@ class Element(Item):
         if height < self.min_height:
             height = self.min_height
         h = self._handles
-        h[SE].y = h[NW].y + height
+        h[SW].y = h[NW].y + height
 
     def _get_height(self):
         """
