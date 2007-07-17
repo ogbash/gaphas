@@ -116,9 +116,14 @@ class Item(object):
     Base class (or interface) for items on a canvas.Canvas.
 
     Attributes:
-     - _canvas:  canvas, which owns an item
-     - _handles: list of handles owned by an item
-     - _matrix:  item's transformation matrix
+     - _canvas:      canvas, which owns an item
+     - _handles:     list of handles owned by an item
+     - _constraints: item's constraints
+     - matrix:       item's transformation matrix
+     - _matrix_i2c:  item to canvas coordinates matrix
+     - _matrix_c2i:  canvas to item coordinates matrix
+     - _matrix_i2v:  item to view coordinates matrices
+     - _matrix_v2i:  view to item coordinates matrices
     """
 
     def __init__(self):
@@ -126,6 +131,12 @@ class Item(object):
         self._matrix = Matrix()
         self._handles = []
         self._constraints = []
+
+        self._matrix_i2c = None
+        self._matrix_2ci = None
+        self._matrix_i2v = {}
+        self._matrix_v2i = {}
+
 
     @observed
     def _set_canvas(self, canvas):

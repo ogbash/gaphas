@@ -6,8 +6,6 @@ and a constraint solver.
 __version__ = "$Revision$"
 # $HeadURL$
 
-from weakref import WeakKeyDictionary
-
 import cairo
 from cairo import Matrix
 from gaphas import tree
@@ -37,24 +35,6 @@ class Context(object):
         raise AttributeError, 'context is not writable'
 
 
-class ViewBucket(object):
-    __slots__ = ('matrix_v2i', 'matrix_i2v', 'handles')
-    def __init__(self):
-        self.matrix_v2i = None
-        self.matrix_i2v = None
-        self.handles = []
-
-
-class CanvasBucket(object):
-    __slots__ = ('matrix_c2i', 'matrix_i2c', 'view', 'handles')
-    def __init__(self):
-        self.matrix_c2i = None
-        self.matrix_i2c = None
-        self.view = {}
-        self.handles = []
-
-
-
 class Canvas(object):
     """
     Container class for items.
@@ -62,7 +42,6 @@ class Canvas(object):
     Attributes:
      - projector: canvas constraint projector between item and canvas
        coordinates
-     - _cache: additional cache of item data
      - _canvas_constraints: constraints set between canvas items
     """
 
@@ -73,11 +52,9 @@ class Canvas(object):
         self._dirty_matrix_items = set()
 
         self._registered_views = set()
-        self._cache = WeakKeyDictionary()
+        self._canvas_constraints = {}
 
         self.projector = CanvasProjector(self)
-
-        self._canvas_constraints = {}
 
     solver = property(lambda s: s._solver)
 
@@ -98,11 +75,9 @@ class Canvas(object):
         assert item not in self._tree.nodes, 'Adding already added node %s' % item
         item.canvas = self
         self._tree.add(item, parent)
-        self._cache[item] = CanvasBucket()
         self._canvas_constraints[item] = {}
 
         for v in self._registered_views:
-            self._cache[item].view[v] = ViewBucket()
             v.update_matrix(item)
 
         self.request_update(item)
@@ -373,10 +348,9 @@ class Canvas(object):
               in stead of raising an AttributeError when no matrix is present
               yet. Note that out-of-date matrices are not recalculated.
         """
-        data = self._cache[item]
-        if data.matrix_i2c is None or calculate:
+        if item._matrix_i2c is None or calculate:
             self.update_matrix(item, recursive=False)
-        return data.matrix_i2c
+        return item._matrix_i2c
 
 
     def get_matrix_c2i(self, item, calculate=False):
@@ -384,10 +358,9 @@ class Canvas(object):
         Get the World to Item matrix for @item.
         See get_matrix_i2w().
         """
-        data = self._cache[item]
-        if data.matrix_c2i is None or calculate:
+        if item._matrix_c2i is None or calculate:
             self.update_matrix(item, recursive=False)
-        return data.matrix_c2i
+        return item._matrix_c2i
 
 
     @observed
@@ -548,21 +521,20 @@ class Canvas(object):
         # First remove from the to-be-updated set.
         self._dirty_matrix_items.discard(item)
 
-        data = self._cache[item]
         if parent:
             if parent in self._dirty_matrix_items:
                 # Parent takes care of updating the child, including current
                 self.update_matrix(parent)
                 return
             else:
-                data.matrix_i2c = Matrix(*item.matrix)
-                data.matrix_i2c *= self.get_matrix_i2c(parent)
+                item._matrix_i2c = Matrix(*item.matrix)
+                item._matrix_i2c *= self.get_matrix_i2c(parent)
         else:
-            data.matrix_i2c = Matrix(*item.matrix)
+            item._matrix_i2c = Matrix(*item.matrix)
 
         # It's nice to have the W2I matrix present too:
-        data.matrix_c2i = Matrix(*data.matrix_i2c)
-        data.matrix_c2i.invert()
+        item._matrix_c2i = Matrix(*item._matrix_i2c)
+        item._matrix_c2i.invert()
         for v in self._registered_views:
             v.update_matrix(item)
 
@@ -625,8 +597,6 @@ class Canvas(object):
         """
         self._registered_views.add(view)
         for item in self.get_all_items():
-            data = ViewBucket()
-            self._cache[item].view[view] = data
             view.update_matrix(item)
 
 

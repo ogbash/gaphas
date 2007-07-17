@@ -290,21 +290,22 @@ class View(object):
                                     cairo=cr,
                                     area=None))
 
+
     def get_matrix_i2v(self, item):
-        return self._canvas._cache[item].view[self].matrix_i2v
+        return item._matrix_i2v[self]
+
 
     def get_matrix_v2i(self, item):
-        return self._canvas._cache[item].view[self].matrix_v2i
+        return item._matrix_v2i[self]
 
 
     def update_matrix(self, item):
         """
         Update item matrices related to view.
         """
-        v = self._canvas._cache[item].view[self]
-        v.matrix_i2v = self._canvas.get_matrix_i2c(item) * self._matrix
-        v.matrix_v2i = Matrix(*v.matrix_i2v)
-        v.matrix_v2i.invert()
+        i2v = item._matrix_i2v[self] = self._canvas.get_matrix_i2c(item) * self._matrix
+        v2i = item._matrix_v2i[self] = Matrix(*i2v)
+        v2i.invert()
 
 
 
