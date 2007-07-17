@@ -61,6 +61,7 @@ class Canvas(object):
 
     Attributes:
      - _cache: additional cache of item data
+     - _canvas_constraints: constraints set between canvas items
     """
 
     def __init__(self):
@@ -73,6 +74,8 @@ class Canvas(object):
         self._cache = WeakKeyDictionary()
 
         self.proj = CanvasProjector(self)
+
+        self._canvas_constraints = {}
 
     solver = property(lambda s: s._solver)
 
@@ -93,8 +96,9 @@ class Canvas(object):
         assert item not in self._tree.nodes, 'Adding already added node %s' % item
         item.canvas = self
         self._tree.add(item, parent)
-
         self._cache[item] = CanvasBucket()
+        self._canvas_constraints[item] = {}
+
         for v in self._registered_views:
             self._cache[item].view[v] = ViewBucket()
             v.update_matrix(item)
@@ -124,12 +128,75 @@ class Canvas(object):
         item.canvas = None
         self._tree.remove(item)
         self.remove_connections_to_item(item)
+        del self._canvas_constraints[item]
         self._update_views((item,))
         self._dirty_items.discard(item)
         self._dirty_matrix_items.discard(item)
 
     reversible_pair(add, remove,
                     bind1={'parent': lambda self, item: self.get_parent(item) })
+
+
+    def add_canvas_constraint(self, item, handle, c):
+        """
+        Add constraint between items.
+
+        Parameters:
+         - item: item holding constraint
+         - handle: handle holding constraint
+         - c: constraint between items
+        """
+        if item not in self._canvas_constraints:
+            raise ValueError, 'Item not added to canvas'
+
+        i_cons = self._canvas_constraints[item]
+        if handle not in i_cons:
+            i_cons[handle] = set()
+        i_cons[handle].add(c)
+        self._solver.add_constraint(c)
+
+
+    def remove_canvas_constraint(self, item, handle, c=None):
+        """
+        Remove constraint set between item.
+
+        If constraint is not set then all constraints are removed for given
+        item and handle.
+
+        Parameters:
+         - item: item holding constraint
+         - handle: handle holding constraint
+         - c: constraint between items
+        """
+        if item not in self._canvas_constraints:
+            raise ValueError, 'Item not added to canvas'
+
+        i_cons = self._canvas_constraints[item]
+
+        if c is None: # remove all handle's constraints
+            h_cons = i_cons[handle]
+            for c in h_cons:
+                self._solver.remove_constraint(c)
+            h_cons.clear()
+        else:
+            # remove specific constraint
+            self._solver.remove_constraint(c)
+            i_cons[handle].remove(c)
+
+
+    def canvas_constraints(self, item):
+        """
+        Get all constraints set between items for specific item.
+        """
+        if item not in self._canvas_constraints:
+            raise ValueError, 'Item not added to canvas'
+
+        i_cons = self._canvas_constraints[item]
+
+        for cons in i_cons.values():
+            for c in cons:
+                yield c
+
 
     def remove_connections_to_item(self, item):
         """
@@ -499,7 +566,7 @@ class Canvas(object):
 
         # Make sure handles are marked (for constraint solving)
         request_resolve = self._solver.request_resolve
-        for c in item.iconstraints():
+        for c in self.canvas_constraints(item):
             request_resolve(c)
             
         if recursive:

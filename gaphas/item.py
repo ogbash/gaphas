@@ -126,33 +126,6 @@ class Item(object):
         self._matrix = Matrix()
         self._handles = []
         self._constraints = []
-        self._iconstraints = {}
-
-
-    def add_iconstraint(self, h, c):
-        if h not in self._iconstraints:
-            self._iconstraints[h] = set()
-        self._iconstraints[h].add(c)
-        self._canvas.solver.add_constraint(c)
-
-
-    def remove_iconstraint(self, h, c=None):
-        if c is None: # remove all handle's constraints
-            cons = self._iconstraints[h]
-            for c in cons:
-                self._canvas.solver.remove_constraint(c)
-            cons.clear()
-        else:
-            # remove specific constraint
-            self._canvas.solver.remove_constraint(c)
-            self._iconstraints[h].remove(c)
-
-
-    def iconstraints(self):
-        for cons in self._iconstraints.values():
-            for c in cons:
-                yield c
-
 
     @observed
     def _set_canvas(self, canvas):

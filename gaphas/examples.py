@@ -214,7 +214,7 @@ class ConnectingHandleTool(tool.HandleTool):
 
         def handle_disconnect():
             try:
-                item.remove_iconstraint(handle)
+                view.canvas.remove_canvas_constraint(item, handle)
             except KeyError:
                 pass # constraint was alreasy removed
             handle.connected_to = None
@@ -225,7 +225,7 @@ class ConnectingHandleTool(tool.HandleTool):
         glue_item = self.glue(view, item, handle, wx, wy)
         if glue_item and glue_item is handle.connected_to:
             try:
-                item.remove_iconstraint(handle)
+                view.canvas.remove_canvas_constraint(item, handle)
             except KeyError:
                 pass # constraint was already removed
 
@@ -240,7 +240,7 @@ class ConnectingHandleTool(tool.HandleTool):
             view.canvas.proj(lc, xy=pdata)
             view.canvas.proj(lc, xy=pdata, f=lc.update_ratio)
             lc.update_ratio()
-            item.add_iconstraint(handle, lc)
+            view.canvas.add_canvas_constraint(item, handle, lc)
 
             handle.disconnect = handle_disconnect
             return
@@ -264,7 +264,7 @@ class ConnectingHandleTool(tool.HandleTool):
                 view.canvas.proj(lc, xy=pdata)
                 view.canvas.proj(lc, xy=pdata, f=lc.update_ratio)
                 lc.update_ratio()
-                item.add_iconstraint(handle, lc)
+                view.canvas.add_canvas_constraint(item, handle, lc)
 
                 handle.connected_to = glue_item
                 handle.disconnect = handle_disconnect
@@ -272,7 +272,7 @@ class ConnectingHandleTool(tool.HandleTool):
     def disconnect(self, view, item, handle):
         if handle.connected_to:
             #print 'Handle.disconnect', view, item, handle
-            item.remove_iconstraint(handle)
+            view.canvas.remove_canvas_constraint(item, handle)
 
 
 def DefaultExampleTool():
