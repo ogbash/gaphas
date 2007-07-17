@@ -297,9 +297,15 @@ def main():
     b=MyBox()
     b.min_width = 20
     b.min_height = 30
-    b.width = b.height = 40
+    print 'box', b
     b.matrix=(1.0, 0.0, 0.0, 1, 20,20)
+    b.width = b.height = 40
     c.add(b)
+
+    bb=Box()
+    print 'box', bb
+    bb.matrix=(1.0, 0.0, 0.0, 1, 10,10)
+    c.add(bb, parent=b)
 
     fl = FatLine()
     fl.height = 50
@@ -313,30 +319,25 @@ def main():
     circle.matrix.translate(50, 100)
     c.add(circle)
 
-#   bb=Box()
-#   print 'box', bb
-#   bb.matrix=(1.0, 0.0, 0.0, 1, 10,10)
-#   c.add(bb, parent=b)
-#   #v.selected_items = bb
-
-#   # AJM: extra boxes:
+    # AJM: extra boxes:
     bb=Box()
     print 'box', bb
     bb.matrix.rotate(math.pi/4.)
     c.add(bb, parent=b)
-#   for i in xrange(1):
-#       bb=Box()
-#       print 'box', bb
-#       bb.matrix.rotate(math.pi/4.0 * i / 10.0)
-#       c.add(bb, parent=b)
+#    for i in xrange(10):
+#        bb=Box()
+#        print 'box', bb
+#        bb.matrix.rotate(math.pi/4.0 * i / 10.0)
+#        c.add(bb, parent=b)
 
     t=MyText('Single line')
     t.matrix.translate(70,70)
     c.add(t)
 
     l=MyLine()
+    l.handles()[1].pos = (30, 30)
     l.split_segment(0, 3)
-    l.matrix.translate(30, 30)
+    l.matrix.translate(30, 60)
     c.add(l)
     l.orthogonal = True
 
