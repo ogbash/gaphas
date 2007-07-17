@@ -173,7 +173,7 @@ def main():
         bb.matrix.rotate(math.pi/4.0 * i / 10.0)
         c.add(bb, parent=b)
 
-    for i in range(count):
+    for i in range(40):
         bb = MyBox()
         bb.width = bb.height = 15
         x = int(i % 4) * 20
