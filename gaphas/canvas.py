@@ -57,9 +57,11 @@ class CanvasBucket(object):
 
 class Canvas(object):
     """
-    Container class for Items.
+    Container class for items.
 
     Attributes:
+     - projector: canvas constraint projector between item and canvas
+       coordinates
      - _cache: additional cache of item data
      - _canvas_constraints: constraints set between canvas items
     """
@@ -667,6 +669,12 @@ class Canvas(object):
 
 
 class CanvasProjector(Projector):
+    """
+    Canvas constraint projector between item and canvas coordinates.
+
+    Attributes:
+     - _canvas: canvas reference
+    """
     def __init__(self, canvas):
         super(CanvasProjector, self).__init__()
         self._canvas = canvas
