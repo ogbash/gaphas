@@ -487,9 +487,9 @@ class Projector(object):
     space before constraint solving.
 
     Consider two geometrical objects defined by their position (x0, y0)
-    and object's affine information (see gaphas.sexample module)
+    and object's affine information (see gaphas.tests.test_projector module)
     >>> from solver import Variable
-    >>> from gaphas.sexamples import Rectangle, Vector, AffineProjector
+    >>> from gaphas.tests.test_projector import Rectangle, Vector, AffineProjector
     >>> r = Rectangle(5, 5, 20, 20)
     >>> v = Vector(5, 50, 5, -25)
 

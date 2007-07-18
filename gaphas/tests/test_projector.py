@@ -1,6 +1,3 @@
-"""
-Solver examples.
-"""
 from gaphas.solver import Variable
 from gaphas.constraint import Projector
 
@@ -61,3 +58,4 @@ class Vector(object):
 ###
 ### end of projection example
 ###
+
