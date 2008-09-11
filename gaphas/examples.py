@@ -10,9 +10,7 @@ from item import Handle, Element, Item
 from item import NW, NE,SW, SE
 from solver import solvable
 import tool
-from constraint import LineConstraint, LessThanConstraint, EqualsConstraint
-from canvas import CanvasProjection
-from geometry import point_on_rectangle, distance_rectangle_point
+from constraint import LessThanConstraint, EqualsConstraint
 from util import text_extents, text_align, text_multiline, path_ellipse
 from cairo import Matrix
 
@@ -130,33 +128,6 @@ class Circle(Item):
         cr = context.cairo
         path_ellipse(cr, 0, 0, 2 * self.radius, 2 * self.radius)
         cr.stroke()
-
-
-class DisconnectHandle(object):
-
-    def __init__(self, canvas, item, handle):
-        self.canvas = canvas
-        self.item = item
-        self.handle = handle
-
-    def __call__(self):
-        self.handle_disconnect()
-
-    def handle_disconnect(self):
-        canvas = self.canvas
-        item = self.item
-        handle = self.handle
-        try:
-            canvas.solver.remove_constraint(handle.connection_data)
-        except KeyError:
-            print 'constraint was already removed for', item, handle
-            pass # constraint was alreasy removed
-        else:
-            print 'constraint removed for', item, handle
-        handle.connection_data = None
-        handle.connected_to = None
-        # Remove disconnect handler:
-        handle.disconnect = None
 
 
 
