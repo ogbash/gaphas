@@ -28,7 +28,7 @@ import cairo
 import gtk
 from canvas import Context
 from item import Element
-from geometry import Rectangle
+from geometry import Rectangle, distance_line_point
 
 DEBUG_TOOL = False
 DEBUG_TOOL_CHAIN = False
@@ -731,40 +731,61 @@ class ConnectHandleTool(HandleTool):
     This is a HandleTool which supports a simple connection algorithm,
     using LineConstraint.
     """
+    GLUE_DISTANCE = 10
 
-    def glue(self, view, item, handle, wx, wy):
+    def glue(self, view, item, handle, vx, vy):
         """
-        It allows the tool to glue to a Box or (other) Line item.
-        The distance from the item to the handle is determined in canvas
-        coordinates, using a 10 pixel glue distance.
+        Glue to an item.
+
+        Look for items in glue rectangle (which is defined by (vx, vy)
+        and glue distance) and find the closest port.
+
+        Glue position is found for closest point as well. Handle of
+        connecting item is moved to glue point.
+
+        Return found port or `None` if not found.
+
+        Parameters::
+            - view: view used by user
+            - item: connecting imte
+            - handle: handle of connecting item
         """
         if not handle.connectable:
-            return
+            return None
 
-        # Make glue distance depend on the zoom ratio (should be about 10 pixels)
-        inverse = Matrix(*view.matrix)
-        inverse.invert()
-        #glue_distance, dummy = inverse.transform_distance(10, 0)
-        glue_distance = 10
-        glue_point = None
-        glue_item = None
-        for i in view.canvas.get_all_items():
-            if not i is item:
-                v2i = view.get_matrix_v2i(i).transform_point
-                ix, iy = v2i(wx, wy)
-                try:
-                    distance, point = i.glue(item, handle, ix, iy)
-                    if distance <= glue_distance:
-                        glue_distance = distance
-                        i2v = view.get_matrix_i2v(i).transform_point
-                        glue_point = i2v(*point)
-                        glue_item = i
-                except AttributeError:
-                    pass
-        if glue_point:
+        dist = self.GLUE_DISTANCE
+        max_dist = dist
+        port = None
+        glue_pos = None
+        v2i = view.get_matrix_v2i
+
+        rect = (vx - dist, vy - dist, dist * 2, dist * 2)
+        items = view.get_items_in_rectangle(rect, reverse=True)
+        for i in items:
+            if i is item:
+                continue
+            for p in i.ports():
+                h1 = p[0]
+                h2 = p[1]
+                p1, p2 = (h1.x, h1.y), (h2.x, h2.y)
+                pi = v2i(i).transform_point(vx, vy)
+                d, pl = distance_line_point(p1, p2, pi)
+                if d >= max_dist:
+                    continue
+                port = p
+                # transform coordinates from connectable item space to view
+                # space
+                i2v = view.get_matrix_i2v(i).transform_point
+                glue_pos = i2v(*pl)
+
+        if port is not None:
+            # transport coordinates from view space to connecting item
+            # space and update position connecting item's handle
             v2i = view.get_matrix_v2i(item).transform_point
-            handle.x, handle.y = v2i(*glue_point)
-        return glue_item
+            handle.pos = v2i(*glue_pos)
+
+        return port
+
 
     def connect(self, view, item, handle, wx, wy):
         """
