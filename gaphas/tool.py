@@ -725,15 +725,123 @@ class TextEditTool(Tool):
         widget.destroy()
 
 
+
+class ConnectHandleTool(HandleTool):
+    """
+    This is a HandleTool which supports a simple connection algorithm,
+    using LineConstraint.
+    """
+
+    def glue(self, view, item, handle, wx, wy):
+        """
+        It allows the tool to glue to a Box or (other) Line item.
+        The distance from the item to the handle is determined in canvas
+        coordinates, using a 10 pixel glue distance.
+        """
+        if not handle.connectable:
+            return
+
+        # Make glue distance depend on the zoom ratio (should be about 10 pixels)
+        inverse = Matrix(*view.matrix)
+        inverse.invert()
+        #glue_distance, dummy = inverse.transform_distance(10, 0)
+        glue_distance = 10
+        glue_point = None
+        glue_item = None
+        for i in view.canvas.get_all_items():
+            if not i is item:
+                v2i = view.get_matrix_v2i(i).transform_point
+                ix, iy = v2i(wx, wy)
+                try:
+                    distance, point = i.glue(item, handle, ix, iy)
+                    if distance <= glue_distance:
+                        glue_distance = distance
+                        i2v = view.get_matrix_i2v(i).transform_point
+                        glue_point = i2v(*point)
+                        glue_item = i
+                except AttributeError:
+                    pass
+        if glue_point:
+            v2i = view.get_matrix_v2i(item).transform_point
+            handle.x, handle.y = v2i(*glue_point)
+        return glue_item
+
+    def connect(self, view, item, handle, wx, wy):
+        """
+        Connect a handle to another item.
+
+        In this "method" the following assumptios are made:
+        
+        1. The only item that accepts handle connections are the Box instances
+        2. The only items with connectable handles are Line's
+         
+        """
+        def side(handle, glued):
+            handles = glued.handles()
+            hx, hy = view.get_matrix_i2v(item).transform_point(handle.x, handle.y)
+            ax, ay = view.get_matrix_i2v(glued).transform_point(handles[NW].x, handles[NW].y)
+            bx, by = view.get_matrix_i2v(glued).transform_point(handles[SE].x, handles[SE].y)
+
+            if abs(hx - ax) < 0.01:
+                return handles[NW], handles[SW]
+            elif abs(hy - ay) < 0.01:
+                return handles[NW], handles[NE]
+            elif abs(hx - bx) < 0.01:
+                return handles[NE], handles[SE]
+            else:
+                return handles[SW], handles[SE]
+            assert False
+
+        #print 'Handle.connect', view, item, handle, wx, wy
+        glue_item = self.glue(view, item, handle, wx, wy)
+        if glue_item and glue_item is handle.connected_to:
+            try:
+                view.canvas.solver.remove_constraint(handle.connection_data)
+            except KeyError:
+                pass # constraint was already removed
+
+            h1, h2 = side(handle, glue_item)
+            handle.connection_data = LineConstraint(line=(CanvasProjection(h1.pos, glue_item),
+                                      CanvasProjection(h2.pos, glue_item)),
+                                point=CanvasProjection(handle.pos, item))
+            view.canvas.solver.add_constraint(handle.connection_data)
+
+            handle.disconnect = DisconnectHandle(view.canvas, item, handle)
+            return
+
+        # drop old connetion
+        if handle.connected_to:
+            handle.disconnect()
+
+        if glue_item:
+            if isinstance(glue_item, Element):
+                h1, h2 = side(handle, glue_item)
+
+                # Make a constraint that keeps into account item coordinates.
+                handle.connection_data = \
+                        LineConstraint(line=(CanvasProjection(h1.pos, glue_item),
+                            CanvasProjection(h2.pos, glue_item)),
+                            point=CanvasProjection(handle.pos, item))
+                view.canvas.solver.add_constraint(handle.connection_data)
+
+                handle.connected_to = glue_item
+                handle.disconnect = DisconnectHandle(view.canvas, item, handle)
+
+    def disconnect(self, view, item, handle):
+        if handle.connected_to:
+            #print 'Handle.disconnect', view, item, handle
+            view.canvas.solver.remove_constraint(handle.connection_data)
+
+
 def DefaultTool():
     """
     The default tool chain build from HoverTool, ItemTool and HandleTool.
     """
-    chain = ToolChain().\
-        append(HoverTool()).\
-        append(HandleTool()).\
-        append(ItemTool()).\
-        append(TextEditTool()).\
+    chain = ToolChain(). \
+        append(HoverTool()). \
+        append(ConnectHandleTool()). \
+        append(ItemTool()). \
+        append(TextEditTool()). \
         append(RubberbandTool())
     return chain
 

@@ -24,7 +24,7 @@ import math
 import gtk
 import cairo
 from gaphas import Canvas, GtkView, View
-from gaphas.examples import Box, Text, FatLine, Circle, DefaultExampleTool
+from gaphas.examples import Box, Text, FatLine, Circle
 from gaphas.item import Line, NW, SE
 from gaphas.tool import PlacementTool, HandleTool
 from gaphas.painter import ItemPainter
@@ -97,7 +97,6 @@ class MyText(Text):
 
 def create_window(canvas, title, zoom=1.0):
     view = GtkView()
-    view.tool = DefaultExampleTool()
 
     w = gtk.Window()
     w.set_title(title)
