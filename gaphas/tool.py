@@ -798,26 +798,22 @@ class ConnectHandleTool(HandleTool):
         glue_item, port = self.glue(view, item, handle, wx, wy)
 
         # reconnect
-        if glue_item and glue_item is handle.connected_to:
-            try:
-                view.canvas.solver.remove_constraint(handle.connection_data)
-            except KeyError:
-                pass # constraint was already removed
-
-            self._connect(view, item, handle, glue_item, port)
-            return
-
-        # drop old connetion
-        if handle.connected_to:
+        if not glue_item \
+                or glue_item and handle.connected_to is not glue_item:
             handle.disconnect()
 
-        # connect
-        if glue_item:
-            self._connect(view, item, handle, glue_item, port)
+        # safety guard: connect only if it's permitted by glue()
+        if not glue_item:
+            return False
+        
+        # make the connection
+        self.connect_constraints(view, item, handle, glue_item, port)
+        return True
 
-    def _connect(self, view, item, handle, glue_item, port):
+
+    def connect_constraints(self, view, item, handle, glue_item, port):
         """
-        Connect item's handle to port of glue item.
+        Create constraint between item's handle and port of glue item.
         """
         h1, h2 = port
 
