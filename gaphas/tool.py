@@ -744,7 +744,8 @@ class ConnectHandleTool(HandleTool):
         Glue position is found for closest port as well. Handle of
         connecting item is moved to glue point.
 
-        Return found item and its connection port or `None` if not found.
+        Return found item and its connection port or (`None`, `None`) if
+        not found.
 
         Parameters::
             - view: view used by user
@@ -787,9 +788,7 @@ class ConnectHandleTool(HandleTool):
             v2i = view.get_matrix_v2i(item).transform_point
             handle.pos = v2i(*glue_pos)
 
-            return glue_item, port
-        else:
-            return None
+        return glue_item, port
 
 
     def connect(self, view, item, handle, wx, wy):
@@ -798,37 +797,40 @@ class ConnectHandleTool(HandleTool):
         """
         glue_item, port = self.glue(view, item, handle, wx, wy)
 
+        # reconnect
         if glue_item and glue_item is handle.connected_to:
             try:
                 view.canvas.solver.remove_constraint(handle.connection_data)
             except KeyError:
                 pass # constraint was already removed
 
-            h1, h2 = port
-            handle.connection_data = LineConstraint(line=(CanvasProjection(h1.pos, glue_item),
-                                      CanvasProjection(h2.pos, glue_item)),
-                                point=CanvasProjection(handle.pos, item))
-            view.canvas.solver.add_constraint(handle.connection_data)
-
-            handle.disconnect = DisconnectHandle(view.canvas, item, handle)
+            self._connect(view, item, handle, glue_item, port)
             return
 
         # drop old connetion
         if handle.connected_to:
             handle.disconnect()
 
+        # connect
         if glue_item:
-            h1, h2 = port
+            self._connect(view, item, handle, glue_item, port)
 
-            # Make a constraint that keeps into account item coordinates.
-            handle.connection_data = \
-                    LineConstraint(line=(CanvasProjection(h1.pos, glue_item),
-                        CanvasProjection(h2.pos, glue_item)),
-                        point=CanvasProjection(handle.pos, item))
-            view.canvas.solver.add_constraint(handle.connection_data)
+    def _connect(self, view, item, handle, glue_item, port):
+        """
+        Connect item's handle to port of glue item.
+        """
+        h1, h2 = port
 
-            handle.connected_to = glue_item
-            handle.disconnect = DisconnectHandle(view.canvas, item, handle)
+        # Make a constraint that keeps into account item coordinates.
+        handle.connection_data = \
+                LineConstraint(line=(CanvasProjection(h1.pos, glue_item),
+                    CanvasProjection(h2.pos, glue_item)),
+                    point=CanvasProjection(handle.pos, item))
+        view.canvas.solver.add_constraint(handle.connection_data)
+
+        handle.connected_to = glue_item
+        handle.disconnect = DisconnectHandle(view.canvas, item, handle)
+
 
     def disconnect(self, view, item, handle):
         if handle.connected_to:
