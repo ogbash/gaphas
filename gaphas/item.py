@@ -542,6 +542,7 @@ class Line(Item):
         do_split(segment, parts)
         # Force orthogonal constraints to be recreated
         self._update_orthogonal_constraints(self.orthogonal)
+        self._update_ports()
         return self._handles[segment+1:segment+parts]
 
     def merge_segment(self, segment, parts=2):
@@ -586,7 +587,21 @@ class Line(Item):
         else:
             # Force orthogonal constraints to be recreated
             self._update_orthogonal_constraints(self.orthogonal)
+        self._update_ports()
         return deleted_handles
+
+
+    def _update_ports(self):
+        """
+        Update line ports.
+        """
+        self._ports = []
+        # at least two handles are required
+        if len(self._handles) > 2:
+            hp = self._handles[0]
+            for i, h in enumerate(self._handles[1:]):
+                self._ports.append((hp, h))
+                hp = h
 
 
     def opposite(self, handle):
