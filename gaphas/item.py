@@ -30,6 +30,7 @@ class Item(object):
 
     - _canvas:      canvas, which owns an item
     - _handles:     list of handles owned by an item
+    - _ports:       list of ports, connectable areas of an item
     - _matrix_i2c:  item to canvas coordinates matrix
     - _matrix_c2i:  canvas to item coordinates matrix
     - _matrix_i2v:  item to view coordinates matrices
@@ -42,6 +43,7 @@ class Item(object):
         self._matrix = Matrix()
         self._handles = []
         self._constraints = []
+        self._ports = []
 
         # used by gaphas.canvas.Canvas to hold conversion matrices
         self._matrix_i2c = None
@@ -159,6 +161,12 @@ class Item(object):
         """
         return self._handles
 
+    def ports(self):
+        """
+        Return list of ports.
+        """
+        return self._ports
+
     def point(self, x, y):
         """
         Get the distance from a point (``x``, ``y``) to the item.
@@ -216,6 +224,14 @@ class Element(Item):
         h_ne = handles[NE]
         h_sw = handles[SW]
         h_se = handles[SE]
+
+        # edge of element define default element ports
+        self._ports = [
+            (h_nw, h_ne),
+            (h_ne, h_se), 
+            (h_se, h_sw), 
+            (h_sw, h_nw)
+        ]
 
         # create minimal size constraints
         self._c_min_w = LessThanConstraint(smaller=h_nw.x, bigger=h_se.x, delta=10)
@@ -359,6 +375,7 @@ class Line(Item):
     def __init__(self):
         super(Line, self).__init__()
         self._handles = [Handle(connectable=True), Handle(10, 10, connectable=True)]
+        self._ports = [tuple(self._handles)]
 
         self._line_width = 2
         self._fuzziness = 0
