@@ -38,17 +38,6 @@ class Box(Element):
         c.set_source_rgb(0,0,0.8)
         c.stroke()
 
-    def glue(self, item, handle, x, y):
-        """
-        Special glue method used by the ConnectingHandleTool to find
-        a connection point.
-        """
-        h = self._handles
-        h_se = h[SE]
-        r = (0, 0, h_se.x, h_se.y)
-        por = point_on_rectangle(r, (x, y), border=True)
-        p = distance_rectangle_point(r, (x, y))
-        return p, por
 
 
 class Text(Item):
