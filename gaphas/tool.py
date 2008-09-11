@@ -791,18 +791,27 @@ class ConnectHandleTool(HandleTool):
         return glue_item, port
 
 
-    def connect(self, view, item, handle, wx, wy):
+    def connect(self, view, item, handle, vx, vy):
         """
-        Connect a handle to another item.
-        """
-        glue_item, port = self.glue(view, item, handle, wx, wy)
+        Connect a handle of connecting item to connectable item.
+        Connectable item is found by `glue` method.
 
-        # reconnect
+        Return `True` if connection is performed.
+
+        Parameters::
+            - item: connectable item
+            - handle: connecting item handle (of connectable item)
+        """
+        glue_item, port = self.glue(view, item, handle, vx, vy)
+
+        # disconnect when
+        # - no glued item
+        # - currently connected item is not glue item
         if not glue_item \
                 or glue_item and handle.connected_to is not glue_item:
             handle.disconnect()
 
-        # safety guard: connect only if it's permitted by glue()
+        # no glue item, no connection
         if not glue_item:
             return False
         
