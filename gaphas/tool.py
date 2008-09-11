@@ -822,10 +822,9 @@ class ConnectHandleTool(HandleTool):
         h1, h2 = port
 
         # Make a constraint that keeps into account item coordinates.
-        handle.connection_data = \
-                LineConstraint(line=(CanvasProjection(h1.pos, glue_item),
-                    CanvasProjection(h2.pos, glue_item)),
-                    point=CanvasProjection(handle.pos, item))
+        line = CanvasProjection(h1.pos, glue_item), CanvasProjection(h2.pos, glue_item)
+        point = CanvasProjection(handle.pos, item)
+        handle.connection_data = LineConstraint(line=line, point=point)
         view.canvas.solver.add_constraint(handle.connection_data)
 
         handle.connected_to = glue_item
