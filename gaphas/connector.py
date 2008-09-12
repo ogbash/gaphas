@@ -7,6 +7,7 @@ __version__ = "$Revision: 2341 $"
 
 from solver import solvable, WEAK, NORMAL, STRONG, VERY_STRONG
 from state import observed, reversible_property, disable_dispatching
+from geometry import distance_line_point
 
 
 class Connector(object):
@@ -157,13 +158,38 @@ class Handle(Connector):
         return (self.x, self.y)[index]
 
 
-class Port(Connector):
-    """
-    A Port functions as a place on an Item where a Handle can connect.
-    """
 
-    def __init__(self, x=0, y=0, strength=NORMAL):
-        super(Port, self).__init__(x, y, strength)
+class Port(object):
+    """
+    Port connectable part of an item. Item's handle connects to a port.
+    """
+    def glue(self, x, y):
+        """
+        Get glue point on the port and distance to the port.
+        """
+        raise NotImplemented('Glue method not implemented')
+
+
+
+class LinePort(Port):
+    """
+    Port defined as a line between two handles.
+    """
+    def __init__(self, h1, h2):
+        super(LinePort, self).__init__(self)
+
+        self.start = h1
+        self.end = h2
+
+
+    def glue(self, x, y):
+        """
+        Get glue point on the port and distance to the port.
+        """
+        p1 = self.start.x, self.start.y
+        p2 = self.end.x, self.end.y
+        d, pl = distance_line_point(p1, p2, (x, y))
+        return pl, d
 
 
 # vim: sw=4:et:ai

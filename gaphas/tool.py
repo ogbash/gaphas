@@ -27,7 +27,7 @@ __version__ = "$Revision$"
 import cairo
 import gtk
 from canvas import Context
-from geometry import Rectangle, distance_line_point
+from geometry import Rectangle
 from constraint import LineConstraint
 from canvas import CanvasProjection
 
@@ -768,18 +768,16 @@ class ConnectHandleTool(HandleTool):
             if i is item:
                 continue
             for p in i.ports():
-                h1 = p[0]
-                h2 = p[1]
-                p1, p2 = (h1.x, h1.y), (h2.x, h2.y)
-                pi = v2i(i).transform_point(vx, vy)
-                d, pl = distance_line_point(p1, p2, pi)
+                ix, iy = v2i(i).transform_point(vx, vy)
+                pg, d = p.glue(ix, iy)
+
                 if d >= max_dist:
                     continue
                 port = p
                 # transform coordinates from connectable item space to view
                 # space
                 i2v = view.get_matrix_i2v(i).transform_point
-                glue_pos = i2v(*pl)
+                glue_pos = i2v(*pg)
                 glue_item = i
 
         if port is not None:
@@ -824,7 +822,7 @@ class ConnectHandleTool(HandleTool):
         """
         Create constraint between item's handle and port of glue item.
         """
-        h1, h2 = port
+        h1, h2 = port.start, port.end
 
         # Make a constraint that keeps into account item coordinates.
         line = CanvasProjection(h1.pos, glue_item), CanvasProjection(h2.pos, glue_item)

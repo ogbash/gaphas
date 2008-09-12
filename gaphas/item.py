@@ -10,7 +10,7 @@ from weakref import WeakKeyDictionary
 
 from matrix import Matrix
 from geometry import distance_line_point, distance_rectangle_point
-from connector import Handle
+from gaphas.connector import Handle, LinePort
 from solver import solvable, WEAK, NORMAL, STRONG, VERY_STRONG
 from constraint import EqualsConstraint, LessThanConstraint
 from state import observed, reversible_method, reversible_pair, reversible_property, disable_dispatching
@@ -227,10 +227,10 @@ class Element(Item):
 
         # edge of element define default element ports
         self._ports = [
-            (h_nw, h_ne),
-            (h_ne, h_se), 
-            (h_se, h_sw), 
-            (h_sw, h_nw)
+            LinePort(h_nw, h_ne),
+            LinePort(h_ne, h_se), 
+            LinePort(h_se, h_sw), 
+            LinePort(h_sw, h_nw)
         ]
 
         # create minimal size constraints
@@ -375,7 +375,8 @@ class Line(Item):
     def __init__(self):
         super(Line, self).__init__()
         self._handles = [Handle(connectable=True), Handle(10, 10, connectable=True)]
-        self._ports = [tuple(self._handles)]
+        self._ports = []
+        self._update_ports()
 
         self._line_width = 2
         self._fuzziness = 0
@@ -600,7 +601,7 @@ class Line(Item):
         if len(self._handles) > 2:
             hp = self._handles[0]
             for i, h in enumerate(self._handles[1:]):
-                self._ports.append((hp, h))
+                self._ports.append(LinePort(hp, h))
                 hp = h
 
 
