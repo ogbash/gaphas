@@ -6,11 +6,12 @@ These items are used in various tests.
 __version__ = "$Revision$"
 # $HeadURL$
 
-from item import Handle, Element, Item
-from item import NW, NE,SW, SE
-from solver import solvable
+from gaphas.item import Element, Item, NW, NE,SW, SE
+from gaphas.connector import Handle, PointPort
+from gaphas.constraint import LessThanConstraint, EqualsConstraint, \
+    EqualsShiftedConstraint, BalanceConstraint
+from gaphas.solver import solvable, WEAK
 import tool
-from constraint import LessThanConstraint, EqualsConstraint
 from util import text_extents, text_align, text_multiline, path_ellipse
 from cairo import Matrix
 
@@ -35,6 +36,53 @@ class Box(Element):
         c.fill_preserve()
         c.set_source_rgb(0,0,0.8)
         c.stroke()
+
+
+class BoxX(Box):
+    """
+    It is a Box but with additional port (see "x" below).
+
+     NW +--------+ NE
+        |        |
+        |        |
+        |        |x
+        |        |
+     SW +--------+ SE
+    """
+    def __init__(self, width=10, height=10):
+        super(BoxX, self).__init__(width, height)
+        self._hx = Handle(strength=WEAK)
+        self._hx.movable = False
+        self._hx.visible = False
+        self._handles.append(self._hx)
+        # define 'x' port
+        self._ports.append(PointPort(self._hx))
+
+        # keep hx handle at right edge, at 80% of height of the box
+        ne = self._handles[NE]
+        se = self._handles[SE]
+        hxc1 = EqualsShiftedConstraint(ne.x, self._hx.x, shift=10)
+        hxc2 = BalanceConstraint(band=(ne.y, se.y), v=self._hx.y, balance=0.8)
+        self._constraints.append(hxc1)
+        self._constraints.append(hxc2)
+
+
+    def draw(self, context):
+        super(BoxX, self).draw(context)
+        c = context.cairo
+
+        # draw 'x' port
+        hx = self._hx
+        c.rectangle(hx.x - 20 , hx.y - 5, 20, 10)
+        c.rectangle(hx.x - 1 , hx.y - 1, 2, 2)
+        if context.hovered:
+            c.set_source_rgba(.0, .8, 0, .8)
+        else:
+            c.set_source_rgba(.9, .0, .0, .8)
+        c.fill_preserve()
+        c.set_source_rgb(0,0,0.8)
+        c.stroke()
+
 
 
 

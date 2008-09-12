@@ -24,7 +24,7 @@ import math
 import gtk
 import cairo
 from gaphas import Canvas, GtkView, View
-from gaphas.examples import Box, Text, FatLine, Circle
+from gaphas.examples import Box, BoxX, Text, FatLine, Circle
 from gaphas.item import Line, NW, SE
 from gaphas.tool import PlacementTool, HandleTool
 from gaphas.painter import ItemPainter
@@ -348,7 +348,6 @@ def create_canvas(c=None):
     fl.matrix.translate(100, 100)
     c.add(fl)
 
-
     circle = Circle()
     h1, h2 = circle.handles()
     circle.radius = 20
@@ -365,6 +364,13 @@ def create_canvas(c=None):
 #        print 'box', bb
 #        bb.matrix.rotate(math.pi/4.0 * i / 10.0)
 #        c.add(bb, parent=b)
+
+    b=BoxX()
+    b.min_width = 40
+    b.min_height = 50
+    b.width = b.height = 60
+    b.matrix.translate(55, 55)
+    c.add(b)
 
     t=MyText('Single line')
     t.matrix.translate(70,70)

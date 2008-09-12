@@ -7,7 +7,7 @@ __version__ = "$Revision: 2341 $"
 
 from solver import solvable, WEAK, NORMAL, STRONG, VERY_STRONG
 from state import observed, reversible_property, disable_dispatching
-from geometry import distance_line_point
+from geometry import distance_line_point, distance_point_point
 
 
 class Connector(object):
@@ -186,10 +186,28 @@ class LinePort(Port):
         """
         Get glue point on the port and distance to the port.
         """
-        p1 = self.start.x, self.start.y
-        p2 = self.end.x, self.end.y
+        p1 = self.start.pos
+        p2 = self.end.pos
         d, pl = distance_line_point(p1, p2, (x, y))
         return pl, d
+
+
+class PointPort(Port):
+    """
+    Port defined as a point.
+    """
+    def __init__(self, handle):
+        super(PointPort, self).__init__(self)
+        self.handle = handle
+        self.start = self.end = self.handle
+
+
+    def glue(self, x, y):
+        """
+        Get glue point on the port and distance to the port.
+        """
+        d = distance_point_point(self.handle.pos, (x, y))
+        return self.handle.pos, d
 
 
 # vim: sw=4:et:ai

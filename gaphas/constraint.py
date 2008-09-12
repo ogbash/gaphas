@@ -153,6 +153,35 @@ class EqualsConstraint(Constraint):
                 (self.b, self.a.value)))
 
 
+class EqualsShiftedConstraint(Constraint):
+    """
+    Constraint, which ensures that two arguments ``a`` and ``b`` are equal,
+    for example
+    >>> from solver import Variable
+    >>> a, b = Variable(1.0), Variable(2.0)
+    >>> eq = EqualsConstraint(a, b)
+    >>> eq.solve_for(a)
+    >>> a
+    Variable(2, 20)
+    >>> a.value = 10.8
+    >>> eq.solve_for(b)
+    >>> b
+    Variable(10.8, 20)
+    """
+
+    def __init__(self, a=None, b=None, shift=0):
+        super(EqualsShiftedConstraint, self).__init__(a, b)
+        self.a = a
+        self.b = b
+        self.shift = shift
+
+    def solve_for(self, var):
+        assert var in (self.a, self.b)
+
+        _update(*((var is self.a) and \
+                (self.a, self.b.value + self.shift) or \
+                (self.b, self.a.value + self.shift)))
+
 
 class CenterConstraint(Constraint):
     """
