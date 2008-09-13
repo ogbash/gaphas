@@ -218,7 +218,6 @@ class PointPort(Port):
     def __init__(self, handle):
         super(PointPort, self).__init__(self)
         self.handle = handle
-        self.start = self.end = self.handle
 
 
     def glue(self, x, y):
