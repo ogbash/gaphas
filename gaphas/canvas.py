@@ -684,6 +684,22 @@ class Canvas(object):
         #self.update()
 
 
+    def project(self, item, *variables):
+        """
+        Project item's variables to canvas coordinate system.
+
+        If there is only one variable returned than projected variable is
+        returned. If there are more than one variables, then tuple of
+        projected variables is returned.
+        """
+        if len(variables) == 1:
+            return CanvasProjection(variables[0], item)
+        elif len(variables) > 1:
+            return tuple(CanvasProjection(v, item) for v in variables)
+        else:
+            raise AttributeError('There should at least one variable specified')
+
+
 class VariableProjection(solver.Projection):
     """
     Project a single `solver.Variable` to another space/coordinate system.

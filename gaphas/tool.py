@@ -29,7 +29,6 @@ import gtk
 from canvas import Context
 from geometry import Rectangle
 from constraint import LineConstraint
-from canvas import CanvasProjection
 
 DEBUG_TOOL = False
 DEBUG_TOOL_CHAIN = False
@@ -824,14 +823,16 @@ class ConnectHandleTool(HandleTool):
         """
         h1, h2 = port.start, port.end
 
-        # Make a constraint that keeps into account item coordinates.
-        line = CanvasProjection(h1.pos, glue_item), CanvasProjection(h2.pos, glue_item)
-        point = CanvasProjection(handle.pos, item)
+        canvas = view.canvas
+
+        # create a constraint, which operates in canvas coordinate system
+        line = canvas.project(glue_item, h1.pos, h2.pos)
+        point = canvas.project(item, handle.pos)
         handle.connection_data = LineConstraint(line=line, point=point)
-        view.canvas.solver.add_constraint(handle.connection_data)
+        canvas.solver.add_constraint(handle.connection_data)
 
         handle.connected_to = glue_item
-        handle.disconnect = DisconnectHandle(view.canvas, item, handle)
+        handle.disconnect = DisconnectHandle(canvas, item, handle)
 
 
     def disconnect(self, view, item, handle):
