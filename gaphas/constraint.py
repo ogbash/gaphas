@@ -534,4 +534,31 @@ class LineConstraint(Constraint):
         _update(py, y)
 
 
+class PositionConstraint(Constraint):
+    """
+    Ensure that point is always in origin position.
+
+    Attributes:
+     - _origin: origin position
+     - _point: point to be in origin position
+    """
+
+    def __init__(self, origin, point):
+        super(PositionConstraint, self).__init__(origin[0], origin[1],
+                point[0], point[1])
+
+        self._origin = origin
+        self._point = point
+
+        
+    def solve_for(self, var=None):
+        """
+        Ensure that point's coordinates are the same as coordinates of the
+        origin position.
+        """
+        x, y = self._origin[0].value, self._origin[1].value
+        _update(self._point[0], x)
+        _update(self._point[1], y)
+
+
 # vim:sw=4:et:ai

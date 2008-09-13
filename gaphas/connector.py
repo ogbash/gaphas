@@ -5,9 +5,10 @@ Basic connectors such as Ports and Handles.
 __version__ = "$Revision: 2341 $"
 # $HeadURL: https://svn.devjavu.com/gaphor/gaphas/trunk/gaphas/item.py $
 
-from solver import solvable, WEAK, NORMAL, STRONG, VERY_STRONG
-from state import observed, reversible_property, disable_dispatching
-from geometry import distance_line_point, distance_point_point
+from gaphas.solver import solvable, WEAK, NORMAL, STRONG, VERY_STRONG
+from gaphas.state import observed, reversible_property, disable_dispatching
+from gaphas.geometry import distance_line_point, distance_point_point
+from gaphas.constraint import LineConstraint, PositionConstraint
 
 
 class Connector(object):
@@ -170,6 +171,13 @@ class Port(object):
         raise NotImplemented('Glue method not implemented')
 
 
+    def constraint(self, canvas, item, handle, glue_item):
+        """
+        Create connection constraint between item's handle and glue item.
+        """
+        raise NotImplemented('Constraint method not implemented')
+
+
 
 class LinePort(Port):
     """
@@ -192,6 +200,17 @@ class LinePort(Port):
         return pl, d
 
 
+    def constraint(self, canvas, item, handle, glue_item):
+        """
+        Create connection line constraint between item's handle and the
+        port.
+        """
+        h1, h2 = self.start, self.end
+        line = canvas.project(glue_item, h1.pos, h2.pos)
+        point = canvas.project(item, handle.pos)
+        return LineConstraint(line, point)
+
+
 class PointPort(Port):
     """
     Port defined as a point.
@@ -208,6 +227,16 @@ class PointPort(Port):
         """
         d = distance_point_point(self.handle.pos, (x, y))
         return self.handle.pos, d
+
+
+    def constraint(self, canvas, item, handle, glue_item):
+        """
+        Return connection position constraint between item's handle and the
+        port.
+        """
+        origin = canvas.project(glue_item, self.handle.pos)
+        point = canvas.project(item, handle.pos)
+        return PositionConstraint(origin, point)
 
 
 # vim: sw=4:et:ai

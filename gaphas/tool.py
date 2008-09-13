@@ -28,7 +28,6 @@ import cairo
 import gtk
 from canvas import Context
 from geometry import Rectangle
-from constraint import LineConstraint
 
 DEBUG_TOOL = False
 DEBUG_TOOL_CHAIN = False
@@ -728,8 +727,8 @@ class TextEditTool(Tool):
 
 class ConnectHandleTool(HandleTool):
     """
-    This is a HandleTool which supports a simple connection algorithm,
-    using LineConstraint.
+    This is a handle tool which allows to connect item's handle to another
+    itemn's port.
     """
     GLUE_DISTANCE = 10
 
@@ -821,15 +820,12 @@ class ConnectHandleTool(HandleTool):
         """
         Create constraint between item's handle and port of glue item.
         """
-        h1, h2 = port.start, port.end
-
         canvas = view.canvas
 
         # create a constraint, which operates in canvas coordinate system
-        line = canvas.project(glue_item, h1.pos, h2.pos)
-        point = canvas.project(item, handle.pos)
-        handle.connection_data = LineConstraint(line=line, point=point)
-        canvas.solver.add_constraint(handle.connection_data)
+        constraint = port.constraint(canvas, item, handle, glue_item)
+        handle.connection_data = constraint
+        canvas.solver.add_constraint(constraint)
 
         handle.connected_to = glue_item
         handle.disconnect = DisconnectHandle(canvas, item, handle)
