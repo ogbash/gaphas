@@ -9,7 +9,7 @@ __version__ = "$Revision$"
 from gaphas.item import Element, Item, NW, NE,SW, SE
 from gaphas.connector import Handle, PointPort
 from gaphas.constraint import LessThanConstraint, EqualsConstraint, \
-    EqualsShiftedConstraint, BalanceConstraint
+    BalanceConstraint
 from gaphas.solver import solvable, WEAK
 import tool
 from util import text_extents, text_align, text_multiline, path_ellipse
@@ -61,7 +61,7 @@ class BoxX(Box):
         # keep hx handle at right edge, at 80% of height of the box
         ne = self._handles[NE]
         se = self._handles[SE]
-        hxc1 = EqualsShiftedConstraint(ne.x, self._hx.x, shift=10)
+        hxc1 = EqualsConstraint(ne.x, self._hx.x, delta=10)
         hxc2 = BalanceConstraint(band=(ne.y, se.y), v=self._hx.y, balance=0.8)
         self._constraints.append(hxc1)
         self._constraints.append(hxc2)
