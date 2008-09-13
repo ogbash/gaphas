@@ -766,6 +766,9 @@ class ConnectHandleTool(HandleTool):
             if i is item:
                 continue
             for p in i.ports():
+                if not p.connectable:
+                    continue
+
                 ix, iy = v2i(i).transform_point(vx, vy)
                 pg, d = p.glue(ix, iy)
 

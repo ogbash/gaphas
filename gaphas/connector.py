@@ -164,6 +164,19 @@ class Port(object):
     """
     Port connectable part of an item. Item's handle connects to a port.
     """
+    def __init__(self):
+        super(Port, self).__init__()
+
+        self._connectable = True
+
+
+    @observed
+    def _set_connectable(self, connectable):
+        self._connectable = connectable
+
+    connectable = reversible_property(lambda s: s._connectable, _set_connectable)
+
+
     def glue(self, x, y):
         """
         Get glue point on the port and distance to the port.
@@ -184,7 +197,7 @@ class LinePort(Port):
     Port defined as a line between two handles.
     """
     def __init__(self, h1, h2):
-        super(LinePort, self).__init__(self)
+        super(LinePort, self).__init__()
 
         self.start = h1
         self.end = h2
@@ -216,7 +229,7 @@ class PointPort(Port):
     Port defined as a point.
     """
     def __init__(self, handle):
-        super(PointPort, self).__init__(self)
+        super(PointPort, self).__init__()
         self.handle = handle
 
 
