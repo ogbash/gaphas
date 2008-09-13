@@ -52,8 +52,8 @@ class BoxX(Box):
     def __init__(self, width=10, height=10):
         super(BoxX, self).__init__(width, height)
         self._hx = Handle(strength=WEAK)
-        self._hx.movable = False
-        self._hx.visible = False
+        #self._hx.movable = False
+        #self._hx.visible = False
         self._handles.append(self._hx)
         # define 'x' port
         self._ports.append(PointPort(self._hx))
@@ -62,9 +62,9 @@ class BoxX(Box):
         ne = self._handles[NE]
         se = self._handles[SE]
         hxc1 = EqualsConstraint(ne.x, self._hx.x, delta=10)
-        hxc2 = BalanceConstraint(band=(ne.y, se.y), v=self._hx.y, balance=0.8)
+        #hxc2 = BalanceConstraint(band=(ne.y, se.y), v=self._hx.y, balance=0.8)
         self._constraints.append(hxc1)
-        self._constraints.append(hxc2)
+        #self._constraints.append(hxc2)
 
 
     def draw(self, context):
