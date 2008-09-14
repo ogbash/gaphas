@@ -768,6 +768,8 @@ class ConnectHandleTool(HandleTool):
             for p in i.ports():
                 if not p.connectable:
                     continue
+                if not self._can_glue(view, item, handle, i, p):
+                    continue
 
                 ix, iy = v2i(i).transform_point(vx, vy)
                 pg, d = p.glue(ix, iy)
@@ -788,6 +790,27 @@ class ConnectHandleTool(HandleTool):
             handle.pos = v2i(*glue_pos)
 
         return glue_item, port
+
+
+    def _can_glue(self, view, item, handle, glue_item, port):
+        """
+        Determine if item's handle can connect to glue item's port.
+
+        `True` is returned by default. Override this method
+
+        :Parameters:
+         view
+            View.
+         item
+            Item connecting to glue item.
+         handle
+            Connecting handle of the item.
+         glue_item
+            Connectable item.
+         port
+            Port of connectable item.
+        """
+        return True
 
 
     def connect(self, view, item, handle, vx, vy):
