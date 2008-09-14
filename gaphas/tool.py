@@ -768,20 +768,24 @@ class ConnectHandleTool(HandleTool):
             for p in i.ports():
                 if not p.connectable:
                     continue
-                if not self._can_glue(view, item, handle, i, p):
-                    continue
 
                 ix, iy = v2i(i).transform_point(vx, vy)
                 pg, d = p.glue(ix, iy)
 
                 if d >= max_dist:
                     continue
+
+                glue_item = i
                 port = p
+
                 # transform coordinates from connectable item space to view
                 # space
                 i2v = view.get_matrix_i2v(i).transform_point
                 glue_pos = i2v(*pg)
-                glue_item = i
+
+        # check if item and glue item can be connected on closest port
+        if not self._can_glue(view, item, handle, glue_item, port):
+            glue_item, port = None, None
 
         if port is not None:
             # transport coordinates from view space to connecting item
