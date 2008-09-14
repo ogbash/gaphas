@@ -796,7 +796,9 @@ class ConnectHandleTool(HandleTool):
         """
         Determine if item's handle can connect to glue item's port.
 
-        `True` is returned by default. Override this method
+        `True` is returned by default. Override this method to disallow
+        glueing on higher level (i.e. because classes of item and glue item
+        does not much, etc.).
 
         :Parameters:
          view
