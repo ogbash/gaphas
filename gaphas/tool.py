@@ -809,7 +809,7 @@ class ConnectHandleTool(HandleTool):
 
         :Parameters:
          view
-            View.
+            View used by user.
          item
             Item connecting to glue item.
          handle
@@ -829,9 +829,13 @@ class ConnectHandleTool(HandleTool):
 
         Return `True` if connection is performed.
 
-        Parameters::
-            - item: connectable item
-            - handle: connecting item handle (of connectable item)
+        :Parameters:
+         view
+            View used by user.
+         item
+            Connectable item.
+         handle
+            Handle of connecting item.
         """
         glue_item, port = self.glue(view, item, handle, vx, vy)
 
