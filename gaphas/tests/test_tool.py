@@ -9,25 +9,29 @@ from gaphas.canvas import Canvas
 from gaphas.examples import Box
 from gaphas.item import Item, Element, Line
 from gaphas.view import View, GtkView
+from gaphas.constraint import LineConstraint
 
-
-class ConnectHandleToolGlueTestCase(unittest.TestCase):
+def simple_canvas(f):
     """
-    Test handle connection tool glue method.
+    This decorator adds view, canvas and handle connection tool to a test
+    case. Two boxes and a line are added to the canvas as well.
     """
-    def setUp(self):
-        """
-        Create canvas, view and handle connection tool. A box and line are
-        added to the canvas.
-        """
+    def _f(self, *args):
         self.canvas = Canvas()
 
-        self.box = Box()
-        self.canvas.add(self.box)
-        self.box.matrix.translate(100, 50)
-        self.box.width = 40 
-        self.box.height = 40 
-        self.box.request_update()
+        self.box1 = Box()
+        self.canvas.add(self.box1)
+        self.box1.matrix.translate(100, 50)
+        self.box1.width = 40 
+        self.box1.height = 40 
+        self.box1.request_update()
+
+        self.box2 = Box()
+        self.canvas.add(self.box2)
+        self.box2.matrix.translate(100, 150)
+        self.box2.width = 50 
+        self.box2.height = 50 
+        self.box2.request_update()
 
         self.line = Line()
         self.head = self.line.handles()[0]
@@ -44,31 +48,43 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
         win.show()
 
         self.tool = ConnectHandleTool()
+        f(self, *args)
+    return _f
+
+
+
+class ConnectHandleToolGlueTestCase(unittest.TestCase):
+    """
+    Test handle connection tool glue method.
+    """
+    @simple_canvas
+    def setUp(self):
+        pass
 
 
     def test_item_and_port_glue(self):
         """Test glue operation to an item and its ports"""
 
-        ports = self.box.ports()
+        ports = self.box1.ports()
 
         # glue to port nw-ne
         item, port = self.tool.glue(self.view, self.line, self.head, 120, 50)
-        self.assertEquals(item, self.box)
+        self.assertEquals(item, self.box1)
         self.assertEquals(ports[0], port)
 
         # glue to port ne-se
         item, port = self.tool.glue(self.view, self.line, self.head, 140, 70)
-        self.assertEquals(item, self.box)
+        self.assertEquals(item, self.box1)
         self.assertEquals(ports[1], port)
 
         # glue to port se-sw
         item, port = self.tool.glue(self.view, self.line, self.head, 120, 90)
-        self.assertEquals(item, self.box)
+        self.assertEquals(item, self.box1)
         self.assertEquals(ports[2], port)
 
         # glue to port sw-nw
         item, port = self.tool.glue(self.view, self.line, self.head, 100, 70)
-        self.assertEquals(item, self.box)
+        self.assertEquals(item, self.box1)
         self.assertEquals(ports[3], port)
         
 
@@ -115,6 +131,86 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
         item, port = tool.glue(self.view, self.line, self.head, 120, 50)
         self.assertTrue(item is None)
         self.assertTrue(port is None)
+
+
+
+class ConnectHandleToolConnectTestCase(unittest.TestCase):
+    @simple_canvas
+    def setUp(self):
+        pass
+
+
+    def _get_line(self):
+        line = Line()
+        head = self.line.handles()[0]
+        self.canvas.add(line)
+        return line, head
+
+
+    def test_connect(self):
+        """Test connection to an item"""
+        line, head = self._get_line()
+        connected = self.tool.connect(self.view, line, head, 120, 50)
+        self.assertTrue(connected)
+        self.assertEquals(self.box1, head.connected_to)
+        self.assertTrue(head.connection_data is not None)
+        self.assertTrue(isinstance(head.connection_data, LineConstraint))
+        self.assertTrue(head.disconnect is not None)
+
+        line, head = self._get_line()
+        connected = self.tool.connect(self.view, line, head, 90, 50)
+        self.assertFalse(connected)
+
+
+    def test_disconnect(self):
+        """Test disconnection from an item"""
+        line, head = self._get_line()
+        connected = self.tool.connect(self.view, line, head, 120, 50)
+        assert connected
+
+        self.tool.disconnect(self.view, line, head)
+        self.assertTrue(head.connected_to is None)
+        self.assertTrue(head.connection_data is None)
+
+
+    def test_reconnect_another(self):
+        """Test reconnection to another item"""
+        line, head = self._get_line()
+        connected = self.tool.connect(self.view, line, head, 120, 50)
+        assert connected
+        item = head.connected_to
+        constraint = head.connection_data
+
+        assert item == self.box1
+        assert item != self.box2
+
+        # connect to box2, handle's connected item and connection data
+        # should differ
+        connected = self.tool.connect(self.view, line, head, 120, 150)
+        assert connected
+        self.assertEqual(self.box2, head.connected_to)
+        self.assertNotEqual(item, head.connected_to)
+        self.assertNotEqual(constraint, head.connection_data)
+
+
+    def test_reconnect_same(self):
+        """Test reconnection to same item"""
+        line, head = self._get_line()
+        connected = self.tool.connect(self.view, line, head, 120, 50)
+        assert connected
+        item = head.connected_to
+        constraint = head.connection_data
+
+        assert item == self.box1
+        assert item != self.box2
+
+        # connect to box1 again, handle's connected item should be the same
+        # but connection constraint will differ
+        connected = self.tool.connect(self.view, line, head, 120, 50)
+        assert connected
+        self.assertEqual(self.box1, head.connected_to)
+        self.assertNotEqual(constraint, head.connection_data)
+
 
 
 # vim: sw=4:et:ai
