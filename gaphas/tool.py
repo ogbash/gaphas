@@ -742,13 +742,16 @@ class ConnectHandleTool(HandleTool):
         Glue position is found for closest port as well. Handle of
         connecting item is moved to glue point.
 
-        Return found item and its connection port or (`None`, `None`) if
+        Return found item and its connection port or `(None, None)` if
         not found.
 
-        Parameters::
-            - view: view used by user
-            - item: connecting imte
-            - handle: handle of connecting item
+        :Parameters:
+         view
+            View used by user.
+         item
+            Connecting item.
+         handle
+            Handle of connecting item.
         """
         if not handle.connectable:
             return None
