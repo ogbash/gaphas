@@ -728,7 +728,7 @@ class TextEditTool(Tool):
 class ConnectHandleTool(HandleTool):
     """
     This is a handle tool which allows to connect item's handle to another
-    itemn's port.
+    item's port.
     """
     GLUE_DISTANCE = 10
 
