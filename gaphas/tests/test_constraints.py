@@ -12,19 +12,19 @@ class PositionTestCase(unittest.TestCase):
         pc.solve_for()
 
         # origin shall remain the same
-        assert x1 == 10
-        assert y1 == 11
+        self.assertEquals(10, x1)
+        self.assertEquals(11, y1)
 
         # point shall be moved to origin
-        assert x2 == 10
-        assert y2 == 11
+        self.assertEquals(10, x2)
+        self.assertEquals(11, y2)
 
         # change just x of origin
         x1.value = 15
         pc.solve_for()
-        assert x2 == 15
+        self.assertEquals(15, x2)
 
         # change just y of origin
         y1.value = 14
         pc.solve_for()
-        assert y2 == 14
+        self.assertEquals(14, y2)
