@@ -871,9 +871,8 @@ class ConnectHandleTool(HandleTool):
 
 
     def disconnect(self, view, item, handle):
-        if handle.connected_to:
-            #print 'Handle.disconnect', view, item, handle
-            view.canvas.solver.remove_constraint(handle.connection_data)
+        if handle.disconnect:
+            handle.disconnect()
 
 
 class DisconnectHandle(object):
