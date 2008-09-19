@@ -598,7 +598,7 @@ class Line(Item):
         """
         self._ports = []
         # at least two handles are required
-        if len(self._handles) > 2:
+        if len(self._handles) > 1:
             hp = self._handles[0]
             for i, h in enumerate(self._handles[1:]):
                 self._ports.append(LinePort(hp, h))

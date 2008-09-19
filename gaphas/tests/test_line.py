@@ -30,6 +30,13 @@ class LineTestCase(unittest.TestCase):
         state.observers.remove(state.revert_handler)
         state.subscribers.remove(undo_handler)
 
+    def test_initial_ports(self):
+        """Test initial ports amount
+        """
+        line = Line()
+        self.assertEquals(1, len(line.ports()))
+
+
     def test_orthogonal_horizontal_undo(self):
         """
         Orthogonal line constraints bug (#107)
