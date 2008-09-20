@@ -12,7 +12,7 @@ from matrix import Matrix
 from geometry import distance_line_point, distance_rectangle_point
 from gaphas.connector import Handle, LinePort
 from solver import solvable, WEAK, NORMAL, STRONG, VERY_STRONG
-from constraint import EqualsConstraint, LessThanConstraint
+from constraint import EqualsConstraint, LessThanConstraint, LineConstraint
 from state import observed, reversible_method, reversible_pair, reversible_property, disable_dispatching
 
 class Item(object):
@@ -154,6 +154,27 @@ class Item(object):
         - draw_all: a request to draw everything, for bounding box calculations
         """
         pass
+
+    
+    def _constraint(self, handle, horizontal=None, vertical=None, line=None):
+        """
+        Utility method to create item's constraint.
+        """
+        constraint = None
+        if horizontal:
+            pass
+        elif vertical:
+            pass
+        elif len(line) == 2:
+            point = handle.pos
+            line = line[0].pos, line[1].pos
+            constraint = LineConstraint(line=line, point=point)
+        else:
+            raise ValueError('Constraint incorrectly specified')
+        assert constraint is not None
+        self._constraints.append(constraint)
+        return constraint
+
 
     def handles(self):
         """
