@@ -787,7 +787,7 @@ class ConnectHandleTool(HandleTool):
                 glue_pos = i2v(*pg)
 
         # check if item and glue item can be connected on closest port
-        if not self._can_glue(view, item, handle, glue_item, port):
+        if not self.can_glue(view, item, handle, glue_item, port):
             glue_item, port = None, None
 
         if port is not None:
@@ -799,7 +799,7 @@ class ConnectHandleTool(HandleTool):
         return glue_item, port
 
 
-    def _can_glue(self, view, item, handle, glue_item, port):
+    def can_glue(self, view, item, handle, glue_item, port):
         """
         Determine if item's handle can connect to glue item's port.
 
