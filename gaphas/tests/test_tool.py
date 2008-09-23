@@ -100,17 +100,17 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
 
         Box has 4 ports. Every port is examined once per
         ConnectHandleTool.glue method call. The purpose of this test is to
-        assure that ConnectHandleTool._can_glue is called once (for the
+        assure that ConnectHandleTool.can_glue is called once (for the
         found port), it cannot be called four times (once for every port).
         """
 
-        # count ConnectHandleTool._can_glue calls
+        # count ConnectHandleTool.can_glue calls
         class Tool(ConnectHandleTool):
             def __init__(self, *args):
                 super(Tool, self).__init__(*args)
                 self._calls = 0
                 
-            def _can_glue(self, *args):
+            def can_glue(self, *args):
                 self._calls += 1
                 return True
 
@@ -121,10 +121,10 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
 
 
     def test_glue_cannot_glue(self):
-        """Test if glue method respects ConnectHandleTool._can_glue method"""
+        """Test if glue method respects ConnectHandleTool.can_glue method"""
 
         class Tool(ConnectHandleTool):
-            def _can_glue(self, *args):
+            def can_glue(self, *args):
                 return False
 
         tool = Tool()
