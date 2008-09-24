@@ -697,7 +697,7 @@ class Canvas(object):
         elif len(points) > 1:
             return tuple(CanvasProjection(p, item) for p in points)
         else:
-            raise AttributeError('There should at least one point specified')
+            raise AttributeError('There should be at least one point specified')
 
 
 class VariableProjection(solver.Projection):
