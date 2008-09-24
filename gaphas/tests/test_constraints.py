@@ -1,7 +1,7 @@
 import unittest
 
 from gaphas.solver import Variable
-from gaphas.constraint import PositionConstraint
+from gaphas.constraint import PositionConstraint, LineAlignConstraint
 
 class PositionTestCase(unittest.TestCase):
     def test_pos_constraint(self):
@@ -28,3 +28,42 @@ class PositionTestCase(unittest.TestCase):
         y1.value = 14
         pc.solve_for()
         self.assertEquals(14, y2)
+
+
+
+class LineAlignConstraintTestCase(unittest.TestCase):
+    """
+    Line align constraint test case.
+    """
+    def test_delta(self):
+        """Test line align delta
+        """
+        line = (Variable(0), Variable(0)), (Variable(30), Variable(20))
+        point = (Variable(15), Variable(10))
+        lc = LineAlignConstraint(line=line, point=point, align=0.5, delta=5)
+        lc.solve_for()
+        self.assertAlmostEqual(19.16, point[0].value, 0.01)
+        self.assertAlmostEqual(12.77, point[1].value, 0.01)
+
+        line[1][0].value = 40
+        line[1][1].value =  30
+        lc.solve_for()
+        self.assertAlmostEqual(24.00, point[0].value, 0.01)
+        self.assertAlmostEqual(18.00, point[1].value, 0.01)
+
+
+    def test_delta_below_zero(self):
+        """Test line align with delta below zero
+        """
+        line = (Variable(0), Variable(0)), (Variable(30), Variable(20))
+        point = (Variable(15), Variable(10))
+        lc = LineAlignConstraint(line=line, point=point, align=0.5, delta=-5)
+        lc.solve_for()
+        self.assertAlmostEqual(10.83, point[0].value, 0.01)
+        self.assertAlmostEqual(7.22, point[1].value, 0.01)
+
+        line[1][0].value = 40
+        line[1][1].value =  30
+        lc.solve_for()
+        self.assertAlmostEqual(16.25, point[0].value, 0.01)
+        self.assertAlmostEqual(12.00, point[1].value, 0.01)

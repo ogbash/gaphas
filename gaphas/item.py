@@ -12,7 +12,7 @@ from matrix import Matrix
 from geometry import distance_line_point, distance_rectangle_point
 from gaphas.connector import Handle, LinePort
 from solver import solvable, WEAK, NORMAL, STRONG, VERY_STRONG
-from constraint import EqualsConstraint, LessThanConstraint, LineConstraint
+from constraint import EqualsConstraint, LessThanConstraint, LineConstraint, LineAlignConstraint
 from state import observed, reversible_method, reversible_pair, reversible_property, disable_dispatching
 
 class Item(object):
@@ -156,7 +156,7 @@ class Item(object):
         pass
 
     
-    def _constraint(self, handle, horizontal=None, vertical=None, line=None):
+    def _constraint(self, handle, horizontal=None, vertical=None, line=None, delta=0.0, align=None):
         """
         Utility method to create item's constraint.
         """
@@ -168,7 +168,10 @@ class Item(object):
         elif len(line) == 2:
             point = handle.pos
             line = line[0].pos, line[1].pos
-            constraint = LineConstraint(line=line, point=point)
+            if align is None:
+                constraint = LineConstraint(line=line, point=point)
+            else:
+                constraint = LineAlignConstraint(line=line, point=point, align=align, delta=delta)
         else:
             raise ValueError('Constraint incorrectly specified')
         assert constraint is not None

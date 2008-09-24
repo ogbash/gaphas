@@ -30,6 +30,7 @@ appropriate value.
 
 from __future__ import division
 import operator
+import math
 from solver import Projection
 
 
@@ -532,6 +533,56 @@ class PositionConstraint(Constraint):
         x, y = self._origin[0].value, self._origin[1].value
         _update(self._point[0], x)
         _update(self._point[1], y)
+
+
+
+class LineAlignConstraint(Constraint):
+    """
+    Ensure a point is kept on a line in position specified by align and padding
+    information.
+
+    Align is specified as a number between 0 and 1, for example
+     0
+        keep point at one end of the line
+     1
+        keep point at other end of the line
+     0.5
+        keep point in the middle of the line
+
+    Align can be adjusted with `delta` parameter, which specifies the padding of
+    the point.
+
+    :Attributes:
+     _line
+        Line defined by tuple ((x1, y1), (x2, y2)).
+     _point
+        Point defined by tuple (x, y).
+     _align
+        Align of point.
+     _delta
+        Padding of the align.
+    """
+
+    def __init__(self, line, point, align=0.5, delta=0.0):
+        super(LineAlignConstraint, self).__init__(line[0][0], line[0][1], line[1][0], line[1][1], point[0], point[1])
+
+        self._line = line
+        self._point = point
+        self._align = align
+        self._delta = delta
+
+        
+    def solve_for(self, var=None):
+        sx, sy = self._line[0]
+        ex, ey = self._line[1]
+        px, py = self._point
+        a = math.atan2(ey.value - sy.value, ex.value - sx.value)
+
+        x = sx.value + (ex.value - sx.value) * self._align + self._delta * math.cos(a)
+        y = sy.value + (ey.value - sy.value) * self._align + self._delta * math.sin(a)
+
+        _update(px, x)
+        _update(py, y)
 
 
 # vim:sw=4:et:ai
