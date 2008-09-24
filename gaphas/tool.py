@@ -787,7 +787,8 @@ class ConnectHandleTool(HandleTool):
                 glue_pos = i2v(*pg)
 
         # check if item and glue item can be connected on closest port
-        if not self.can_glue(view, item, handle, glue_item, port):
+        if port is not None \
+                and not self.can_glue(view, item, handle, glue_item, port):
             glue_item, port = None, None
 
         if port is not None:
@@ -851,17 +852,14 @@ class ConnectHandleTool(HandleTool):
             return False
         
         # make the connection
-        self.connect_constraints(view, item, handle, glue_item, port)
+        self.connect_constraints(view.canvas, item, handle, glue_item, port)
         return True
 
 
-    def connect_constraints(self, view, item, handle, glue_item, port):
+    def connect_constraints(self, canvas, item, handle, glue_item, port):
         """
         Create constraint between item's handle and port of glue item.
         """
-        canvas = view.canvas
-
-        # create a constraint, which operates in canvas coordinate system
         constraint = port.constraint(canvas, item, handle, glue_item)
         handle.connection_data = constraint
         canvas.solver.add_constraint(constraint)

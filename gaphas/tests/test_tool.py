@@ -133,6 +133,24 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
         self.assertTrue(port is None)
 
 
+    def test_glue_no_port_no_can_glue(self):
+        """Test if glue method does not call ConnectHandleTool.can_glue method when port is not found"""
+
+        class Tool(ConnectHandleTool):
+            def __init__(self, *args):
+                super(Tool, self).__init__(*args)
+                self._calls = 0
+
+            def can_glue(self, *args):
+                self._calls += 1
+
+        tool = Tool()
+        # at 300, 50 there should be no item
+        item, port = tool.glue(self.view, self.line, self.head, 300, 50)
+        assert item is None and port is None
+        self.assertEquals(0, tool._calls)
+
+
 
 class ConnectHandleToolConnectTestCase(unittest.TestCase):
     @simple_canvas
