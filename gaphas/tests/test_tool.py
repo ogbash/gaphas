@@ -176,8 +176,9 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
         self.assertTrue(head.disconnect is not None)
 
         line, head = self._get_line()
-        connected = self.tool.connect(self.view, line, head, 90, 50)
-        self.assertFalse(connected)
+        glue_item, port = self.tool.connect(self.view, line, head, 90, 50)
+        self.assertTrue(glue_item is None)
+        self.assertTrue(port is None)
 
 
     def test_disconnect(self):

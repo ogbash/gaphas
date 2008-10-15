@@ -849,11 +849,11 @@ class ConnectHandleTool(HandleTool):
 
         # no glue item, no connection
         if not glue_item:
-            return False
+            return None, None
         
         # make the connection
         self.connect_constraints(view.canvas, item, handle, glue_item, port)
-        return True
+        return glue_item, port
 
 
     def connect_constraints(self, canvas, item, handle, glue_item, port):
