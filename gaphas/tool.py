@@ -376,8 +376,7 @@ class ItemTool(Tool):
 class HandleTool(Tool):
     """
     Tool for moving handles around. By default this tool does not provide
-    connecting handles to another item (see examples.ConnectingHandleTool for
-    an example).
+    connecting handles to another item (see `ConnectHandleTool`).
     """
 
     def __init__(self):
@@ -823,6 +822,18 @@ class ConnectHandleTool(HandleTool):
         return True
 
 
+    def pre_connect(self, view, item, handle, glue_item, port):
+        """
+        The method is invoked just before connection is performed by
+        `ConnectHandleTool.connect` method. It can be overriden by deriving
+        tools to perform higher level connection.
+
+        `True` is returned to indicate that higher level connection is
+        performed.
+        """
+        return True
+
+
     def connect(self, view, item, handle, vx, vy):
         """
         Connect a handle of connecting item to connectable item.
@@ -849,11 +860,12 @@ class ConnectHandleTool(HandleTool):
 
         # no glue item, no connection
         if not glue_item:
-            return None, None
-        
-        # make the connection
+            return False
+
+        # connection on higher level
+        self.pre_connect(view, item, handle, glue_item, port)
+        # low-level connection
         self.connect_constraints(view.canvas, item, handle, glue_item, port)
-        return glue_item, port
 
 
     def connect_constraints(self, canvas, item, handle, glue_item, port):
