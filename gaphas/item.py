@@ -156,7 +156,7 @@ class Item(object):
         pass
 
     
-    def _constraint(self, handle, horizontal=None, vertical=None, line=None, delta=0.0, align=None):
+    def constraint(self, handle, horizontal=None, vertical=None, line=None, delta=0.0, align=None):
         """
         Utility method to create item's constraint.
         """
