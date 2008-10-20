@@ -11,55 +11,51 @@ from gaphas.item import Item, Element, Line
 from gaphas.view import View, GtkView
 from gaphas.constraint import LineConstraint
 
-def simple_canvas(f):
+def simple_canvas(self):
     """
     This decorator adds view, canvas and handle connection tool to a test
     case. Two boxes and a line are added to the canvas as well.
     """
-    def _f(self, *args):
-        self.canvas = Canvas()
+    self.canvas = Canvas()
 
-        self.box1 = Box()
-        self.canvas.add(self.box1)
-        self.box1.matrix.translate(100, 50)
-        self.box1.width = 40 
-        self.box1.height = 40 
-        self.box1.request_update()
+    self.box1 = Box()
+    self.canvas.add(self.box1)
+    self.box1.matrix.translate(100, 50)
+    self.box1.width = 40 
+    self.box1.height = 40 
+    self.box1.request_update()
 
-        self.box2 = Box()
-        self.canvas.add(self.box2)
-        self.box2.matrix.translate(100, 150)
-        self.box2.width = 50 
-        self.box2.height = 50 
-        self.box2.request_update()
+    self.box2 = Box()
+    self.canvas.add(self.box2)
+    self.box2.matrix.translate(100, 150)
+    self.box2.width = 50 
+    self.box2.height = 50 
+    self.box2.request_update()
 
-        self.line = Line()
-        self.head = self.line.handles()[0]
-        self.canvas.add(self.line)
+    self.line = Line()
+    self.head = self.line.handles()[0]
+    self.canvas.add(self.line)
 
-        self.canvas.update_now()
-        self.view = GtkView()
-        self.view.canvas = self.canvas
-        import gtk
-        win = gtk.Window()
-        win.add(self.view)
-        self.view.show()
-        self.view.update()
-        win.show()
+    self.canvas.update_now()
+    self.view = GtkView()
+    self.view.canvas = self.canvas
+    import gtk
+    win = gtk.Window()
+    win.add(self.view)
+    self.view.show()
+    self.view.update()
+    win.show()
 
-        self.tool = ConnectHandleTool()
-        f(self, *args)
-    return _f
-
+    self.tool = ConnectHandleTool()
 
 
 class ConnectHandleToolGlueTestCase(unittest.TestCase):
     """
     Test handle connection tool glue method.
     """
-    @simple_canvas
+
     def setUp(self):
-        pass
+        simple_canvas(self)
 
 
     def test_item_and_port_glue(self):
@@ -153,9 +149,9 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
 
 
 class ConnectHandleToolConnectTestCase(unittest.TestCase):
-    @simple_canvas
+
     def setUp(self):
-        pass
+        simple_canvas(self)
 
 
     def _get_line(self):
