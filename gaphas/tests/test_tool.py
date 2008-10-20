@@ -164,24 +164,23 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
     def test_connect(self):
         """Test connection to an item"""
         line, head = self._get_line()
-        connected = self.tool.connect(self.view, line, head, 120, 50)
-        self.assertTrue(connected)
+        self.tool.connect(self.view, line, head, 120, 50)
         self.assertEquals(self.box1, head.connected_to)
         self.assertTrue(head.connection_data is not None)
         self.assertTrue(isinstance(head.connection_data, LineConstraint))
         self.assertTrue(head.disconnect is not None)
 
         line, head = self._get_line()
-        glue_item, port = self.tool.connect(self.view, line, head, 90, 50)
-        self.assertTrue(glue_item is None)
-        self.assertTrue(port is None)
+        self.tool.connect(self.view, line, head, 90, 50)
+        self.assertTrue(head.connected_to is None)
+        self.assertTrue(head.connection_data is None)
 
 
     def test_disconnect(self):
         """Test disconnection from an item"""
         line, head = self._get_line()
-        connected = self.tool.connect(self.view, line, head, 120, 50)
-        assert connected
+        self.tool.connect(self.view, line, head, 120, 50)
+        assert head.connected_to is not None
 
         self.tool.disconnect(self.view, line, head)
         self.assertTrue(head.connected_to is None)
@@ -191,8 +190,8 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
     def test_reconnect_another(self):
         """Test reconnection to another item"""
         line, head = self._get_line()
-        connected = self.tool.connect(self.view, line, head, 120, 50)
-        assert connected
+        self.tool.connect(self.view, line, head, 120, 50)
+        assert head.connected_to is not None
         item = head.connected_to
         constraint = head.connection_data
 
@@ -201,8 +200,8 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
 
         # connect to box2, handle's connected item and connection data
         # should differ
-        connected = self.tool.connect(self.view, line, head, 120, 150)
-        assert connected
+        self.tool.connect(self.view, line, head, 120, 150)
+        assert head.connected_to is not None
         self.assertEqual(self.box2, head.connected_to)
         self.assertNotEqual(item, head.connected_to)
         self.assertNotEqual(constraint, head.connection_data)
@@ -211,8 +210,8 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
     def test_reconnect_same(self):
         """Test reconnection to same item"""
         line, head = self._get_line()
-        connected = self.tool.connect(self.view, line, head, 120, 50)
-        assert connected
+        self.tool.connect(self.view, line, head, 120, 50)
+        assert head.connected_to is not None
         item = head.connected_to
         constraint = head.connection_data
 
@@ -222,9 +221,32 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
         # connect to box1 again, handle's connected item should be the same
         # but connection constraint will differ
         connected = self.tool.connect(self.view, line, head, 120, 50)
-        assert connected
+        assert head.connected_to is not None
         self.assertEqual(self.box1, head.connected_to)
         self.assertNotEqual(constraint, head.connection_data)
+
+
+    def test_find_port(self):
+        """Test finding a port
+        """
+        line, head = self._get_line()
+        p1, p2, p3, p4 = self.box1.ports()
+
+        head.pos = 110, 50
+        port = self.tool.find_port(line, head, self.box1)
+        self.assertEquals(p1, port)
+
+        head.pos = 140, 60
+        port = self.tool.find_port(line, head, self.box1)
+        self.assertEquals(p2, port)
+
+        head.pos = 110, 95
+        port = self.tool.find_port(line, head, self.box1)
+        self.assertEquals(p3, port)
+
+        head.pos = 100, 55
+        port = self.tool.find_port(line, head, self.box1)
+        self.assertEquals(p4, port)
 
 
 

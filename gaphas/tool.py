@@ -24,6 +24,8 @@ Maybe even:
 __version__ = "$Revision$"
 # $HeadURL$
 
+import sys
+
 import cairo
 import gtk
 from canvas import Context
@@ -799,6 +801,41 @@ class ConnectHandleTool(HandleTool):
         return glue_item, port
 
 
+    def find_port(self, line, handle, item):
+        """
+        Find port of an item at position of line's handle.
+
+        :Parameters:
+         line
+            Line supposed to connect to an item.
+         handle
+            Handle of a line connecting to an item.
+         item
+            Item to be connected to a line.
+        """
+        port = None
+        max_dist = sys.maxint
+        canvas = item.canvas
+
+        # line's handle position to canvas coordinates
+        i2c = canvas.get_matrix_i2c(line)
+        hx, hy = i2c.transform_point(*handle.pos)
+
+        # from canvas to item coordinates
+        c2i = canvas.get_matrix_c2i(item)
+        ix, iy = c2i.transform_point(hx, hy)
+
+        # find the port using item's coordinates
+        for p in item.ports():
+            pg, d = p.glue(ix, iy)
+            if d >= max_dist:
+                continue
+            port = p
+            max_dist = d
+
+        return port
+
+
     def can_glue(self, view, item, handle, glue_item, port):
         """
         Determine if item's handle can connect to glue item's port.
@@ -860,7 +897,7 @@ class ConnectHandleTool(HandleTool):
 
         # no glue item, no connection
         if not glue_item:
-            return False
+            return
 
         # connection on higher level
         self.pre_connect(view, item, handle, glue_item, port)
