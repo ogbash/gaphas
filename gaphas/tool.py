@@ -902,10 +902,10 @@ class ConnectHandleTool(HandleTool):
         # connection on higher level
         self.pre_connect(view, item, handle, glue_item, port)
         # low-level connection
-        self.connect_constraints(view.canvas, item, handle, glue_item, port)
+        self.post_connect(view.canvas, item, handle, glue_item, port)
 
 
-    def connect_constraints(self, canvas, item, handle, glue_item, port):
+    def post_connect(self, canvas, item, handle, glue_item, port):
         """
         Create constraint between item's handle and port of glue item.
         """
