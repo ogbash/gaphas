@@ -28,8 +28,10 @@ import sys
 
 import cairo
 import gtk
-from canvas import Context
-from geometry import Rectangle
+from gaphas.canvas import Context
+from gaphas.geometry import Rectangle
+from gaphas.geometry import distance_point_point_fast, distance_line_point
+from gaphas.item import Line
 
 DEBUG_TOOL = False
 DEBUG_TOOL_CHAIN = False
@@ -949,6 +951,54 @@ class DisconnectHandle(object):
         handle.disconnect = None
 
 
+class LineSegmentTool(HandleTool):
+    def on_button_press(self, context, event):
+        """
+        In addition to the normal behavior, the button press event creates
+        new handles if it is activated on the middle of a line segment.
+        """
+        if super(LineSegmentTool, self).on_button_press(context, event):
+            return True
+
+        view = context.view
+        item = view.hovered_item
+        if item and item is view.focused_item and isinstance(item, Line):
+            handles = item.handles()
+            x, y = view.get_matrix_v2i(item).transform_point(event.x, event.y)
+            for h1, h2 in zip(handles[:-1], handles[1:]):
+                xp = (h1.x + h2.x) / 2
+                yp = (h1.y + h2.y) / 2
+                if distance_point_point_fast((x,y), (xp, yp)) <= 4:
+                    segment = handles.index(h1)
+                    item.split_segment(segment)
+
+                    # todo perform reconnection
+                    self.grab_handle(item, item.handles()[segment + 1])
+                    context.grab()
+                    return True
+
+
+    def on_button_release(self, context, event):
+        grabbed_handle = self._grabbed_handle
+        grabbed_item = self._grabbed_item
+        if super(LineSegmentTool, self).on_button_release(context, event):
+            if grabbed_handle and grabbed_item:
+                handles = grabbed_item.handles()
+                if handles[0] is grabbed_handle or handles[-1] is grabbed_handle:
+                    return True
+                segment = handles.index(grabbed_handle)
+                before = handles[segment - 1]
+                after = handles[segment + 1]
+                d, p = distance_line_point(before.pos, after.pos, grabbed_handle.pos)
+                if d < 2:
+                    grabbed_item.merge_segment(segment)
+                    # todo: performed reconnection
+
+            return True
+
+
+
+
 def DefaultTool():
     """
     The default tool chain build from HoverTool, ItemTool and HandleTool.
@@ -956,6 +1006,7 @@ def DefaultTool():
     chain = ToolChain(). \
         append(HoverTool()). \
         append(ConnectHandleTool()). \
+        append(LineSegmentTool()). \
         append(ItemTool()). \
         append(TextEditTool()). \
         append(RubberbandTool())
