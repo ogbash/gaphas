@@ -620,13 +620,11 @@ class Line(Item):
         """
         Update line ports.
         """
+        assert len(self._handles) >= 2, 'Not enough segments'
         self._ports = []
-        # at least two handles are required
-        if len(self._handles) > 1:
-            hp = self._handles[0]
-            for i, h in enumerate(self._handles[1:]):
-                self._ports.append(LinePort(hp, h))
-                hp = h
+        handles = self._handles
+        for h1, h2 in zip(handles[:-1], handles[1:]):
+            self._ports.append(LinePort(h1, h2))
 
 
     def opposite(self, handle):
