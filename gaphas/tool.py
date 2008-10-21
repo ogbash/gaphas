@@ -992,7 +992,7 @@ class LineSegmentTool(HandleTool):
                 d, p = distance_line_point(before.pos, after.pos, grabbed_handle.pos)
                 if d < 2:
                     grabbed_item.merge_segment(segment)
-                    # todo: performed reconnection
+                    # todo: perform reconnection
 
             return True
 
