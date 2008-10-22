@@ -4,12 +4,16 @@ Test all the tools provided by gaphas.
 
 import unittest
 
-from gaphas.tool import ConnectHandleTool
+from gaphas.tool import ConnectHandleTool, LineSegmentTool
 from gaphas.canvas import Canvas
 from gaphas.examples import Box
 from gaphas.item import Item, Element, Line
 from gaphas.view import View, GtkView
 from gaphas.constraint import LineConstraint
+from gaphas.canvas import Context
+
+Event = Context
+
 
 def simple_canvas(self):
     """
@@ -34,6 +38,8 @@ def simple_canvas(self):
 
     self.line = Line()
     self.head = self.line.handles()[0]
+    self.tail = self.line.handles()[-1]
+    self.tail.pos = 100, 100
     self.canvas.add(self.line)
 
     self.canvas.update_now()
@@ -247,6 +253,36 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
         head.pos = 100, 55
         port = self.tool.find_port(line, head, self.box1)
         self.assertEquals(p4, port)
+
+
+
+class LineSegmentToolTestCase(unittest.TestCase):
+    """
+    Line segment tool tests.
+    """
+    def setUp(self):
+        simple_canvas(self)
+
+    def test_split(self):
+        """Test splitting line
+        """
+        tool = LineSegmentTool()
+        def dummy_grab(): pass
+
+        context = Context(view=self.view,
+                grab=dummy_grab,
+                ungrab=dummy_grab)
+
+        self.view.hovered_item = self.line
+        self.view.focused_item = self.line
+        tool.on_button_press(context, Event(x=50, y=50, state=0))
+        head, middle, tail = self.line.handles()
+        self.assertEquals(3, len(self.line.handles()))
+        self.assertEquals(self.head, head)
+        self.assertEquals(self.tail, tail)
+
+        #tool.on_motion_notify(context, Event(x=200, y=200, state=0xffff))
+        #tool.on_button_release(context, Event(x=200, y=200, state=0))
 
 
 
