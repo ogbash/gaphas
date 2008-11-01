@@ -56,11 +56,11 @@ class Connector(object):
         """
         Shorthand for returning the x(0) or y(1) component of the point.
 
-            >>> h = Handle(3, 5)
-            >>> h[0]
-            Variable(3, 20)
-            >>> h[1]
-            Variable(5, 20)
+        >>> h = Handle(3, 5)
+        >>> h[0]
+        Variable(3, 20)
+        >>> h[1]
+        Variable(5, 20)
         """
         return (self.x, self.y)[index]
 
@@ -150,20 +150,20 @@ class Handle(Connector):
         """
         Shorthand for returning the x(0) or y(1) component of the point.
 
-            >>> h = Handle(3, 5)
-            >>> h[0]
-            Variable(3, 20)
-            >>> h[1]
-            Variable(5, 20)
+        >>> h = Handle(3, 5)
+        >>> h[0]
+        Variable(3, 20)
+        >>> h[1]
+        Variable(5, 20)
         """
         return (self.x, self.y)[index]
-
 
 
 class Port(object):
     """
     Port connectable part of an item. Item's handle connects to a port.
     """
+
     def __init__(self):
         super(Port, self).__init__()
 
@@ -191,11 +191,11 @@ class Port(object):
         raise NotImplemented('Constraint method not implemented')
 
 
-
 class LinePort(Port):
     """
     Port defined as a line between two handles.
     """
+
     def __init__(self, h1, h2):
         super(LinePort, self).__init__()
 
@@ -206,6 +206,13 @@ class LinePort(Port):
     def glue(self, x, y):
         """
         Get glue point on the port and distance to the port.
+
+        >>> h1, h2 = Handle(0, 0), Handle(100, 100)
+        >>> port = LinePort(h1, h2)
+        >>> port.glue(50, 50)
+        ((50.0, 50.0), 0.0)
+        >>> port.glue(0, 10)
+        ((5.0, 5.0), 7.0710678118654755)
         """
         p1 = self.start.pos
         p2 = self.end.pos
@@ -228,6 +235,7 @@ class PointPort(Port):
     """
     Port defined as a point.
     """
+
     def __init__(self, handle):
         super(PointPort, self).__init__()
         self.handle = handle
@@ -236,6 +244,11 @@ class PointPort(Port):
     def glue(self, x, y):
         """
         Get glue point on the port and distance to the port.
+
+        >>> h = Handle(10, 10)
+        >>> port = PointPort(h)
+        >>> port.glue(10, 0)
+        ((Variable(10, 20), Variable(10, 20)), 10.0)
         """
         d = distance_point_point(self.handle.pos, (x, y))
         return self.handle.pos, d
