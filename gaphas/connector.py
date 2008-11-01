@@ -11,9 +11,17 @@ from gaphas.geometry import distance_line_point, distance_point_point
 from gaphas.constraint import LineConstraint, PositionConstraint
 
 
-class Connector(object):
+class VariablePoint(object):
     """
-    Basic object for connections.
+    A point constructed of two ``Variable``s.
+
+    >>> vp = VariablePoint(3, 5)
+    >>> vp.x, vp.y
+    (Variable(3, 20), Variable(5, 20))
+    >>> vp.pos
+    (Variable(3, 20), Variable(5, 20))
+    >>> vp[0], vp[1]
+    (Variable(3, 20), Variable(5, 20))
     """
 
     _x = solvable(varname='_v_x')
@@ -65,7 +73,7 @@ class Connector(object):
         return (self.x, self.y)[index]
 
 
-class Handle(Connector):
+class Handle(VariablePoint):
     """
     Handles are used to support modifications of Items.
 
