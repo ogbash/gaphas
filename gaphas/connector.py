@@ -204,27 +204,25 @@ class LinePort(Port):
     Port defined as a line between two handles.
     """
 
-    def __init__(self, h1, h2):
+    def __init__(self, start, end):
         super(LinePort, self).__init__()
 
-        self.start = h1
-        self.end = h2
+        self.start = start
+        self.end = end
 
 
     def glue(self, x, y):
         """
         Get glue point on the port and distance to the port.
 
-        >>> h1, h2 = Handle(0, 0), Handle(100, 100)
-        >>> port = LinePort(h1, h2)
+        >>> p1, p2 = (0.0, 0.0), (100.0, 100.0)
+        >>> port = LinePort(p1, p2)
         >>> port.glue(50, 50)
         ((50.0, 50.0), 0.0)
         >>> port.glue(0, 10)
         ((5.0, 5.0), 7.0710678118654755)
         """
-        p1 = self.start.pos
-        p2 = self.end.pos
-        d, pl = distance_line_point(p1, p2, (x, y))
+        d, pl = distance_line_point(self.start, self.end, (x, y))
         return pl, d
 
 
@@ -233,8 +231,7 @@ class LinePort(Port):
         Create connection line constraint between item's handle and the
         port.
         """
-        h1, h2 = self.start, self.end
-        line = canvas.project(glue_item, h1.pos, h2.pos)
+        line = canvas.project(glue_item, self.start, self.end)
         point = canvas.project(item, handle.pos)
         return LineConstraint(line, point)
 
@@ -244,9 +241,9 @@ class PointPort(Port):
     Port defined as a point.
     """
 
-    def __init__(self, handle):
+    def __init__(self, point):
         super(PointPort, self).__init__()
-        self.handle = handle
+        self.point = point
 
 
     def glue(self, x, y):
@@ -254,12 +251,12 @@ class PointPort(Port):
         Get glue point on the port and distance to the port.
 
         >>> h = Handle(10, 10)
-        >>> port = PointPort(h)
+        >>> port = PointPort(h.pos)
         >>> port.glue(10, 0)
         ((Variable(10, 20), Variable(10, 20)), 10.0)
         """
-        d = distance_point_point(self.handle.pos, (x, y))
-        return self.handle.pos, d
+        d = distance_point_point(self.point, (x, y))
+        return self.point, d
 
 
     def constraint(self, canvas, item, handle, glue_item):
@@ -267,7 +264,7 @@ class PointPort(Port):
         Return connection position constraint between item's handle and the
         port.
         """
-        origin = canvas.project(glue_item, self.handle.pos)
+        origin = canvas.project(glue_item, self.point)
         point = canvas.project(item, handle.pos)
         return PositionConstraint(origin, point)
 

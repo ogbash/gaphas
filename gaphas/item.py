@@ -251,10 +251,10 @@ class Element(Item):
 
         # edge of element define default element ports
         self._ports = [
-            LinePort(h_nw, h_ne),
-            LinePort(h_ne, h_se), 
-            LinePort(h_se, h_sw), 
-            LinePort(h_sw, h_nw)
+            LinePort(h_nw.pos, h_ne.pos),
+            LinePort(h_ne.pos, h_se.pos), 
+            LinePort(h_se.pos, h_sw.pos), 
+            LinePort(h_sw.pos, h_nw.pos)
         ]
 
         # create minimal size constraints
@@ -624,7 +624,7 @@ class Line(Item):
         self._ports = []
         handles = self._handles
         for h1, h2 in zip(handles[:-1], handles[1:]):
-            self._ports.append(LinePort(h1, h2))
+            self._ports.append(LinePort(h1.pos, h2.pos))
 
 
     def opposite(self, handle):

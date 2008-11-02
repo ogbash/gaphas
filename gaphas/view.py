@@ -204,7 +204,6 @@ class View(object):
         Parameters:
          - selected: if False returns first non-selected item
         """
-        point = (x, y)
         items = self._qtree.find_intersect((x, y, 1, 1))
         for item in self._canvas.sort(items, reverse=True):
             if not selected and item in self.selected_items:

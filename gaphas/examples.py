@@ -56,7 +56,7 @@ class BoxX(Box):
         #self._hx.visible = False
         self._handles.append(self._hx)
         # define 'x' port
-        self._ports.append(PointPort(self._hx))
+        self._ports.append(PointPort(self._hx.pos))
 
         # keep hx handle at right edge, at 80% of height of the box
         ne = self._handles[NE]
