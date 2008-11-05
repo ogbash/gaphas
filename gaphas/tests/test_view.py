@@ -79,8 +79,8 @@ class ViewTestCase(unittest.TestCase):
         assert len(view._qtree._ids) == 1
         assert not view._qtree._bucket.bounds == (0, 0, 0, 0), view._qtree._bucket.bounds
 
-        assert view.get_item_at_point(10, 10) is box
-        assert view.get_item_at_point(60, 10) is None
+        assert view.get_item_at_point((10, 10)) is box
+        assert view.get_item_at_point((60, 10)) is None
 
         window.destroy()
 

@@ -15,7 +15,7 @@ class VariablePoint(object):
     """
     A point constructed of two ``Variable``s.
 
-    >>> vp = VariablePoint(3, 5)
+    >>> vp = VariablePoint((3, 5))
     >>> vp.x, vp.y
     (Variable(3, 20), Variable(5, 20))
     >>> vp.pos
@@ -27,9 +27,8 @@ class VariablePoint(object):
     _x = solvable(varname='_v_x')
     _y = solvable(varname='_v_y')
 
-    def __init__(self, x=0, y=0, strength=NORMAL):
-        self._x = x
-        self._y = y
+    def __init__(self, pos, strength=NORMAL):
+        self._x, self._y = pos
         self._x.strength = strength
         self._y.strength = strength
 
@@ -64,7 +63,7 @@ class VariablePoint(object):
         """
         Shorthand for returning the x(0) or y(1) component of the point.
 
-        >>> h = Handle(3, 5)
+        >>> h = VariablePoint((3, 5))
         >>> h[0]
         Variable(3, 20)
         >>> h[1]
@@ -87,8 +86,8 @@ class Handle(VariablePoint):
       not capable of pickling ``instancemethod`` or ``function`` objects.
     """
 
-    def __init__(self, x=0, y=0, strength=NORMAL, connectable=False, movable=True):
-        super(Handle, self).__init__(x, y, strength)
+    def __init__(self, pos=(0, 0), strength=NORMAL, connectable=False, movable=True):
+        super(Handle, self).__init__(pos, strength)
 
         # Flags.. can't have enough of those
         self._connectable = connectable
@@ -141,31 +140,6 @@ class Handle(VariablePoint):
 
     disconnect = reversible_property(lambda s: s._disconnect or (lambda: None), _set_disconnect)
 
-    @observed
-    def _set_pos(self, pos):
-        """
-        Set handle position (Item coordinates).
-        """
-        self.x, self.y = pos
-
-    pos = property(lambda s: (s.x, s.y), _set_pos)
-
-    def __str__(self):
-        return '<%s object on (%g, %g)>' % (self.__class__.__name__, float(self.x), float(self.y))
-    __repr__ = __str__
-
-    def __getitem__(self, index):
-        """
-        Shorthand for returning the x(0) or y(1) component of the point.
-
-        >>> h = Handle(3, 5)
-        >>> h[0]
-        Variable(3, 20)
-        >>> h[1]
-        Variable(5, 20)
-        """
-        return (self.x, self.y)[index]
-
 
 class Port(object):
     """
@@ -185,7 +159,7 @@ class Port(object):
     connectable = reversible_property(lambda s: s._connectable, _set_connectable)
 
 
-    def glue(self, x, y):
+    def glue(self, pos):
         """
         Get glue point on the port and distance to the port.
         """
@@ -211,18 +185,18 @@ class LinePort(Port):
         self.end = end
 
 
-    def glue(self, x, y):
+    def glue(self, pos):
         """
         Get glue point on the port and distance to the port.
 
         >>> p1, p2 = (0.0, 0.0), (100.0, 100.0)
         >>> port = LinePort(p1, p2)
-        >>> port.glue(50, 50)
+        >>> port.glue((50, 50))
         ((50.0, 50.0), 0.0)
-        >>> port.glue(0, 10)
+        >>> port.glue((0, 10))
         ((5.0, 5.0), 7.0710678118654755)
         """
-        d, pl = distance_line_point(self.start, self.end, (x, y))
+        d, pl = distance_line_point(self.start, self.end, pos)
         return pl, d
 
 
@@ -246,16 +220,16 @@ class PointPort(Port):
         self.point = point
 
 
-    def glue(self, x, y):
+    def glue(self, pos):
         """
         Get glue point on the port and distance to the port.
 
-        >>> h = Handle(10, 10)
+        >>> h = Handle((10, 10))
         >>> port = PointPort(h.pos)
-        >>> port.glue(10, 0)
+        >>> port.glue((10, 0))
         ((Variable(10, 20), Variable(10, 20)), 10.0)
         """
-        d = distance_point_point(self.point, (x, y))
+        d = distance_point_point(self.point, pos)
         return self.point, d
 
 

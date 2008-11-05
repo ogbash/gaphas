@@ -70,29 +70,29 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
         ports = self.box1.ports()
 
         # glue to port nw-ne
-        item, port = self.tool.glue(self.view, self.line, self.head, 120, 50)
+        item, port = self.tool.glue(self.view, self.line, self.head, (120, 50))
         self.assertEquals(item, self.box1)
         self.assertEquals(ports[0], port)
 
         # glue to port ne-se
-        item, port = self.tool.glue(self.view, self.line, self.head, 140, 70)
+        item, port = self.tool.glue(self.view, self.line, self.head, (140, 70))
         self.assertEquals(item, self.box1)
         self.assertEquals(ports[1], port)
 
         # glue to port se-sw
-        item, port = self.tool.glue(self.view, self.line, self.head, 120, 90)
+        item, port = self.tool.glue(self.view, self.line, self.head, (120, 90))
         self.assertEquals(item, self.box1)
         self.assertEquals(ports[2], port)
 
         # glue to port sw-nw
-        item, port = self.tool.glue(self.view, self.line, self.head, 100, 70)
+        item, port = self.tool.glue(self.view, self.line, self.head, (100, 70))
         self.assertEquals(item, self.box1)
         self.assertEquals(ports[3], port)
         
 
     def test_failed_glue(self):
         """Test glue from too far distance"""
-        item, port = self.tool.glue(self.view, self.line, self.head, 90, 50)
+        item, port = self.tool.glue(self.view, self.line, self.head, (90, 50))
         self.assertTrue(item is None)
         self.assertTrue(port is None)
 
@@ -117,7 +117,7 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
                 return True
 
         tool = Tool()
-        item, port = tool.glue(self.view, self.line, self.head, 120, 50)
+        item, port = tool.glue(self.view, self.line, self.head, (120, 50))
         assert item and port
         self.assertEquals(1, tool._calls)
 
@@ -130,7 +130,7 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
                 return False
 
         tool = Tool()
-        item, port = tool.glue(self.view, self.line, self.head, 120, 50)
+        item, port = tool.glue(self.view, self.line, self.head, (120, 50))
         self.assertTrue(item is None)
         self.assertTrue(port is None)
 
@@ -148,7 +148,7 @@ class ConnectHandleToolGlueTestCase(unittest.TestCase):
 
         tool = Tool()
         # at 300, 50 there should be no item
-        item, port = tool.glue(self.view, self.line, self.head, 300, 50)
+        item, port = tool.glue(self.view, self.line, self.head, (300, 50))
         assert item is None and port is None
         self.assertEquals(0, tool._calls)
 
@@ -170,14 +170,14 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
     def test_connect(self):
         """Test connection to an item"""
         line, head = self._get_line()
-        self.tool.connect(self.view, line, head, 120, 50)
+        self.tool.connect(self.view, line, head, (120, 50))
         self.assertEquals(self.box1, head.connected_to)
         self.assertTrue(head.connection_data is not None)
         self.assertTrue(isinstance(head.connection_data, LineConstraint))
         self.assertTrue(head.disconnect is not None)
 
         line, head = self._get_line()
-        self.tool.connect(self.view, line, head, 90, 50)
+        self.tool.connect(self.view, line, head, (90, 50))
         self.assertTrue(head.connected_to is None)
         self.assertTrue(head.connection_data is None)
 
@@ -185,7 +185,7 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
     def test_disconnect(self):
         """Test disconnection from an item"""
         line, head = self._get_line()
-        self.tool.connect(self.view, line, head, 120, 50)
+        self.tool.connect(self.view, line, head, (120, 50))
         assert head.connected_to is not None
 
         self.tool.disconnect(self.view, line, head)
@@ -196,7 +196,7 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
     def test_reconnect_another(self):
         """Test reconnection to another item"""
         line, head = self._get_line()
-        self.tool.connect(self.view, line, head, 120, 50)
+        self.tool.connect(self.view, line, head, (120, 50))
         assert head.connected_to is not None
         item = head.connected_to
         constraint = head.connection_data
@@ -206,7 +206,7 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
 
         # connect to box2, handle's connected item and connection data
         # should differ
-        self.tool.connect(self.view, line, head, 120, 150)
+        self.tool.connect(self.view, line, head, (120, 150))
         assert head.connected_to is not None
         self.assertEqual(self.box2, head.connected_to)
         self.assertNotEqual(item, head.connected_to)
@@ -216,7 +216,7 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
     def test_reconnect_same(self):
         """Test reconnection to same item"""
         line, head = self._get_line()
-        self.tool.connect(self.view, line, head, 120, 50)
+        self.tool.connect(self.view, line, head, (120, 50))
         assert head.connected_to is not None
         item = head.connected_to
         constraint = head.connection_data
@@ -226,7 +226,7 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
 
         # connect to box1 again, handle's connected item should be the same
         # but connection constraint will differ
-        connected = self.tool.connect(self.view, line, head, 120, 50)
+        connected = self.tool.connect(self.view, line, head, (120, 50))
         assert head.connected_to is not None
         self.assertEqual(self.box1, head.connected_to)
         self.assertNotEqual(constraint, head.connection_data)

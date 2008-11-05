@@ -197,21 +197,21 @@ class View(object):
     painter = property(lambda s: s._painter, _set_painter)
 
 
-    def get_item_at_point(self, x, y, selected=True):
+    def get_item_at_point(self, pos, selected=True):
         """
-        Return the topmost item located at (x, y).
+        Return the topmost item located at ``pos`` (x, y).
 
         Parameters:
          - selected: if False returns first non-selected item
         """
-        items = self._qtree.find_intersect((x, y, 1, 1))
+        items = self._qtree.find_intersect((pos[0], pos[1], 1, 1))
         for item in self._canvas.sort(items, reverse=True):
             if not selected and item in self.selected_items:
                 continue  # skip selected items
 
             v2i = self.get_matrix_v2i(item)
-            ix, iy = v2i.transform_point(x, y)
-            if item.point(ix, iy) < 0.5:
+            ix, iy = v2i.transform_point(*pos)
+            if item.point((ix, iy)) < 0.5:
                 return item
         return None
 

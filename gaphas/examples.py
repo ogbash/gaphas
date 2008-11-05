@@ -109,7 +109,7 @@ class Text(Item):
         else:
             text_align(cr, 0, 0, self.text, self.align_x, self.align_y)
 
-    def point(self, x, y):
+    def point(self, pos):
         return 0
 
 

@@ -294,7 +294,7 @@ class HoverTool(Tool):
     def on_motion_notify(self, context, event):
         view = context.view
         old_hovered = view.hovered_item
-        view.hovered_item = view.get_item_at_point(event.x, event.y)
+        view.hovered_item = view.get_item_at_point((event.x, event.y))
         return None
 
 
@@ -447,30 +447,29 @@ class HandleTool(Tool):
         return None, None
 
 
-    def move(self, view, item, handle, x, y):
+    def move(self, view, item, handle, pos):
         """
         Move the handle to position ``(x,y)``. ``x`` and ``y`` are in
         item coordnates. ``item`` is the item whose ``handle`` is moved.
         """
-        handle.x = x
-        handle.y = y
+        handle.x, handle.y = pos
 
 
-    def glue(self, view, item, handle, vx, vy):
+    def glue(self, view, item, handle, vpos):
         """
         Find an item that ``handle`` can connect to. ``item`` is the ``Item``
         owing the handle.
-        ``vx`` and ``vy`` are the pointer (view) coordinates.
+        ``vpos`` is the point in the pointer (view) coordinates.
 
         The ``glue()`` code should take care of moving ``handle`` to the
         correct position, creating a glue effect.
         """
 
-    def connect(self, view, item, handle, vx, vy):
+    def connect(self, view, item, handle, vpos):
         """
         Find an item that ``handle`` can connect to and create a connection.
         ``item`` is the ``Item`` owning the handle.
-        ``vx`` and ``vy`` are the pointer (view) coordinates.
+        ``vpos`` is the point in the pointer (view) coordinates.
         
         A typical connect action may involve the following:
         
@@ -531,7 +530,7 @@ class HandleTool(Tool):
         try:
             view = context.view
             if grabbed_handle and grabbed_handle.connectable:
-                self.connect(view, grabbed_item, grabbed_handle, event.x, event.y)
+                self.connect(view, grabbed_item, grabbed_handle, (event.x, event.y))
         finally:
             context.ungrab()
             self.ungrab_handle()
@@ -556,14 +555,14 @@ class HandleTool(Tool):
             x, y = v2i.transform_point(event.x, event.y)
 
             # Do the actual move:
-            self.move(view, item, handle, x, y)
+            self.move(view, item, handle, (x, y))
             
             # do not request matrix update as matrix recalculation will be
             # performed due to item normalization if required
             item.request_update(matrix=False)
             try:
                 if self._grabbed_handle.connectable:
-                    self.glue(view, item, handle, event.x, event.y)
+                    self.glue(view, item, handle, (event.x, event.y))
                 # TODO: elif isinstance(item, Element):
                 #   schedule (item, handle) to be handled by some "guides" tool
                 #   that tries to align the handle with some other Element's
@@ -637,7 +636,7 @@ class PlacementTool(Tool):
     def on_button_press(self, context, event):
         view = context.view
         canvas = view.canvas
-        new_item = self._create_item(context, event.x, event.y)
+        new_item = self._create_item(context, (event.x, event.y))
         # Enforce matrix update, as a good matrix is required for the handle
         # positioning:
         canvas.get_matrix_i2c(new_item, calculate=True)
@@ -653,11 +652,11 @@ class PlacementTool(Tool):
         return True
 
 
-    def _create_item(self, context, x, y):
+    def _create_item(self, context, pos):
         view = context.view
         canvas = view.canvas
         item = self._factory()
-        x, y = view.get_matrix_v2i(item).transform_point(x, y)
+        x, y = view.get_matrix_v2i(item).transform_point(*pos)
         item.matrix.translate(x, y)
         return item
 
@@ -704,7 +703,7 @@ class TextEditTool(Tool):
         window.size_allocate(gtk.gdk.Rectangle(int(event.x), int(event.y), 50, 50))
         #window.move(int(event.x), int(event.y))
         cursor_pos = context.view.get_toplevel().get_screen().get_display().get_pointer()
-        window.move(cursor_pos[1], cursor_pos[2])
+        window.move((cursor_pos[1], cursor_pos[2]))
         window.connect('focus-out-event', self._on_focus_out_event, buffer)
         text_view.connect('key-press-event', self._on_key_press_event, buffer)
         #text_view.set_size_request(50, 50)
@@ -735,11 +734,11 @@ class ConnectHandleTool(HandleTool):
     """
     GLUE_DISTANCE = 10
 
-    def glue(self, view, item, handle, vx, vy):
+    def glue(self, view, item, handle, vpos):
         """
         Glue to an item.
 
-        Look for items in glue rectangle (which is defined by (vx, vy)
+        Look for items in glue rectangle (which is defined by ``vpos`` (vx, vy)
         and glue distance) and find the closest port.
 
         Glue position is found for closest port as well. Handle of
@@ -765,6 +764,7 @@ class ConnectHandleTool(HandleTool):
         glue_pos = None
         glue_item = None
         v2i = view.get_matrix_v2i
+        vx, vy = vpos
 
         rect = (vx - dist, vy - dist, dist * 2, dist * 2)
         items = view.get_items_in_rectangle(rect, reverse=True)
@@ -776,7 +776,7 @@ class ConnectHandleTool(HandleTool):
                     continue
 
                 ix, iy = v2i(i).transform_point(vx, vy)
-                pg, d = p.glue(ix, iy)
+                pg, d = p.glue((ix, iy))
 
                 if d >= max_dist:
                     continue
@@ -829,7 +829,7 @@ class ConnectHandleTool(HandleTool):
 
         # find the port using item's coordinates
         for p in item.ports():
-            pg, d = p.glue(ix, iy)
+            pg, d = p.glue((ix, iy))
             if d >= max_dist:
                 continue
             port = p
@@ -873,7 +873,7 @@ class ConnectHandleTool(HandleTool):
         return True
 
 
-    def connect(self, view, item, handle, vx, vy):
+    def connect(self, view, item, handle, vpos):
         """
         Connect a handle of connecting item to connectable item.
         Connectable item is found by `glue` method.
@@ -888,7 +888,7 @@ class ConnectHandleTool(HandleTool):
          handle
             Handle of connecting item.
         """
-        glue_item, port = self.glue(view, item, handle, vx, vy)
+        glue_item, port = self.glue(view, item, handle, vpos)
 
         # disconnect when
         # - no glued item

@@ -170,7 +170,7 @@ class PickleTestCase(unittest.TestCase):
 
         from gaphas.tool import ConnectHandleTool
         handle_tool = ConnectHandleTool()
-        handle_tool.connect(view, line, line.handles()[0], 40, 0)
+        handle_tool.connect(view, line, line.handles()[0], (40, 0))
         assert line.handles()[0].connected_to is box, line.handles()[0].connected_to
         assert line.handles()[0].connection_data
         assert line.handles()[0].disconnect

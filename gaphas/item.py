@@ -185,13 +185,15 @@ class Item(object):
         """
         return self._handles
 
+
     def ports(self):
         """
         Return list of ports.
         """
         return self._ports
 
-    def point(self, x, y):
+
+    def point(self, pos):
         """
         Get the distance from a point (``x``, ``y``) to the item.
         ``x`` and ``y`` are in item coordinates.
@@ -368,13 +370,13 @@ class Element(Item):
     min_height = reversible_property(lambda s: s._c_min_h.delta, _set_min_height)
 
         
-    def point(self, x, y):
+    def point(self, pos):
         """
         Distance from the point (x, y) to the item.
         """
         h = self._handles
         hnw, hse = h[NW], h[SE]
-        return distance_rectangle_point(map(float, (hnw.x, hnw.y, hse.x, hse.y)), (x, y))
+        return distance_rectangle_point(map(float, (hnw.x, hnw.y, hse.x, hse.y)), pos)
 
 
 class Line(Item):
@@ -398,7 +400,7 @@ class Line(Item):
 
     def __init__(self):
         super(Line, self).__init__()
-        self._handles = [Handle(connectable=True), Handle(10, 10, connectable=True)]
+        self._handles = [Handle(connectable=True), Handle((10, 10), connectable=True)]
         self._ports = []
         self._update_ports()
 
@@ -560,7 +562,7 @@ class Line(Item):
             h0 = self._handles[segment]
             h1 = self._handles[segment + 1]
             dx, dy = h1.x - h0.x, h1.y - h0.y
-            new_h = Handle(h0.x + dx / parts, h0.y + dy / parts, strength=WEAK)
+            new_h = Handle((h0.x + dx / parts, h0.y + dy / parts), strength=WEAK)
             self._reversible_insert_handle(segment + 1, new_h)
             if parts > 2:
                 do_split(segment + 1, parts - 1)
@@ -648,7 +650,7 @@ class Line(Item):
         h1, h0 = self._handles[-2:]
         self._tail_angle = atan2(h1.y - h0.y, h1.x - h0.x)
 
-    def closest_segment(self, x, y):
+    def closest_segment(self, pos):
         """
         Obtain a tuple (distance, point_on_line, segment).
         Distance is the distance from point to the closest line segment 
@@ -656,32 +658,32 @@ class Line(Item):
         Segment is the line segment closest to (x, y)
 
         >>> a = Line()
-        >>> a.closest_segment(4, 5)
+        >>> a.closest_segment((4, 5))
         (0.70710678118654757, (4.5, 4.5), 0)
         """
         h = self._handles
 
         # create a list of (distance, point_on_line) tuples:
-        distances = map(distance_line_point, h[:-1], h[1:], [(x, y)] * (len(h) - 1))
+        distances = map(distance_line_point, h[:-1], h[1:], [pos] * (len(h) - 1))
         distances, pols = zip(*distances)
         return reduce(min, zip(distances, pols, range(len(distances))))
 
-    def point(self, x, y):
+    def point(self, pos):
         """
         >>> a = Line()
         >>> a.handles()[1].pos = 30, 30
         >>> a.split_segment(0)
         [<Handle object on (15, 15)>]
         >>> a.handles()[1].pos = 25, 5
-        >>> a.point(-1, 0)
+        >>> a.point((-1, 0))
         1.0
-        >>> '%.3f' % a.point(5, 4)
+        >>> '%.3f' % a.point((5, 4))
         '2.942'
-        >>> '%.3f' % a.point(29, 29)
+        >>> '%.3f' % a.point((29, 29))
         '0.784'
         """
         h = self._handles
-        distance, point, segment = self.closest_segment(x, y)
+        distance, point, segment = self.closest_segment(pos)
         return max(0, distance - self.fuzziness)
 
     def draw_head(self, context):
