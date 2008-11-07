@@ -548,7 +548,9 @@ class Line(Item):
         # Force orthogonal constraints to be recreated
         self._update_orthogonal_constraints(self.orthogonal)
         self._update_ports()
-        return self._handles[segment+1:segment+parts]
+        handles = self._handles[segment + 1:segment + parts]
+        ports = self._ports[segment:segment + parts - 1]
+        return handles, ports
 
     def merge_segment(self, segment, parts=2):
         """

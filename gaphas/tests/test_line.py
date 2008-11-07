@@ -135,17 +135,24 @@ class LineSplitTestCase(TestCaseBase):
         line = Line()
         line.handles()[1].pos = (20, 0)
 
-        # we start with two handles, after split we expect 3 handles
+        # we start with two handles and one port, after split 3 handles are
+        # expected and 2 ports
         assert len(line.handles()) == 2
+        assert len(line.ports()) == 1
 
-        handles = line.split_segment(0)
+        old_port = line.ports()[0]
+
+        handles, ports = line.split_segment(0)
         handle = handles[0]
         self.assertEquals(1, len(handles))
         self.assertEquals((10, 0), handle.pos)
         self.assertEquals(3, len(line.handles()))
+        self.assertEquals(2, len(line.ports()))
 
         # new handle is between old handles
         self.assertEquals(handle, line.handles()[1])
+        # and old port is deleted
+        self.assertTrue(old_port not in line.ports())
 
 
     def test_split_multiple(self):
@@ -154,12 +161,14 @@ class LineSplitTestCase(TestCaseBase):
         line = Line()
         line.handles()[1].pos = (20, 16)
         handles = line.handles()
+        old_ports = line.ports()[:]
 
         # start with two handles, split into 4 parts - 3 new handles to be
         # expected
         assert len(handles) == 2
+        assert len(old_ports) == 1
 
-        handles = line.split_segment(0, parts=4)
+        handles, ports = line.split_segment(0, parts=4)
         self.assertEquals(3, len(handles))
         h1, h2, h3 = handles
         self.assertEquals((5, 4), h1.pos)
@@ -172,6 +181,30 @@ class LineSplitTestCase(TestCaseBase):
         self.assertEquals(h2, line.handles()[2])
         self.assertEquals(h3, line.handles()[3])
 
+        # and old port is deleted
+        self.assertTrue(old_ports[0] not in line.ports())
+
+
+    def test_ports_after_split(self):
+        """Test ports removal after split
+        """
+        line = Line()
+        line.handles()[1].pos = (20, 16)
+
+        line.split_segment(0)
+        handles = line.handles()
+        old_ports = line.ports()[:]
+
+        # start with 3 handles and two ports
+        assert len(handles) == 3
+        assert len(old_ports) == 2
+
+        # do split of first segment again
+        # first port should be deleted, but 2nd one should remain untouched
+        line.split_segment(0)
+        self.assertFalse(old_ports[0] in line.ports())
+        self.assertEquals(old_ports[1], line.ports()[2])
+
 
     def test_split_undo(self):
         """Test line splitting undo
@@ -179,16 +212,19 @@ class LineSplitTestCase(TestCaseBase):
         line = Line()
         line.handles()[1].pos = (20, 0)
 
-        # we start with two handles, after split we expect 3 handles
+        # we start with two handles and one port, after split 3 handles and
+        # 2 ports are expected
         assert len(line.handles()) == 2
+        assert len(line.ports()) == 1
 
         line.split_segment(0)
         assert len(line.handles()) == 3
+        assert len(line.ports()) == 2
 
+        # after undo, 2 handles and 1 port are expected again
         undo()
-
-        # after undo, 2 handles are expected again
         self.assertEquals(2, len(line.handles()))
+        self.assertEquals(1, len(line.ports()))
 
 
     def test_orthogonal_line_split(self):
