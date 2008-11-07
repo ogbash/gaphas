@@ -534,8 +534,11 @@ class Line(Item):
         Note that ``split_segment`` is not able to reconnect constraints that
         are connected to the segment. 
         """
-        assert parts >= 2
-        assert segment >= 0
+        if segment < 0 or segment >= len(self._ports):
+            raise ValueError('Incorrect segment')
+        if parts < 2:
+            raise ValueError('Incorrect count of parts')
+
         def do_split(segment, parts):
             h0 = self._handles[segment]
             h1 = self._handles[segment + 1]

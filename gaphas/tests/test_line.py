@@ -232,4 +232,19 @@ class LineSplitTestCase(TestCaseBase):
         """
         assert 0
 
+
+    def test_params_errors(self):
+        """Test parameter error exceptions
+        """
+        # there is only 1 segment
+        line = Line()
+        self.assertRaises(ValueError, line.split_segment, -1)
+
+        line = Line()
+        self.assertRaises(ValueError, line.split_segment, 1)
+
+        line = Line()
+        # can't split into one or less parts :)
+        self.assertRaises(ValueError, line.split_segment, 0, 1)
+
 # vim:sw=4:et
