@@ -522,6 +522,17 @@ class Line(Item):
     reversible_pair(_reversible_insert_handle, _reversible_remove_handle, \
             bind1={'index': lambda self, handle: self._handles.index(handle)})
 
+    @observed
+    def _reversible_insert_port(self, index, port):
+        self._ports.insert(index, port)
+
+    @observed
+    def _reversible_remove_port(self, port):
+        self._ports.remove(port)
+
+    reversible_pair(_reversible_insert_port, _reversible_remove_port, \
+            bind1={'index': lambda self, port: self._ports.index(port)})
+
 
     def split_segment(self, segment, parts=2):
         """
@@ -545,12 +556,18 @@ class Line(Item):
             dx, dy = h1.x - h0.x, h1.y - h0.y
             new_h = Handle((h0.x + dx / parts, h0.y + dy / parts), strength=WEAK)
             self._reversible_insert_handle(segment + 1, new_h)
+
+            p0 = LinePort(h0.pos, new_h.pos)
+            p1 = LinePort(new_h.pos, h1.pos)
+            self._reversible_remove_port(self._ports[segment])
+            self._reversible_insert_port(segment, p0)
+            self._reversible_insert_port(segment, p1)
+
             if parts > 2:
                 do_split(segment + 1, parts - 1)
         do_split(segment, parts)
         # Force orthogonal constraints to be recreated
         self._update_orthogonal_constraints(self.orthogonal)
-        self._update_ports()
         handles = self._handles[segment + 1:segment + parts]
         ports = self._ports[segment:segment + parts - 1]
         return handles, ports
