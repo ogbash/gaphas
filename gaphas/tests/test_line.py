@@ -176,7 +176,20 @@ class LineSplitTestCase(TestCaseBase):
     def test_split_undo(self):
         """Test line splitting undo
         """
-        assert 0
+        line = Line()
+        line.handles()[1].pos = (20, 0)
+
+        # we start with two handles, after split we expect 3 handles
+        assert len(line.handles()) == 2
+
+        line.split_segment(0)
+        assert len(line.handles()) == 3
+
+        undo()
+
+        # after undo, 2 handles are expected again
+        self.assertEquals(2, len(line.handles()))
+
 
     def test_orthogonal_line_split(self):
         """Test orthogonal line splitting
