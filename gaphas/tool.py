@@ -803,41 +803,6 @@ class ConnectHandleTool(HandleTool):
         return glue_item, port
 
 
-    def find_port(self, line, handle, item):
-        """
-        Find port of an item at position of line's handle.
-
-        :Parameters:
-         line
-            Line supposed to connect to an item.
-         handle
-            Handle of a line connecting to an item.
-         item
-            Item to be connected to a line.
-        """
-        port = None
-        max_dist = sys.maxint
-        canvas = item.canvas
-
-        # line's handle position to canvas coordinates
-        i2c = canvas.get_matrix_i2c(line)
-        hx, hy = i2c.transform_point(*handle.pos)
-
-        # from canvas to item coordinates
-        c2i = canvas.get_matrix_c2i(item)
-        ix, iy = c2i.transform_point(hx, hy)
-
-        # find the port using item's coordinates
-        for p in item.ports():
-            pg, d = p.glue((ix, iy))
-            if d >= max_dist:
-                continue
-            port = p
-            max_dist = d
-
-        return port
-
-
     def can_glue(self, view, item, handle, glue_item, port):
         """
         Determine if item's handle can connect to glue item's port.
@@ -911,9 +876,7 @@ class ConnectHandleTool(HandleTool):
         """
         Create constraint between item's handle and port of glue item.
         """
-        constraint = port.constraint(canvas, item, handle, glue_item)
-        handle.connection_data = constraint
-        canvas.solver.add_constraint(constraint)
+        ConnectHandleTool.create_constraint(item, handle, glue_item, port)
 
         handle.connected_to = glue_item
         handle.disconnect = DisconnectHandle(canvas, item, handle)
@@ -922,6 +885,72 @@ class ConnectHandleTool(HandleTool):
     def disconnect(self, view, item, handle):
         if handle.disconnect:
             handle.disconnect()
+
+
+    @staticmethod
+    def find_port(line, handle, item):
+        """
+        Find port of an item at position of line's handle.
+
+        :Parameters:
+         line
+            Line supposed to connect to an item.
+         handle
+            Handle of a line connecting to an item.
+         item
+            Item to be connected to a line.
+        """
+        port = None
+        max_dist = sys.maxint
+        canvas = item.canvas
+
+        # line's handle position to canvas coordinates
+        i2c = canvas.get_matrix_i2c(line)
+        hx, hy = i2c.transform_point(*handle.pos)
+
+        # from canvas to item coordinates
+        c2i = canvas.get_matrix_c2i(item)
+        ix, iy = c2i.transform_point(hx, hy)
+
+        # find the port using item's coordinates
+        for p in item.ports():
+            pg, d = p.glue((ix, iy))
+            if d >= max_dist:
+                continue
+            port = p
+            max_dist = d
+
+        return port
+
+
+    @staticmethod
+    def create_constraint(line, handle, item, port):
+        """
+        Create connection constraint between line's handle and item's port.
+
+        If constraint already exists, then it is removed and new constraint
+        is created instead.
+
+        :Parameters:
+         line
+            Line connecting to an item.
+         handle
+            Handle of a line connecting to an item.
+         item
+            Item to be connected to a line.
+         port
+            Item's port used for connection with a line.
+        """
+        canvas = line.canvas
+        solver = canvas.solver
+
+        if handle.connection_data:
+            solver.remove_constraint(handle.connection_data)
+
+        constraint = port.constraint(canvas, line, handle, item)
+        handle.connection_data = constraint
+        solver.add_constraint(constraint)
+
 
 
 class DisconnectHandle(object):
@@ -972,7 +1001,12 @@ class LineSegmentTool(HandleTool):
                     segment = handles.index(h1)
                     item.split_segment(segment)
 
-                    # todo perform reconnection
+                    canvas = view.canvas
+                    connected = canvas.get_connected_items(item)
+                    for line, h in connected:
+                        port = ConnectHandleTool.find_port(line, h, item)
+                        ConnectHandleTool.create_constraint(line, h, item, port)
+
                     self.grab_handle(item, item.handles()[segment + 1])
                     context.grab()
                     return True

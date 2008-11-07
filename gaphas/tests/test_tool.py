@@ -285,5 +285,34 @@ class LineSegmentToolTestCase(unittest.TestCase):
         #tool.on_button_release(context, Event(x=200, y=200, state=0))
 
 
+    def test_constraints_after_split(self):
+        """Test if constraints are recreated after line split
+        """
+        tool = LineSegmentTool()
+        def dummy_grab(): pass
+
+        context = Context(view=self.view,
+                grab=dummy_grab,
+                ungrab=dummy_grab)
+
+        # connect line2 and line3 to self.line
+        line2 = Line()
+        self.canvas.add(line2)
+        head = line2.handles()[0]
+        self.tool.connect(self.view, line2, head, (25, 25))
+        self.assertEquals(self.line, head.connected_to)
+
+        self.view.hovered_item = self.line
+        self.view.focused_item = self.line
+        tool.on_button_press(context, Event(x=50, y=50, state=0))
+        assert len(self.line.handles()) == 3
+        h1, h2, h3 = self.line.handles()
+
+        # connection shall be reconstrained between 1st and 2nd handle
+        c1 = head.connection_data
+        self.assertEquals(c1._line[0]._point, h1.pos)
+        self.assertEquals(c1._line[1]._point, h2.pos)
+
+
 
 # vim: sw=4:et:ai
