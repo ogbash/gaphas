@@ -527,34 +527,12 @@ class Line(Item):
         """
         Split one segment in the Line in ``parts`` equal pieces.
         ``segment`` 0 is the first segment (between handles 0 and 1).
-        The min number of parts is 2.
+        The minimum number of parts is 2.
 
         A list of new handles is returned.
 
         Note that ``split_segment`` is not able to reconnect constraints that
         are connected to the segment. 
-
-        >>> a = Line()
-        >>> a.handles()[1].pos = (20, 0)
-        >>> len(a.handles())
-        2
-        >>> a.split_segment(0)
-        [<Handle object on (10, 0)>]
-        >>> a.handles()
-        [<Handle object on (0, 0)>, <Handle object on (10, 0)>, <Handle object on (20, 0)>]
-
-        A line segment can be split into multiple (equal) parts:
-
-        >>> b = Line()
-        >>> b.handles()[1].pos = (20, 16)
-        >>> b.handles()
-        [<Handle object on (0, 0)>, <Handle object on (20, 16)>]
-        >>> b.split_segment(0, parts=4)
-        [<Handle object on (5, 4)>, <Handle object on (10, 8)>, <Handle object on (15, 12)>]
-        >>> len(b.handles())
-        5
-        >>> b.handles()
-        [<Handle object on (0, 0)>, <Handle object on (5, 4)>, <Handle object on (10, 8)>, <Handle object on (15, 12)>, <Handle object on (20, 16)>]
         """
         assert parts >= 2
         assert segment >= 0
