@@ -49,34 +49,34 @@ class LineTestCase(unittest.TestCase):
 
 
     def test_orthogonal_horizontal_undo(self):
-        """
-        Orthogonal line constraints bug (#107)
+        """Test orthogonal line constraints bug (#107)
         """
         canvas = Canvas()
         line = Line()
         canvas.add(line)
-
+        assert not line.horizontal
         assert len(canvas.solver._constraints) == 0
 
         line.orthogonal = True
 
-        assert len(canvas.solver._constraints) == 2
+        self.assertEquals(2, len(canvas.solver._constraints))
         after_ortho = set(canvas.solver._constraints)
 
         del undo_list[:]
         line.horizontal = True
 
-        assert len(canvas.solver._constraints) == 2
+        self.assertEquals(2, len(canvas.solver._constraints))
 
         undo()
 
-        assert not line.horizontal
-        assert len(canvas.solver._constraints) == 2, canvas.solver._constraints
+        self.assertFalse(line.horizontal)
+        self.assertEquals(2, len(canvas.solver._constraints))
 
         line.horizontal = True
 
-        assert line.horizontal
-        assert len(canvas.solver._constraints) == 2, canvas.solver._constraints
+        self.assertEquals(line.horizontal)
+        self.assertEquals(2, len(canvas.solver._constraints))
+
 
     def test_orthogonal_line_split_segment(self):
         canvas = Canvas()
