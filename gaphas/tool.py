@@ -13,6 +13,7 @@ Current tools:
     ItemTool - handle selection and movement of items
     HandleTool - handle selection and movement of handles
     RubberbandTool - for Rubber band selection
+    PanTool - for easily moving the canvas around
     PlacementTool - for placing items on the canvas
 
 Maybe even:
@@ -132,6 +133,13 @@ class Tool(object):
         Keyboard key is released again (follows a key press normally).
         """
         if DEBUG_TOOL: print 'on_key_release', context, event
+        pass
+
+    def on_scroll(self, context, event):
+        """
+        Scroll wheel was turned.
+        """
+        if DEBUG_TOOL: print 'on_scroll', context, event, event.direction
         pass
 
     def draw(self, context):
@@ -277,6 +285,9 @@ class ToolChain(Tool):
 
     def on_key_release(self, context, event):
         self._handle('on_key_release', context, event)
+
+    def on_scroll(self, context, event):
+        self._handle('on_scroll', context, event)
 
     def draw(self, context):
         if self._grabbed_tool:
@@ -616,6 +627,67 @@ class RubberbandTool(Tool):
         cr.set_source_rgba(.5, .5, .7, .6)
         cr.rectangle(min(x0, x1), min(y0, y1), abs(x1 - x0), abs(y1 - y0))
         cr.fill()
+
+
+class PanTool(Tool):
+    """
+    Captures drag events with the middle mouse button and uses them to
+    translate the canvas within the view. Trumps the ZoomTool, so should be
+    placed later in the ToolChain.
+    """
+
+    def __init__(self):
+        self.x0, self.y0 = 0, 0
+        self.speed = 10
+
+    def on_button_press(self,context,event):
+        if event.button == 2:
+            context.grab()
+            self.x0, self.y0 = event.x, event.y
+            return True
+
+    def on_button_release(self, context, event):
+        context.ungrab()
+        self.x0, self.y0 = event.x, event.y
+        return True
+
+    def on_motion_notify(self, context, event):
+        if event.state & gtk.gdk.BUTTON2_MASK:
+            view = context.view
+            dx = self.x0 - event.x
+            dy = self.y0 - event.y
+            if dx:
+                adj = context.view.hadjustment
+                adj.value = adj.value + dx
+                adj.value_changed()
+                self.x0 = event.x
+
+            if dy:
+                adj = context.view.vadjustment
+                adj.value = adj.value + dy
+                adj.value_changed()
+                self.y0 = event.y
+            return True
+
+    def on_scroll(self, context, event):
+        direction = event.direction
+        gdk = gtk.gdk
+        adj = None
+        if direction == gdk.SCROLL_LEFT:
+            adj = context.view.hadjustment
+            adj.value = adj.value - self.speed
+        elif direction == gdk.SCROLL_RIGHT:
+            adj = context.view.hadjustment
+            adj.value = adj.value + self.speed
+        elif direction == gdk.SCROLL_UP:
+            adj = context.view.vadjustment
+            adj.value = adj.value - self.speed
+        elif direction == gdk.SCROLL_DOWN:
+            adj = context.view.vadjustment
+            adj.value = adj.value + self.speed
+        if adj:
+            adj.value_changed()
+        return True
 
 
 class PlacementTool(Tool):
@@ -1041,6 +1113,7 @@ def DefaultTool():
         append(HoverTool()). \
         append(ConnectHandleTool()). \
         append(LineSegmentTool()). \
+        append(PanTool()). \
         append(ItemTool()). \
         append(TextEditTool()). \
         append(RubberbandTool())

@@ -345,7 +345,8 @@ EVENT_HANDLERS = {
     gtk.gdk._3BUTTON_PRESS: 'on_triple_click',
     gtk.gdk.MOTION_NOTIFY: 'on_motion_notify',
     gtk.gdk.KEY_PRESS: 'on_key_press',
-    gtk.gdk.KEY_RELEASE: 'on_key_release'
+    gtk.gdk.KEY_RELEASE: 'on_key_release',
+    gtk.gdk.SCROLL: 'on_scroll'
 }
 
 
@@ -396,7 +397,8 @@ class GtkView(gtk.DrawingArea, View):
                         | gtk.gdk.BUTTON_RELEASE_MASK
                         | gtk.gdk.POINTER_MOTION_MASK
                         | gtk.gdk.KEY_PRESS_MASK
-                        | gtk.gdk.KEY_RELEASE_MASK)
+                        | gtk.gdk.KEY_RELEASE_MASK
+                        | gtk.gdk.SCROLL_MASK)
 
         self._hadjustment = hadjustment or gtk.Adjustment()
         self._vadjustment = vadjustment or gtk.Adjustment()
@@ -484,10 +486,13 @@ class GtkView(gtk.DrawingArea, View):
             adjustment.page_increment = viewport_size
             adjustment.step_increment = viewport_size/10
             adjustment.upper = adjustment.value + canvas_offset + canvas_size
-            adjustment.lower = adjustment.value + canvas_offset
+            adjustment.lower = 0 #adjustment.value + canvas_offset
         
         if adjustment.value > adjustment.upper - viewport_size:
             adjustment.value = adjustment.upper - viewport_size
+        elif adjustment.value < 0:
+            adjustment.value = 0
+
 
     @async(single=True)
     def update_adjustments(self, allocation=None):
