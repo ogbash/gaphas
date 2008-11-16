@@ -345,6 +345,10 @@ class LineMergeTestCase(TestCaseBase):
         line.split_segment(0)
         # can't merge one or less parts :)
         self.assertRaises(ValueError, line.merge_segment, 0, 1)
+ 
+        line = Line()
+        # can't merge line with one segment
+        self.assertRaises(ValueError, line.merge_segment, 0)
 
 
 # vim:sw=4:et

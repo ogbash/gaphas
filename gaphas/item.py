@@ -581,6 +581,8 @@ class Line(Item):
         Tuple of two lists is returned, list of deleted handles and list of
         deleted ports.
         """
+        if len(self._ports) < 2:
+            raise ValueError('Cannot merge line with one segment')
         if segment < 0 or segment >= len(self._ports):
             raise ValueError('Incorrect segment')
         if parts < 2:
