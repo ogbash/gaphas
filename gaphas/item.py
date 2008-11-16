@@ -572,50 +572,31 @@ class Line(Item):
         ports = self._ports[segment:segment + parts - 1]
         return handles, ports
 
+
     def merge_segment(self, segment, parts=2):
         """
-        Merge the ``segment`` and the next.
-        The parts parameter indicates how many segments should be merged
+        Merge two line segments starting from ``segment``.
+        The parts parameter indicates how many segments should be merged.
 
-        The deleted handles are returned as a list.
-
-        >>> a = Line()
-        >>> a.handles()[1].pos = (20, 0)
-        >>> _ = a.split_segment(0)
-        >>> a.handles()
-        [<Handle object on (0, 0)>, <Handle object on (10, 0)>, <Handle object on (20, 0)>]
-        >>> a.merge_segment(0)
-        [<Handle object on (10, 0)>]
-        >>> a.handles()
-        [<Handle object on (0, 0)>, <Handle object on (20, 0)>]
-        >>> try: a.merge_segment(0)
-        ... except AssertionError: print 'okay'
-        okay
-
-        More than two segments can be merged at once:
-        >>> _ = a.split_segment(0)
-        >>> _ = a.split_segment(0)
-        >>> _ = a.split_segment(0)
-        >>> a.handles()
-        [<Handle object on (0, 0)>, <Handle object on (2.5, 0)>, <Handle object on (5, 0)>, <Handle object on (10, 0)>, <Handle object on (20, 0)>]
-        >>> a.merge_segment(0, parts=4)
-        [<Handle object on (2.5, 0)>, <Handle object on (5, 0)>, <Handle object on (10, 0)>]
-        >>> a.handles()
-        [<Handle object on (0, 0)>, <Handle object on (20, 0)>]
+        Tuple of two lists is returned, list of deleted handles and list of
+        deleted ports.
         """
-        assert len(self._handles) > 2, 'Not enough segments'
-        if 0 >= segment > len(self._handles) - 1:
-            raise IndexError("index out of range (0 > %d > %d)" % (segment, len(self._handles) - 1))
-        if segment == 0: segment = 1
-        deleted_handles = self._handles[segment:segment+parts-1]
+        if segment < 0 or segment >= len(self._ports):
+            raise ValueError('Incorrect segment')
+        if parts < 2:
+            raise ValueError('Incorrect count of parts')
+        if segment == 0:
+            segment = 1
+        deleted_handles = self._handles[segment:segment + parts - 1]
+        deleted_ports = self._ports[segment:segment + parts - 1]
         self._reversible_remove_handle(self._handles[segment])
+        self._reversible_remove_port(self._ports[segment])
         if parts > 2:
             self.merge_segment(segment, parts - 1)
         else:
             # Force orthogonal constraints to be recreated
             self._update_orthogonal_constraints(self.orthogonal)
-        self._update_ports()
-        return deleted_handles
+        return deleted_handles, deleted_ports
 
 
     def _update_ports(self):

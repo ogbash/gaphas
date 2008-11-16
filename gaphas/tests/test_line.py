@@ -247,4 +247,104 @@ class LineSplitTestCase(TestCaseBase):
         # can't split into one or less parts :)
         self.assertRaises(ValueError, line.split_segment, 0, 1)
 
+
+
+class LineMergeTestCase(TestCaseBase):
+    """
+    Tests for line merging.
+    """
+    def test_merge_single(self):
+        """Test single line merging
+        """
+        line = Line()
+        line.handles()[1].pos = (20, 0)
+        line.split_segment(0)
+
+        # we start with 3 handles and 2 ports, after merging 2 handles and
+        # 1 port are expected
+        assert len(line.handles()) == 3
+        assert len(line.ports()) == 2
+
+        handles, ports = line.merge_segment(0)
+        # deleted handles and ports
+        self.assertEquals(1, len(handles))
+        self.assertEquals(1, len(ports))
+        # handles and ports left after segment merging
+        self.assertEquals(2, len(line.handles()))
+        self.assertEquals(1, len(line.ports()))
+
+        self.assertTrue(handles[0] not in line.handles())
+        self.assertTrue(ports[0] not in line.ports())
+
+
+    def test_merge_multiple(self):
+        """Test multiple line merge
+        """
+        line = Line()
+        line.handles()[1].pos = (20, 16)
+        line.split_segment(0, parts=3)
+ 
+        # start with 4 handles and 3 ports, merge 3 parts
+        assert len(line.handles()) == 4
+        assert len(line.ports()) == 3
+ 
+        handles, ports = line.merge_segment(0, parts=3)
+        self.assertEquals(2, len(handles))
+        self.assertEquals(2, len(ports))
+        self.assertEquals(2, len(line.handles()))
+        self.assertEquals(1, len(line.ports()))
+
+        self.assertTrue(set(handles).isdisjoint(set(line.handles())))
+        self.assertTrue(set(ports).isdisjoint(set(line.ports())))
+
+ 
+    def test_merge_undo(self):
+        """Test line merging undo
+        """
+        line = Line()
+        line.handles()[1].pos = (20, 0)
+
+        # split for merging
+        line.split_segment(0)
+        assert len(line.handles()) == 3
+        assert len(line.ports()) == 2
+
+        # clear undo stack before merging
+        del undo_list[:]
+ 
+        # merge with empty undo stack
+        line.merge_segment(0)
+        assert len(line.handles()) == 2
+        assert len(line.ports()) == 1
+ 
+        # after merge undo, 3 handles and 2 ports are expected again
+        undo()
+        self.assertEquals(3, len(line.handles()))
+        self.assertEquals(2, len(line.ports()))
+ 
+ 
+    def test_orthogonal_line_merge(self):
+        """Test orthogonal line merging
+        """
+        assert 0
+ 
+ 
+    def test_params_errors(self):
+        """Test parameter error exceptions
+        """
+        # there is only 1 segment
+        line = Line()
+        line.split_segment(0)
+        self.assertRaises(ValueError, line.merge_segment, -1)
+ 
+        line = Line()
+        line.split_segment(0)
+        self.assertRaises(ValueError, line.merge_segment, 2)
+ 
+        line = Line()
+        line.split_segment(0)
+        # can't merge one or less parts :)
+        self.assertRaises(ValueError, line.merge_segment, 0, 1)
+
+
 # vim:sw=4:et
