@@ -587,17 +587,28 @@ class Line(Item):
             raise ValueError('Incorrect segment')
         if parts < 2:
             raise ValueError('Incorrect count of parts')
-        if segment == 0:
-            segment = 1
-        deleted_handles = self._handles[segment:segment + parts - 1]
-        deleted_ports = self._ports[segment:segment + parts - 1]
-        self._reversible_remove_handle(self._handles[segment])
-        self._reversible_remove_port(self._ports[segment])
-        if parts > 2:
-            self.merge_segment(segment, parts - 1)
-        else:
-            # Force orthogonal constraints to be recreated
-            self._update_orthogonal_constraints(self.orthogonal)
+
+        if segment + parts >= len(self._ports):
+            segment = len(self._ports) - parts
+            assert segment >= 0
+
+        # remove handle and ports which share position with handle
+        deleted_handles = self._handles[segment + 1:segment + parts]
+        deleted_ports = self._ports[segment:segment + parts]
+        for h in deleted_handles:
+            self._reversible_remove_handle(h)
+        for p in deleted_ports:
+            self._reversible_remove_port(p)
+
+        # create new port, which replaces old ports destroyed due to
+        # deleted handle
+        h1 = self._handles[segment]
+        h2 = self._handles[segment + 1]
+        port = LinePort(h1.pos, h2.pos)
+        self._reversible_insert_port(segment, port)
+
+        # force orthogonal constraints to be recreated
+        self._update_orthogonal_constraints(self.orthogonal)
         return deleted_handles, deleted_ports
 
 

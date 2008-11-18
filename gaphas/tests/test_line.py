@@ -253,8 +253,8 @@ class LineMergeTestCase(TestCaseBase):
     """
     Tests for line merging.
     """
-    def test_merge_single(self):
-        """Test single line merging
+    def test_merge_first_single(self):
+        """Test single line merging starting from 1st segment
         """
         line = Line()
         line.handles()[1].pos = (20, 0)
@@ -264,17 +264,63 @@ class LineMergeTestCase(TestCaseBase):
         # 1 port are expected
         assert len(line.handles()) == 3
         assert len(line.ports()) == 2
+        old_ports = line.ports()[:]
 
         handles, ports = line.merge_segment(0)
         # deleted handles and ports
         self.assertEquals(1, len(handles))
-        self.assertEquals(1, len(ports))
+        self.assertEquals(2, len(ports))
         # handles and ports left after segment merging
         self.assertEquals(2, len(line.handles()))
         self.assertEquals(1, len(line.ports()))
 
         self.assertTrue(handles[0] not in line.handles())
         self.assertTrue(ports[0] not in line.ports())
+        self.assertTrue(ports[1] not in line.ports())
+
+        # old ports are completely removed as they are replaced by new one
+        # port
+        self.assertEquals(old_ports, ports)
+
+        # finally, created port shall span between first and last handle
+        port = line.ports()[0]
+        self.assertEquals((0, 0), port.start)
+        self.assertEquals((20, 0), port.end)
+
+
+    def test_merge_second_single(self):
+        """Test single line merging starting from 2nd segment
+        """
+        line = Line()
+        line.handles()[1].pos = (20, 0)
+        line.split_segment(0)
+
+        # we start with 3 handles and 2 ports, after merging 2 handles and
+        # 1 port are expected
+        assert len(line.handles()) == 3
+        assert len(line.ports()) == 2
+        old_ports = line.ports()[:]
+
+        handles, ports = line.merge_segment(1)
+        # deleted handles and ports
+        self.assertEquals(1, len(handles))
+        self.assertEquals(2, len(ports))
+        # handles and ports left after segment merging
+        self.assertEquals(2, len(line.handles()))
+        self.assertEquals(1, len(line.ports()))
+
+        self.assertTrue(handles[0] not in line.handles())
+        self.assertTrue(ports[0] not in line.ports())
+        self.assertTrue(ports[1] not in line.ports())
+
+        # old ports are completely removed as they are replaced by new one
+        # port
+        self.assertEquals(old_ports, ports)
+
+        # finally, created port shall span between first and last handle
+        port = line.ports()[0]
+        self.assertEquals((0, 0), port.start)
+        self.assertEquals((20, 0), port.end)
 
 
     def test_merge_multiple(self):
@@ -288,14 +334,20 @@ class LineMergeTestCase(TestCaseBase):
         assert len(line.handles()) == 4
         assert len(line.ports()) == 3
  
+        print line.handles()
         handles, ports = line.merge_segment(0, parts=3)
         self.assertEquals(2, len(handles))
-        self.assertEquals(2, len(ports))
+        self.assertEquals(3, len(ports))
         self.assertEquals(2, len(line.handles()))
         self.assertEquals(1, len(line.ports()))
 
         self.assertTrue(set(handles).isdisjoint(set(line.handles())))
         self.assertTrue(set(ports).isdisjoint(set(line.ports())))
+
+        # finally, created port shall span between first and last handle
+        port = line.ports()[0]
+        self.assertEquals((0, 0), port.start)
+        self.assertEquals((20, 16), port.end)
 
  
     def test_merge_undo(self):
