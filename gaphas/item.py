@@ -561,7 +561,7 @@ class Line(Item):
             p1 = LinePort(new_h.pos, h1.pos)
             self._reversible_remove_port(self._ports[segment])
             self._reversible_insert_port(segment, p0)
-            self._reversible_insert_port(segment, p1)
+            self._reversible_insert_port(segment + 1, p1)
 
             if parts > 2:
                 do_split(segment + 1, parts - 1)

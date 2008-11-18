@@ -154,6 +154,14 @@ class LineSplitTestCase(TestCaseBase):
         # and old port is deleted
         self.assertTrue(old_port not in line.ports())
 
+        # check ports order
+        p1, p2 = line.ports()
+        h1, h2, h3 = line.handles()
+        self.assertEquals(h1.pos, p1.start)
+        self.assertEquals(h2.pos, p1.end)
+        self.assertEquals(h2.pos, p2.start)
+        self.assertEquals(h3.pos, p2.end)
+
 
     def test_split_multiple(self):
         """Test multiple line splitting
@@ -181,8 +189,22 @@ class LineSplitTestCase(TestCaseBase):
         self.assertEquals(h2, line.handles()[2])
         self.assertEquals(h3, line.handles()[3])
 
+        self.assertEquals(4, len(line.ports()))
+
         # and old port is deleted
         self.assertTrue(old_ports[0] not in line.ports())
+
+        # check ports order
+        p1, p2, p3, p4 = line.ports()
+        h1, h2, h3, h4, h5 = line.handles()
+        self.assertEquals(h1.pos, p1.start)
+        self.assertEquals(h2.pos, p1.end)
+        self.assertEquals(h2.pos, p2.start)
+        self.assertEquals(h3.pos, p2.end)
+        self.assertEquals(h3.pos, p3.start)
+        self.assertEquals(h4.pos, p3.end)
+        self.assertEquals(h4.pos, p4.start)
+        self.assertEquals(h5.pos, p4.end)
 
 
     def test_ports_after_split(self):
