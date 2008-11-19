@@ -273,10 +273,11 @@ class LineSegmentToolTestCase(unittest.TestCase):
                 grab=dummy_grab,
                 ungrab=dummy_grab)
 
+        head, tail = self.line.handles()
+
         self.view.hovered_item = self.line
         self.view.focused_item = self.line
         tool.on_button_press(context, Event(x=50, y=50, state=0))
-        head, middle, tail = self.line.handles()
         self.assertEquals(3, len(self.line.handles()))
         self.assertEquals(self.head, head)
         self.assertEquals(self.tail, tail)
@@ -313,6 +314,60 @@ class LineSegmentToolTestCase(unittest.TestCase):
         self.assertEquals(c1._line[0]._point, h1.pos)
         self.assertEquals(c1._line[1]._point, h2.pos)
 
+
+    def test_merge(self):
+        """Test line merging
+        """
+        tool = LineSegmentTool()
+        def dummy_grab(): pass
+
+        context = Context(view=self.view,
+                grab=dummy_grab,
+                ungrab=dummy_grab)
+
+        self.view.hovered_item = self.line
+        self.view.focused_item = self.line
+        tool.on_button_press(context, Event(x=50, y=50, state=0))
+        # start with 2 segments
+        assert len(self.line.handles()) == 3
+
+        # try to merge, now
+        tool.on_button_release(context, Event(x=0, y=0, state=0))
+        self.assertEquals(2, len(self.line.handles()))
+
+
+    def test_constraints_after_merge(self):
+        """Test if constraints are recreated after line merge
+        """
+        tool = LineSegmentTool()
+        def dummy_grab(): pass
+
+        context = Context(view=self.view,
+                grab=dummy_grab,
+                ungrab=dummy_grab)
+
+        # connect line2 and line3 to self.line
+        line2 = Line()
+        self.canvas.add(line2)
+        head = line2.handles()[0]
+        self.tool.connect(self.view, line2, head, (25, 25))
+        self.assertEquals(self.line, head.connected_to)
+
+        self.view.hovered_item = self.line
+        self.view.focused_item = self.line
+        tool.on_button_press(context, Event(x=50, y=50, state=0))
+        assert len(self.line.handles()) == 3
+        c1 = head.connection_data
+
+        tool.on_button_release(context, Event(x=0, y=0, state=0))
+        assert len(self.line.handles()) == 2
+
+        h1, h2 = self.line.handles()
+        # connection shall be reconstrained between 1st and 2nd handle
+        c2 = head.connection_data
+        self.assertEquals(c2._line[0]._point, h1.pos)
+        self.assertEquals(c2._line[1]._point, h2.pos)
+        self.assertFalse(c1 == c2)
 
 
 # vim: sw=4:et:ai

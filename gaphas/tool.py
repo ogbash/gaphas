@@ -1052,7 +1052,7 @@ class DisconnectHandle(object):
         handle.disconnect = None
 
 
-class LineSegmentTool(HandleTool):
+class LineSegmentTool(ConnectHandleTool):
     def on_button_press(self, context, event):
         """
         In addition to the normal behavior, the button press event creates
@@ -1072,16 +1072,12 @@ class LineSegmentTool(HandleTool):
                 if distance_point_point_fast((x,y), (xp, yp)) <= 4:
                     segment = handles.index(h1)
                     item.split_segment(segment)
-
-                    canvas = view.canvas
-                    connected = canvas.get_connected_items(item)
-                    for line, h in connected:
-                        port = ConnectHandleTool.find_port(line, h, item)
-                        ConnectHandleTool.create_constraint(line, h, item, port)
+                    self.recreate_constraints(view, item)
 
                     self.grab_handle(item, item.handles()[segment + 1])
                     context.grab()
                     return True
+        return True
 
 
     def on_button_release(self, context, event):
@@ -1090,18 +1086,37 @@ class LineSegmentTool(HandleTool):
         if super(LineSegmentTool, self).on_button_release(context, event):
             if grabbed_handle and grabbed_item:
                 handles = grabbed_item.handles()
+
+                # don't merge using first or last handle
                 if handles[0] is grabbed_handle or handles[-1] is grabbed_handle:
                     return True
+
                 segment = handles.index(grabbed_handle)
                 before = handles[segment - 1]
                 after = handles[segment + 1]
                 d, p = distance_line_point(before.pos, after.pos, grabbed_handle.pos)
                 if d < 2:
                     grabbed_item.merge_segment(segment)
-                    # todo: perform reconnection
+                    self.recreate_constraints(context.view, grabbed_item)
 
             return True
 
+
+    def recreate_constraints(self, view, item):
+        """
+        Recreate constraints between item and all connecting items.
+
+        :Parameters:
+         view
+            View used by user.
+         item
+            Item, which connecting items connection constraints should be
+            recreated.
+        """
+        connected = view.canvas.get_connected_items(item)
+        for line, h in connected:
+            port = ConnectHandleTool.find_port(line, h, item)
+            ConnectHandleTool.create_constraint(line, h, item, port)
 
 
 
@@ -1109,9 +1124,9 @@ def DefaultTool():
     """
     The default tool chain build from HoverTool, ItemTool and HandleTool.
     """
+        #append(ConnectHandleTool()). \
     chain = ToolChain(). \
         append(HoverTool()). \
-        append(ConnectHandleTool()). \
         append(LineSegmentTool()). \
         append(PanTool()). \
         append(ItemTool()). \
