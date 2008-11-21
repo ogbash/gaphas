@@ -296,7 +296,7 @@ class LineSegmentToolTestCase(unittest.TestCase):
                 grab=dummy_grab,
                 ungrab=dummy_grab)
 
-        # connect line2 and line3 to self.line
+        # connect line2 to self.line
         line2 = Line()
         self.canvas.add(line2)
         head = line2.handles()[0]
@@ -346,7 +346,7 @@ class LineSegmentToolTestCase(unittest.TestCase):
                 grab=dummy_grab,
                 ungrab=dummy_grab)
 
-        # connect line2 and line3 to self.line
+        # connect line2 to self.line
         line2 = Line()
         self.canvas.add(line2)
         head = line2.handles()[0]
@@ -368,6 +368,38 @@ class LineSegmentToolTestCase(unittest.TestCase):
         self.assertEquals(c2._line[0]._point, h1.pos)
         self.assertEquals(c2._line[1]._point, h2.pos)
         self.assertFalse(c1 == c2)
+
+
+    def test_merged_segment(self):
+        """Test if proper segment is merged
+        """
+        tool = LineSegmentTool()
+        def dummy_grab(): pass
+
+        context = Context(view=self.view,
+                grab=dummy_grab,
+                ungrab=dummy_grab)
+
+        self.view.hovered_item = self.line
+        self.view.focused_item = self.line
+        tool.on_button_press(context, Event(x=50, y=50, state=0))
+        tool.on_button_press(context, Event(x=75, y=75, state=0))
+        # start with 3 segments
+        assert len(self.line.handles()) == 4
+
+        # ports to be removed
+        port1 = self.line.ports()[0]
+        port2 = self.line.ports()[1]
+
+        # try to merge, now
+        tool.grab_handle(self.line, self.line.handles()[1])
+        tool.on_button_release(context, Event(x=0, y=0, state=0))
+        # check if line merging was performed
+        assert len(self.line.handles()) == 3
+        
+        # check if proper segments were merged
+        self.assertFalse(port1 in self.line.ports())
+        self.assertFalse(port2 in self.line.ports())
 
 
 # vim: sw=4:et:ai

@@ -1091,11 +1091,20 @@ class LineSegmentTool(ConnectHandleTool):
                 if handles[0] is grabbed_handle or handles[-1] is grabbed_handle:
                     return True
 
-                segment = handles.index(grabbed_handle)
-                before = handles[segment - 1]
-                after = handles[segment + 1]
+                handle_index = handles.index(grabbed_handle)
+                segment = handle_index - 1
+
+                # cannot merge starting from last segment
+                if segment == len(grabbed_item.ports()) - 1:
+                    segment =- 1
+                assert segment >= 0 and segment < len(grabbed_item.ports()) - 1
+
+                before = handles[handle_index - 1]
+                after = handles[handle_index + 1]
                 d, p = distance_line_point(before.pos, after.pos, grabbed_handle.pos)
+
                 if d < 2:
+                    assert len(context.view.canvas.solver._marked_cons) == 0
                     grabbed_item.merge_segment(segment)
                     self.recreate_constraints(context.view, grabbed_item)
 

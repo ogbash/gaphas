@@ -534,11 +534,11 @@ class Line(Item):
             bind1={'index': lambda self, port: self._ports.index(port)})
 
 
-    def split_segment(self, segment, parts=2):
+    def split_segment(self, segment, count=2):
         """
-        Split one segment in the Line in ``parts`` equal pieces.
+        Split one segment in the Line in ``count`` equal pieces.
         ``segment`` 0 is the first segment (between handles 0 and 1).
-        The minimum number of parts is 2.
+        The minimum number of count is 2.
 
         A list of new handles is returned.
 
@@ -547,14 +547,14 @@ class Line(Item):
         """
         if segment < 0 or segment >= len(self._ports):
             raise ValueError('Incorrect segment')
-        if parts < 2:
-            raise ValueError('Incorrect count of parts')
+        if count < 2:
+            raise ValueError('Incorrect count of count')
 
-        def do_split(segment, parts):
+        def do_split(segment, count):
             h0 = self._handles[segment]
             h1 = self._handles[segment + 1]
             dx, dy = h1.x - h0.x, h1.y - h0.y
-            new_h = Handle((h0.x + dx / parts, h0.y + dy / parts), strength=WEAK)
+            new_h = Handle((h0.x + dx / count, h0.y + dy / count), strength=WEAK)
             self._reversible_insert_handle(segment + 1, new_h)
 
             p0 = LinePort(h0.pos, new_h.pos)
@@ -563,20 +563,22 @@ class Line(Item):
             self._reversible_insert_port(segment, p0)
             self._reversible_insert_port(segment + 1, p1)
 
-            if parts > 2:
-                do_split(segment + 1, parts - 1)
-        do_split(segment, parts)
+            if count > 2:
+                do_split(segment + 1, count - 1)
+        do_split(segment, count)
         # Force orthogonal constraints to be recreated
         self._update_orthogonal_constraints(self.orthogonal)
-        handles = self._handles[segment + 1:segment + parts]
-        ports = self._ports[segment:segment + parts - 1]
+        handles = self._handles[segment + 1:segment + count]
+        ports = self._ports[segment:segment + count - 1]
         return handles, ports
 
 
-    def merge_segment(self, segment, parts=2):
+    def merge_segment(self, segment, count=2):
         """
         Merge two line segments starting from ``segment``.
-        The parts parameter indicates how many segments should be merged.
+
+        The ``count`` parameter indicates how many segments should be
+        merged.
 
         Tuple of two lists is returned, list of deleted handles and list of
         deleted ports.
@@ -585,16 +587,12 @@ class Line(Item):
             raise ValueError('Cannot merge line with one segment')
         if segment < 0 or segment >= len(self._ports):
             raise ValueError('Incorrect segment')
-        if parts < 2:
-            raise ValueError('Incorrect count of parts')
-
-        if segment + parts >= len(self._ports):
-            segment = len(self._ports) - parts
-            assert segment >= 0
+        if count < 2 or segment + count > len(self._ports):
+            raise ValueError('Incorrect count of segments')
 
         # remove handle and ports which share position with handle
-        deleted_handles = self._handles[segment + 1:segment + parts]
-        deleted_ports = self._ports[segment:segment + parts]
+        deleted_handles = self._handles[segment + 1:segment + count]
+        deleted_ports = self._ports[segment:segment + count]
         for h in deleted_handles:
             self._reversible_remove_handle(h)
         for p in deleted_ports:

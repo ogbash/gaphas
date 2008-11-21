@@ -171,12 +171,12 @@ class LineSplitTestCase(TestCaseBase):
         handles = line.handles()
         old_ports = line.ports()[:]
 
-        # start with two handles, split into 4 parts - 3 new handles to be
-        # expected
+        # start with two handles, split into 4 segments - 3 new handles to
+        # be expected
         assert len(handles) == 2
         assert len(old_ports) == 1
 
-        handles, ports = line.split_segment(0, parts=4)
+        handles, ports = line.split_segment(0, count=4)
         self.assertEquals(3, len(handles))
         h1, h2, h3 = handles
         self.assertEquals((5, 4), h1.pos)
@@ -266,7 +266,7 @@ class LineSplitTestCase(TestCaseBase):
         self.assertRaises(ValueError, line.split_segment, 1)
 
         line = Line()
-        # can't split into one or less parts :)
+        # can't split into one or less segment :)
         self.assertRaises(ValueError, line.split_segment, 0, 1)
 
 
@@ -310,54 +310,19 @@ class LineMergeTestCase(TestCaseBase):
         self.assertEquals((20, 0), port.end)
 
 
-    def test_merge_second_single(self):
-        """Test single line merging starting from 2nd segment
-        """
-        line = Line()
-        line.handles()[1].pos = (20, 0)
-        line.split_segment(0)
-
-        # we start with 3 handles and 2 ports, after merging 2 handles and
-        # 1 port are expected
-        assert len(line.handles()) == 3
-        assert len(line.ports()) == 2
-        old_ports = line.ports()[:]
-
-        handles, ports = line.merge_segment(1)
-        # deleted handles and ports
-        self.assertEquals(1, len(handles))
-        self.assertEquals(2, len(ports))
-        # handles and ports left after segment merging
-        self.assertEquals(2, len(line.handles()))
-        self.assertEquals(1, len(line.ports()))
-
-        self.assertTrue(handles[0] not in line.handles())
-        self.assertTrue(ports[0] not in line.ports())
-        self.assertTrue(ports[1] not in line.ports())
-
-        # old ports are completely removed as they are replaced by new one
-        # port
-        self.assertEquals(old_ports, ports)
-
-        # finally, created port shall span between first and last handle
-        port = line.ports()[0]
-        self.assertEquals((0, 0), port.start)
-        self.assertEquals((20, 0), port.end)
-
-
     def test_merge_multiple(self):
         """Test multiple line merge
         """
         line = Line()
         line.handles()[1].pos = (20, 16)
-        line.split_segment(0, parts=3)
+        line.split_segment(0, count=3)
  
-        # start with 4 handles and 3 ports, merge 3 parts
+        # start with 4 handles and 3 ports, merge 3 segments
         assert len(line.handles()) == 4
         assert len(line.ports()) == 3
  
         print line.handles()
-        handles, ports = line.merge_segment(0, parts=3)
+        handles, ports = line.merge_segment(0, count=3)
         self.assertEquals(2, len(handles))
         self.assertEquals(3, len(ports))
         self.assertEquals(2, len(line.handles()))
@@ -406,23 +371,36 @@ class LineMergeTestCase(TestCaseBase):
     def test_params_errors(self):
         """Test parameter error exceptions
         """
-        # there is only 1 segment
         line = Line()
         line.split_segment(0)
+        # no segment -1
         self.assertRaises(ValueError, line.merge_segment, -1)
  
         line = Line()
         line.split_segment(0)
+        # no segment no 2
         self.assertRaises(ValueError, line.merge_segment, 2)
  
         line = Line()
         line.split_segment(0)
-        # can't merge one or less parts :)
+        # can't merge one or less segments :)
         self.assertRaises(ValueError, line.merge_segment, 0, 1)
  
         line = Line()
         # can't merge line with one segment
         self.assertRaises(ValueError, line.merge_segment, 0)
+
+        line = Line()
+        line.split_segment(0)
+        # 2 segments: no 0 and 1. cannot merge as there are no segments
+        # after segment no 1
+        self.assertRaises(ValueError, line.merge_segment, 1)
+
+        line = Line()
+        line.split_segment(0)
+        # 2 segments: no 0 and 1. cannot merge 3 segments as there are no 3
+        # segments
+        self.assertRaises(ValueError, line.merge_segment, 0, 3)
 
 
 # vim:sw=4:et
