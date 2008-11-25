@@ -78,50 +78,27 @@ class LineTestCase(TestCaseBase):
         self.assertEquals(2, len(canvas.solver._constraints))
 
 
-    def test_orthogonal_line_split_segment(self):
+    def test_orthogonal_line_undo(self):
+        """Test orthogonal line undo
+        """
         canvas = Canvas()
         line = Line()
         canvas.add(line)
 
+        # start with no orthogonal constraints
         assert len(canvas.solver._constraints) == 0
 
         line.orthogonal = True
 
-        assert len(canvas.solver._constraints) == 2
-        after_ortho = set(canvas.solver._constraints)
-        assert len(line.handles()) == 3
-
-        del undo_list[:]
-
-        line.split_segment(0)
-
-        assert len(canvas.solver._constraints) == 3
-        assert len(line.handles()) == 4
-
-        undo()
-
-        assert len(canvas.solver._constraints) == 2
-        assert len(line.handles()) == 3
-        assert canvas.solver._constraints == after_ortho
-
-        line.split_segment(0)
-
-        assert len(canvas.solver._constraints) == 3
-        assert len(line.handles()) == 4
-        after_split = set(canvas.solver._constraints)
-
-        del undo_list[:]
-
-        line.merge_segment(0)
-
+        # check orthogonal constraints
         assert len(canvas.solver._constraints) == 2
         assert len(line.handles()) == 3
 
         undo()
 
-        assert len(canvas.solver._constraints) == 3
-        assert len(line.handles()) == 4
-        assert canvas.solver._constraints == after_split
+        self.assertFalse(line.orthogonal)
+        self.assertEquals(0, len(canvas.solver._constraints))
+        self.assertEquals(2, len(line.handles()))
 
 
 
@@ -252,7 +229,27 @@ class LineSplitTestCase(TestCaseBase):
     def test_orthogonal_line_split(self):
         """Test orthogonal line splitting
         """
-        assert 0
+        canvas = Canvas()
+        line = Line()
+        line.handles()[-1].pos = 100, 100
+        canvas.add(line)
+
+        # start with no orthogonal constraints
+        assert len(canvas.solver._constraints) == 0
+
+        line.orthogonal = True
+
+        # check orthogonal constraints
+        assert len(canvas.solver._constraints) == 2
+        assert len(line.handles()) == 3
+
+        line.split_segment(0)
+
+        # 4 handles and 3 ports are expected
+        # 3 constraints keep the line orthogonal
+        self.assertEquals(3, len(canvas.solver._constraints))
+        self.assertEquals(4, len(line.handles()))
+        self.assertEquals(3, len(line.ports()))
 
 
     def test_params_errors(self):
@@ -365,8 +362,26 @@ class LineMergeTestCase(TestCaseBase):
     def test_orthogonal_line_merge(self):
         """Test orthogonal line merging
         """
-        assert 0
- 
+        canvas = Canvas()
+        line = Line()
+        line.handles()[-1].pos = 100, 100
+        canvas.add(line)
+
+        # prepare the line for merging
+        line.orthogonal = True
+        line.split_segment(0)
+
+        assert len(canvas.solver._constraints) == 3
+        assert len(line.handles()) == 4 
+        assert len(line.ports()) == 3 
+
+        # test the merging
+        line.merge_segment(0)
+
+        self.assertEquals(2, len(canvas.solver._constraints))
+        self.assertEquals(3, len(line.handles()))
+        self.assertEquals(2, len(line.ports()))
+
  
     def test_params_errors(self):
         """Test parameter error exceptions
