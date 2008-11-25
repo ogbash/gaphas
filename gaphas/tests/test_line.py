@@ -36,7 +36,7 @@ class TestCaseBase(unittest.TestCase):
 
 
 
-class LineTestCase(unittest.TestCase):
+class LineTestCase(TestCaseBase):
     """
     Basic line item tests.
     """
@@ -74,7 +74,7 @@ class LineTestCase(unittest.TestCase):
 
         line.horizontal = True
 
-        self.assertEquals(line.horizontal)
+        self.assertTrue(line.horizontal)
         self.assertEquals(2, len(canvas.solver._constraints))
 
 
