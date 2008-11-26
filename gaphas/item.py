@@ -552,7 +552,7 @@ class Line(Item):
         if segment < 0 or segment >= len(self._ports):
             raise ValueError('Incorrect segment')
         if count < 2:
-            raise ValueError('Incorrect count of count')
+            raise ValueError('Incorrect count of segments')
 
         def do_split(segment, count):
             h0 = self._handles[segment]
