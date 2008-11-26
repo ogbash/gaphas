@@ -1024,6 +1024,54 @@ class ConnectHandleTool(HandleTool):
         solver.add_constraint(constraint)
 
 
+    @staticmethod
+    def remove_constraint(line, handle):
+        """
+        Remove connection constraint created between line's handle and
+        connected item's port.
+
+        :Parameters:
+         line
+            Line connecting to an item.
+         handle
+            Handle of a line connecting to an item.
+        """
+        if handle.connection_data:
+            line.canvas.solver.remove_constraint(handle.connection_data)
+            handle.connection_data = None
+
+
+    @staticmethod
+    def create_constraints(lines, handles, item):
+        """
+        Create connection constraints between connecting lines and an item.
+
+        :Parameters:
+         lines
+            Lines connecting to an item.
+         handles
+            Handles of lines connecting to an item.
+         item
+            Item connected to lines.
+        """
+        for line, h in zip(lines, handles):
+            port = ConnectHandleTool.find_port(line, h, item)
+            ConnectHandleTool.create_constraint(line, h, item, port)
+
+
+    @staticmethod
+    def remove_constraints(lines, handles):
+        """
+        Remove connection constraints established between lines' handles
+        and connected items.
+
+        Use `ConnectHandleTool.create_constraints` method to recreate the
+        constraints.
+        """
+        for line, h in zip(lines, handles):
+            ConnectHandleTool.remove_constraint(line, h)
+
+
 
 class DisconnectHandle(object):
 
@@ -1111,12 +1159,23 @@ class LineSegmentTool(ConnectHandleTool):
 
             if count > 2:
                 do_split(segment + 1, count - 1)
+
+        # get rid of connection constraints (to be recreated later)
+        citems = None
+        if line.canvas:
+            data = zip(*line.canvas.get_connected_items(line))
+            if data:
+                citems, chandles = data
+                ConnectHandleTool.remove_constraints(citems, chandles)
+
         do_split(segment, count)
 
         # force orthogonal constraints to be recreated
         line._update_orthogonal_constraints(line.orthogonal)
+
         # recreate connection constraints
-        self.recreate_constraints(line)
+        if citems:
+            ConnectHandleTool.create_constraints(citems, chandles, line)
 
         handles = line.handles()[segment + 1:segment + count]
         ports = line.ports()[segment:segment + count - 1]
@@ -1145,6 +1204,15 @@ class LineSegmentTool(ConnectHandleTool):
         if count < 2 or segment + count > len(line.ports()):
             raise ValueError('Incorrect count of segments')
 
+        # get rid of connection constraints (to be recreated later)
+        citems = None
+        if line.canvas:
+            data = zip(*line.canvas.get_connected_items(line))
+            if data:
+                citems, chandles = data
+                ConnectHandleTool.remove_constraints(citems, chandles)
+
+
         # remove handle and ports which share position with handle
         deleted_handles = line.handles()[segment + 1:segment + count]
         deleted_ports = line.ports()[segment:segment + count]
@@ -1162,27 +1230,12 @@ class LineSegmentTool(ConnectHandleTool):
 
         # force orthogonal constraints to be recreated
         line._update_orthogonal_constraints(line.orthogonal)
-        self.recreate_constraints(line)
+
+        # recreate connection constraints
+        if citems:
+            ConnectHandleTool.create_constraints(citems, chandles, line)
 
         return deleted_handles, deleted_ports
-
-
-    def recreate_constraints(self, item):
-        """
-        Recreate constraints between item and all connecting items.
-
-        :Parameters:
-         item
-            Item, which connecting items connection constraints should be
-            recreated.
-        """
-        if item.canvas is None:
-            return # no canvas, no connection constraints
-
-        connected = item.canvas.get_connected_items(item)
-        for line, h in connected:
-            port = ConnectHandleTool.find_port(line, h, item)
-            ConnectHandleTool.create_constraint(line, h, item, port)
 
 
     def on_button_press(self, context, event):
