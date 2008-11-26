@@ -1053,6 +1053,17 @@ class DisconnectHandle(object):
 
 
 class LineSegmentTool(ConnectHandleTool):
+    """
+    Line segment tool provides functionality for splitting and merging line
+    segments.
+
+    Line segment is defined by two adjacent handles.
+
+    Line splitting is performed by clicking a line in the middle of
+    a segment.
+
+    Line merging is performed by moving a handle onto adjacent handle.
+    """
     def split_segment(self, line, segment, count=2):
         """
         Split one line segment into ``count`` equal pieces.
