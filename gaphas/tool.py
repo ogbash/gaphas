@@ -1099,6 +1099,48 @@ class LineSegmentTool(ConnectHandleTool):
         return handles, ports
 
 
+    def merge_segment(self, line, segment, count=2):
+        """
+        Merge two (or more) line segments.
+
+        Tuple of two lists is returned, list of deleted handles and list of
+        deleted ports.
+
+        :Parameters:
+         line
+            Line item, which segments shall be merged.
+         segment
+            Segment number to start merging from (starting from zero).
+         count
+            Amount of segments to be merged (minimum 2). 
+        """
+        if len(line.ports()) < 2:
+            raise ValueError('Cannot merge line with one segment')
+        if segment < 0 or segment >= len(line.ports()):
+            raise ValueError('Incorrect segment')
+        if count < 2 or segment + count > len(line.ports()):
+            raise ValueError('Incorrect count of segments')
+
+        # remove handle and ports which share position with handle
+        deleted_handles = line.handles()[segment + 1:segment + count]
+        deleted_ports = line.ports()[segment:segment + count]
+        for h in deleted_handles:
+            line._reversible_remove_handle(h)
+        for p in deleted_ports:
+            line._reversible_remove_port(p)
+
+        # create new port, which replaces old ports destroyed due to
+        # deleted handle
+        h1 = line.handles()[segment]
+        h2 = line.handles()[segment + 1]
+        port = line._create_port(h1, h2)
+        line._reversible_insert_port(segment, port)
+
+        # force orthogonal constraints to be recreated
+        line._update_orthogonal_constraints(line.orthogonal)
+        return deleted_handles, deleted_ports
+
+
     def on_button_press(self, context, event):
         """
         In addition to the normal behavior, the button press event creates
@@ -1151,7 +1193,7 @@ class LineSegmentTool(ConnectHandleTool):
 
                 if d < 2:
                     assert len(context.view.canvas.solver._marked_cons) == 0
-                    grabbed_item.merge_segment(segment)
+                    self.merge_segment(grabbed_item, segment)
                     self.recreate_constraints(context.view, grabbed_item)
 
             return True

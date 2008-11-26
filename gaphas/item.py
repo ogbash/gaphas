@@ -534,43 +534,6 @@ class Line(Item):
             bind1={'index': lambda self, port: self._ports.index(port)})
 
 
-    def merge_segment(self, segment, count=2):
-        """
-        Merge two line segments starting from ``segment``.
-
-        The ``count`` parameter indicates how many segments should be
-        merged.
-
-        Tuple of two lists is returned, list of deleted handles and list of
-        deleted ports.
-        """
-        if len(self._ports) < 2:
-            raise ValueError('Cannot merge line with one segment')
-        if segment < 0 or segment >= len(self._ports):
-            raise ValueError('Incorrect segment')
-        if count < 2 or segment + count > len(self._ports):
-            raise ValueError('Incorrect count of segments')
-
-        # remove handle and ports which share position with handle
-        deleted_handles = self._handles[segment + 1:segment + count]
-        deleted_ports = self._ports[segment:segment + count]
-        for h in deleted_handles:
-            self._reversible_remove_handle(h)
-        for p in deleted_ports:
-            self._reversible_remove_port(p)
-
-        # create new port, which replaces old ports destroyed due to
-        # deleted handle
-        h1 = self._handles[segment]
-        h2 = self._handles[segment + 1]
-        port = LinePort(h1.pos, h2.pos)
-        self._reversible_insert_port(segment, port)
-
-        # force orthogonal constraints to be recreated
-        self._update_orthogonal_constraints(self.orthogonal)
-        return deleted_handles, deleted_ports
-
-
     def _create_handle(self, pos, strength=WEAK):
         return Handle(pos, strength=strength)
 
