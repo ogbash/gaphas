@@ -1063,6 +1063,15 @@ class LineSegmentTool(ConnectHandleTool):
     a segment.
 
     Line merging is performed by moving a handle onto adjacent handle.
+
+    Please note, that this tool provides functionality without involving
+    context menu. Any further research into line spliting/merging
+    functionality should take into account this assumption and new
+    improvements (or even this tool replacement) shall be behavior based.
+
+    It is possible to use this tool from a menu by using
+    `LineSegmentTool.split_segment` and `LineSegmentTool.merge_segment`
+    methods.
     """
     def split_segment(self, line, segment, count=2):
         """
