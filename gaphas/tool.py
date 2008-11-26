@@ -1053,6 +1053,52 @@ class DisconnectHandle(object):
 
 
 class LineSegmentTool(ConnectHandleTool):
+    def split_segment(self, line, segment, count=2):
+        """
+        Split one line segment into ``count`` equal pieces.
+
+        Two lists are returned
+        
+        - list of created handles
+        - list of created ports
+
+        :Parameters:
+         line
+            Line item, which segment shall be split.
+         segment
+            Segment number to split (starting from zero).
+         count
+            Amount of new segments to be created (minimum 2). 
+        """
+        if segment < 0 or segment >= len(line.ports()):
+            raise ValueError('Incorrect segment')
+        if count < 2:
+            raise ValueError('Incorrect count of segments')
+
+        def do_split(segment, count):
+            handles = line.handles()
+            h0 = handles[segment]
+            h1 = handles[segment + 1]
+            dx, dy = h1.x - h0.x, h1.y - h0.y
+            new_h = line._create_handle((h0.x + dx / count, h0.y + dy / count))
+            line._reversible_insert_handle(segment + 1, new_h)
+
+            p0 = line._create_port(h0, new_h)
+            p1 = line._create_port(new_h, h1)
+            line._reversible_remove_port(line.ports()[segment])
+            line._reversible_insert_port(segment, p0)
+            line._reversible_insert_port(segment + 1, p1)
+
+            if count > 2:
+                do_split(segment + 1, count - 1)
+        do_split(segment, count)
+        # force orthogonal constraints to be recreated
+        line._update_orthogonal_constraints(line.orthogonal)
+        handles = line.handles()[segment + 1:segment + count]
+        ports = line.ports()[segment:segment + count - 1]
+        return handles, ports
+
+
     def on_button_press(self, context, event):
         """
         In addition to the normal behavior, the button press event creates
@@ -1071,7 +1117,7 @@ class LineSegmentTool(ConnectHandleTool):
                 yp = (h1.y + h2.y) / 2
                 if distance_point_point_fast((x,y), (xp, yp)) <= 4:
                     segment = handles.index(h1)
-                    item.split_segment(segment)
+                    self.split_segment(item, segment)
                     self.recreate_constraints(view, item)
 
                     self.grab_handle(item, item.handles()[segment + 1])

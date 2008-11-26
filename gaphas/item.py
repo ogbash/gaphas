@@ -534,49 +534,6 @@ class Line(Item):
             bind1={'index': lambda self, port: self._ports.index(port)})
 
 
-    def split_segment(self, segment, count=2):
-        """
-        Split one line segment into ``count`` equal pieces.
-
-        Two lists are returned
-        
-        - list of created handles
-        - list of created ports
-
-        :Parameters:
-         segment
-            Segment number to split (starting from zero).
-         count
-            Amount of new segments to be created (minimum 2). 
-        """
-        if segment < 0 or segment >= len(self._ports):
-            raise ValueError('Incorrect segment')
-        if count < 2:
-            raise ValueError('Incorrect count of segments')
-
-        def do_split(segment, count):
-            h0 = self._handles[segment]
-            h1 = self._handles[segment + 1]
-            dx, dy = h1.x - h0.x, h1.y - h0.y
-            new_h = Handle((h0.x + dx / count, h0.y + dy / count), strength=WEAK)
-            self._reversible_insert_handle(segment + 1, new_h)
-
-            p0 = LinePort(h0.pos, new_h.pos)
-            p1 = LinePort(new_h.pos, h1.pos)
-            self._reversible_remove_port(self._ports[segment])
-            self._reversible_insert_port(segment, p0)
-            self._reversible_insert_port(segment + 1, p1)
-
-            if count > 2:
-                do_split(segment + 1, count - 1)
-        do_split(segment, count)
-        # Force orthogonal constraints to be recreated
-        self._update_orthogonal_constraints(self.orthogonal)
-        handles = self._handles[segment + 1:segment + count]
-        ports = self._ports[segment:segment + count - 1]
-        return handles, ports
-
-
     def merge_segment(self, segment, count=2):
         """
         Merge two line segments starting from ``segment``.
@@ -612,6 +569,14 @@ class Line(Item):
         # force orthogonal constraints to be recreated
         self._update_orthogonal_constraints(self.orthogonal)
         return deleted_handles, deleted_ports
+
+
+    def _create_handle(self, pos, strength=WEAK):
+        return Handle(pos, strength=strength)
+
+    
+    def _create_port(self, h1, h2):
+        return LinePort(h1.pos, h2.pos)
 
 
     def _update_ports(self):
