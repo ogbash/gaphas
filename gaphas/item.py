@@ -536,14 +536,18 @@ class Line(Item):
 
     def split_segment(self, segment, count=2):
         """
-        Split one segment in the Line in ``count`` equal pieces.
-        ``segment`` 0 is the first segment (between handles 0 and 1).
-        The minimum number of count is 2.
+        Split one line segment into ``count`` equal pieces.
 
-        A list of new handles is returned.
+        Two lists are returned
+        
+            - list of created handles
+            - list of created ports
 
-        Note that ``split_segment`` is not able to reconnect constraints that
-        are connected to the segment. 
+        :Parameters:
+         segment
+            Segment number to split (starting from zero).
+         count
+            Amount of new segments to be created (minimum 2). 
         """
         if segment < 0 or segment >= len(self._ports):
             raise ValueError('Incorrect segment')
