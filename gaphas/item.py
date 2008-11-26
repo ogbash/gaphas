@@ -540,8 +540,8 @@ class Line(Item):
 
         Two lists are returned
         
-            - list of created handles
-            - list of created ports
+        - list of created handles
+        - list of created ports
 
         :Parameters:
          segment
