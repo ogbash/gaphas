@@ -1103,8 +1103,12 @@ class LineSegmentTool(ConnectHandleTool):
             if count > 2:
                 do_split(segment + 1, count - 1)
         do_split(segment, count)
+
         # force orthogonal constraints to be recreated
         line._update_orthogonal_constraints(line.orthogonal)
+        # recreate connection constraints
+        self.recreate_constraints(line)
+
         handles = line.handles()[segment + 1:segment + count]
         ports = line.ports()[segment:segment + count - 1]
         return handles, ports
@@ -1149,7 +1153,27 @@ class LineSegmentTool(ConnectHandleTool):
 
         # force orthogonal constraints to be recreated
         line._update_orthogonal_constraints(line.orthogonal)
+        self.recreate_constraints(line)
+
         return deleted_handles, deleted_ports
+
+
+    def recreate_constraints(self, item):
+        """
+        Recreate constraints between item and all connecting items.
+
+        :Parameters:
+         item
+            Item, which connecting items connection constraints should be
+            recreated.
+        """
+        if item.canvas is None:
+            return # no canvas, no connection constraints
+
+        connected = item.canvas.get_connected_items(item)
+        for line, h in connected:
+            port = ConnectHandleTool.find_port(line, h, item)
+            ConnectHandleTool.create_constraint(line, h, item, port)
 
 
     def on_button_press(self, context, event):
@@ -1171,7 +1195,6 @@ class LineSegmentTool(ConnectHandleTool):
                 if distance_point_point_fast((x,y), (xp, yp)) <= 4:
                     segment = handles.index(h1)
                     self.split_segment(item, segment)
-                    self.recreate_constraints(view, item)
 
                     self.grab_handle(item, item.handles()[segment + 1])
                     context.grab()
@@ -1180,6 +1203,11 @@ class LineSegmentTool(ConnectHandleTool):
 
 
     def on_button_release(self, context, event):
+        """
+        In addition to the normal behavior, the button release event
+        removes line segment if grabbed handle is close enough to an
+        adjacent handle.
+        """
         grabbed_handle = self._grabbed_handle
         grabbed_item = self._grabbed_item
         if super(LineSegmentTool, self).on_button_release(context, event):
@@ -1205,26 +1233,8 @@ class LineSegmentTool(ConnectHandleTool):
                 if d < 2:
                     assert len(context.view.canvas.solver._marked_cons) == 0
                     self.merge_segment(grabbed_item, segment)
-                    self.recreate_constraints(context.view, grabbed_item)
 
             return True
-
-
-    def recreate_constraints(self, view, item):
-        """
-        Recreate constraints between item and all connecting items.
-
-        :Parameters:
-         view
-            View used by user.
-         item
-            Item, which connecting items connection constraints should be
-            recreated.
-        """
-        connected = view.canvas.get_connected_items(item)
-        for line, h in connected:
-            port = ConnectHandleTool.find_port(line, h, item)
-            ConnectHandleTool.create_constraint(line, h, item, port)
 
 
 

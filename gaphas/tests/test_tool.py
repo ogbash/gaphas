@@ -81,6 +81,7 @@ class TestCaseBase(unittest.TestCase):
     def setUp(self):
         state.observers.add(state.revert_handler)
         state.subscribers.add(undo_handler)
+        simple_canvas(self)
 
     def tearDown(self):
         state.observers.remove(state.revert_handler)
@@ -297,7 +298,7 @@ class LineSegmentToolTestCase(unittest.TestCase):
         simple_canvas(self)
 
     def test_split(self):
-        """Test splitting line
+        """Test if line is splitted while pressing it in the middle
         """
         tool = LineSegmentTool()
         def dummy_grab(): pass
@@ -315,41 +316,9 @@ class LineSegmentToolTestCase(unittest.TestCase):
         self.assertEquals(self.head, head)
         self.assertEquals(self.tail, tail)
 
-        #tool.on_motion_notify(context, Event(x=200, y=200, state=0xffff))
-        #tool.on_button_release(context, Event(x=200, y=200, state=0))
-
-
-    def test_constraints_after_split(self):
-        """Test if constraints are recreated after line split
-        """
-        tool = LineSegmentTool()
-        def dummy_grab(): pass
-
-        context = Context(view=self.view,
-                grab=dummy_grab,
-                ungrab=dummy_grab)
-
-        # connect line2 to self.line
-        line2 = Line()
-        self.canvas.add(line2)
-        head = line2.handles()[0]
-        self.tool.connect(self.view, line2, head, (25, 25))
-        self.assertEquals(self.line, head.connected_to)
-
-        self.view.hovered_item = self.line
-        self.view.focused_item = self.line
-        tool.on_button_press(context, Event(x=50, y=50, state=0))
-        assert len(self.line.handles()) == 3
-        h1, h2, h3 = self.line.handles()
-
-        # connection shall be reconstrained between 1st and 2nd handle
-        c1 = head.connection_data
-        self.assertEquals(c1._line[0]._point, h1.pos)
-        self.assertEquals(c1._line[1]._point, h2.pos)
-
 
     def test_merge(self):
-        """Test line merging
+        """Test if line is merged by moving handle onto adjacent handle
         """
         tool = LineSegmentTool()
         def dummy_grab(): pass
@@ -367,40 +336,6 @@ class LineSegmentToolTestCase(unittest.TestCase):
         # try to merge, now
         tool.on_button_release(context, Event(x=0, y=0, state=0))
         self.assertEquals(2, len(self.line.handles()))
-
-
-    def test_constraints_after_merge(self):
-        """Test if constraints are recreated after line merge
-        """
-        tool = LineSegmentTool()
-        def dummy_grab(): pass
-
-        context = Context(view=self.view,
-                grab=dummy_grab,
-                ungrab=dummy_grab)
-
-        # connect line2 to self.line
-        line2 = Line()
-        self.canvas.add(line2)
-        head = line2.handles()[0]
-        self.tool.connect(self.view, line2, head, (25, 25))
-        self.assertEquals(self.line, head.connected_to)
-
-        self.view.hovered_item = self.line
-        self.view.focused_item = self.line
-        tool.on_button_press(context, Event(x=50, y=50, state=0))
-        assert len(self.line.handles()) == 3
-        c1 = head.connection_data
-
-        tool.on_button_release(context, Event(x=0, y=0, state=0))
-        assert len(self.line.handles()) == 2
-
-        h1, h2 = self.line.handles()
-        # connection shall be reconstrained between 1st and 2nd handle
-        c2 = head.connection_data
-        self.assertEquals(c2._line[0]._point, h1.pos)
-        self.assertEquals(c2._line[1]._point, h2.pos)
-        self.assertFalse(c1 == c2)
 
 
     def test_merged_segment(self):
@@ -443,33 +378,30 @@ class LineSplitTestCase(TestCaseBase):
     def test_split_single(self):
         """Test single line splitting
         """
-        line = Line()
-        line.handles()[1].pos = (20, 0)
-
         # we start with two handles and one port, after split 3 handles are
         # expected and 2 ports
-        assert len(line.handles()) == 2
-        assert len(line.ports()) == 1
+        assert len(self.line.handles()) == 2
+        assert len(self.line.ports()) == 1
 
-        old_port = line.ports()[0]
+        old_port = self.line.ports()[0]
 
         tool = LineSegmentTool()
         
-        handles, ports = tool.split_segment(line, 0)
+        handles, ports = tool.split_segment(self.line, 0)
         handle = handles[0]
         self.assertEquals(1, len(handles))
-        self.assertEquals((10, 0), handle.pos)
-        self.assertEquals(3, len(line.handles()))
-        self.assertEquals(2, len(line.ports()))
+        self.assertEquals((50, 50), handle.pos)
+        self.assertEquals(3, len(self.line.handles()))
+        self.assertEquals(2, len(self.line.ports()))
 
         # new handle is between old handles
-        self.assertEquals(handle, line.handles()[1])
+        self.assertEquals(handle, self.line.handles()[1])
         # and old port is deleted
-        self.assertTrue(old_port not in line.ports())
+        self.assertTrue(old_port not in self.line.ports())
 
         # check ports order
-        p1, p2 = line.ports()
-        h1, h2, h3 = line.handles()
+        p1, p2 = self.line.ports()
+        h1, h2, h3 = self.line.handles()
         self.assertEquals(h1.pos, p1.start)
         self.assertEquals(h2.pos, p1.end)
         self.assertEquals(h2.pos, p2.start)
@@ -479,10 +411,9 @@ class LineSplitTestCase(TestCaseBase):
     def test_split_multiple(self):
         """Test multiple line splitting
         """
-        line = Line()
-        line.handles()[1].pos = (20, 16)
-        handles = line.handles()
-        old_ports = line.ports()[:]
+        self.line.handles()[1].pos = (20, 16)
+        handles = self.line.handles()
+        old_ports = self.line.ports()[:]
 
         # start with two handles, split into 4 segments - 3 new handles to
         # be expected
@@ -491,7 +422,7 @@ class LineSplitTestCase(TestCaseBase):
 
         tool = LineSegmentTool()
 
-        handles, ports = tool.split_segment(line, 0, count=4)
+        handles, ports = tool.split_segment(self.line, 0, count=4)
         self.assertEquals(3, len(handles))
         h1, h2, h3 = handles
         self.assertEquals((5, 4), h1.pos)
@@ -499,19 +430,19 @@ class LineSplitTestCase(TestCaseBase):
         self.assertEquals((15, 12), h3.pos)
 
         # new handles between old handles
-        self.assertEquals(5, len(line.handles()))
-        self.assertEquals(h1, line.handles()[1])
-        self.assertEquals(h2, line.handles()[2])
-        self.assertEquals(h3, line.handles()[3])
+        self.assertEquals(5, len(self.line.handles()))
+        self.assertEquals(h1, self.line.handles()[1])
+        self.assertEquals(h2, self.line.handles()[2])
+        self.assertEquals(h3, self.line.handles()[3])
 
-        self.assertEquals(4, len(line.ports()))
+        self.assertEquals(4, len(self.line.ports()))
 
         # and old port is deleted
-        self.assertTrue(old_ports[0] not in line.ports())
+        self.assertTrue(old_ports[0] not in self.line.ports())
 
         # check ports order
-        p1, p2, p3, p4 = line.ports()
-        h1, h2, h3, h4, h5 = line.handles()
+        p1, p2, p3, p4 = self.line.ports()
+        h1, h2, h3, h4, h5 = self.line.handles()
         self.assertEquals(h1.pos, p1.start)
         self.assertEquals(h2.pos, p1.end)
         self.assertEquals(h2.pos, p2.start)
@@ -525,14 +456,13 @@ class LineSplitTestCase(TestCaseBase):
     def test_ports_after_split(self):
         """Test ports removal after split
         """
-        line = Line()
-        line.handles()[1].pos = (20, 16)
+        self.line.handles()[1].pos = (20, 16)
 
         tool = LineSegmentTool()
 
-        tool.split_segment(line, 0)
-        handles = line.handles()
-        old_ports = line.ports()[:]
+        tool.split_segment(self.line, 0)
+        handles = self.line.handles()
+        old_ports = self.line.ports()[:]
 
         # start with 3 handles and two ports
         assert len(handles) == 3
@@ -540,57 +470,73 @@ class LineSplitTestCase(TestCaseBase):
 
         # do split of first segment again
         # first port should be deleted, but 2nd one should remain untouched
-        tool.split_segment(line, 0)
-        self.assertFalse(old_ports[0] in line.ports())
-        self.assertEquals(old_ports[1], line.ports()[2])
+        tool.split_segment(self.line, 0)
+        self.assertFalse(old_ports[0] in self.line.ports())
+        self.assertEquals(old_ports[1], self.line.ports()[2])
+
+
+    def test_constraints_after_split(self):
+        """Test if constraints are recreated after line split
+        """
+        tool = LineSegmentTool()
+
+        # connect line2 to self.line
+        line2 = Line()
+        self.canvas.add(line2)
+        head = line2.handles()[0]
+        self.tool.connect(self.view, line2, head, (25, 25))
+        self.assertEquals(self.line, head.connected_to)
+
+        tool.split_segment(self.line, 0)
+        assert len(self.line.handles()) == 3
+        h1, h2, h3 = self.line.handles()
+
+        # connection shall be reconstrained between 1st and 2nd handle
+        c1 = head.connection_data
+        self.assertEquals(h1.pos, c1._line[0]._point)
+        self.assertEquals(h2.pos, c1._line[1]._point)
 
 
     def test_split_undo(self):
         """Test line splitting undo
         """
-        line = Line()
-        line.handles()[1].pos = (20, 0)
+        self.line.handles()[1].pos = (20, 0)
 
         # we start with two handles and one port, after split 3 handles and
         # 2 ports are expected
-        assert len(line.handles()) == 2
-        assert len(line.ports()) == 1
+        assert len(self.line.handles()) == 2
+        assert len(self.line.ports()) == 1
 
         tool = LineSegmentTool()
-        tool.split_segment(line, 0)
-        assert len(line.handles()) == 3
-        assert len(line.ports()) == 2
+        tool.split_segment(self.line, 0)
+        assert len(self.line.handles()) == 3
+        assert len(self.line.ports()) == 2
 
         # after undo, 2 handles and 1 port are expected again
         undo()
-        self.assertEquals(2, len(line.handles()))
-        self.assertEquals(1, len(line.ports()))
+        self.assertEquals(2, len(self.line.handles()))
+        self.assertEquals(1, len(self.line.ports()))
 
 
     def test_orthogonal_line_split(self):
         """Test orthogonal line splitting
         """
-        canvas = Canvas()
-        line = Line()
-        line.handles()[-1].pos = 100, 100
-        canvas.add(line)
-
         # start with no orthogonal constraints
-        assert len(canvas.solver._constraints) == 0
+        assert len(self.line._orthogonal_constraints) == 0
 
-        line.orthogonal = True
+        self.line.orthogonal = True
 
         # check orthogonal constraints
-        assert len(canvas.solver._constraints) == 2
-        assert len(line.handles()) == 3
+        assert len(self.line._orthogonal_constraints) == 2
+        assert len(self.line.handles()) == 3
 
-        line.split_segment(0)
+        self.line.split_segment(0)
 
         # 4 handles and 3 ports are expected
-        # 3 constraints keep the line orthogonal
-        self.assertEquals(3, len(canvas.solver._constraints))
-        self.assertEquals(4, len(line.handles()))
-        self.assertEquals(3, len(line.ports()))
+        # 3 constraints keep the self.line orthogonal
+        self.assertEquals(3, len(self.line._orthogonal_constraints))
+        self.assertEquals(4, len(self.line.handles()))
+        self.assertEquals(3, len(self.line.ports()))
 
 
     def test_params_errors(self):
@@ -619,62 +565,92 @@ class LineMergeTestCase(TestCaseBase):
         """Test single line merging starting from 1st segment
         """
         tool = LineSegmentTool()
-        line = Line()
-        line.handles()[1].pos = (20, 0)
-        tool.split_segment(line, 0)
+        self.line.handles()[1].pos = (20, 0)
+        tool.split_segment(self.line, 0)
 
         # we start with 3 handles and 2 ports, after merging 2 handles and
         # 1 port are expected
-        assert len(line.handles()) == 3
-        assert len(line.ports()) == 2
-        old_ports = line.ports()[:]
+        assert len(self.line.handles()) == 3
+        assert len(self.line.ports()) == 2
+        old_ports = self.line.ports()[:]
 
-        handles, ports = tool.merge_segment(line, 0)
+        handles, ports = tool.merge_segment(self.line, 0)
         # deleted handles and ports
         self.assertEquals(1, len(handles))
         self.assertEquals(2, len(ports))
         # handles and ports left after segment merging
-        self.assertEquals(2, len(line.handles()))
-        self.assertEquals(1, len(line.ports()))
+        self.assertEquals(2, len(self.line.handles()))
+        self.assertEquals(1, len(self.line.ports()))
 
-        self.assertTrue(handles[0] not in line.handles())
-        self.assertTrue(ports[0] not in line.ports())
-        self.assertTrue(ports[1] not in line.ports())
+        self.assertTrue(handles[0] not in self.line.handles())
+        self.assertTrue(ports[0] not in self.line.ports())
+        self.assertTrue(ports[1] not in self.line.ports())
 
         # old ports are completely removed as they are replaced by new one
         # port
         self.assertEquals(old_ports, ports)
 
         # finally, created port shall span between first and last handle
-        port = line.ports()[0]
+        port = self.line.ports()[0]
         self.assertEquals((0, 0), port.start)
         self.assertEquals((20, 0), port.end)
+
+
+    def test_constraints_after_merge(self):
+        """Test if constraints are recreated after line merge
+        """
+        tool = LineSegmentTool()
+        def dummy_grab(): pass
+
+        context = Context(view=self.view,
+                grab=dummy_grab,
+                ungrab=dummy_grab)
+
+        # connect line2 to self.line
+        line2 = Line()
+        self.canvas.add(line2)
+        head = line2.handles()[0]
+        self.tool.connect(self.view, line2, head, (25, 25))
+        self.assertEquals(self.line, head.connected_to)
+
+        tool.split_segment(self.line, 0)
+        assert len(self.line.handles()) == 3
+        c1 = head.connection_data
+
+        tool.merge_segment(self.line, 0)
+        assert len(self.line.handles()) == 2
+
+        h1, h2 = self.line.handles()
+        # connection shall be reconstrained between 1st and 2nd handle
+        c2 = head.connection_data
+        self.assertEquals(c2._line[0]._point, h1.pos)
+        self.assertEquals(c2._line[1]._point, h2.pos)
+        self.assertFalse(c1 == c2)
 
 
     def test_merge_multiple(self):
         """Test multiple line merge
         """
         tool = LineSegmentTool()
-        line = Line()
-        line.handles()[1].pos = (20, 16)
-        tool.split_segment(line, 0, count=3)
+        self.line.handles()[1].pos = (20, 16)
+        tool.split_segment(self.line, 0, count=3)
  
         # start with 4 handles and 3 ports, merge 3 segments
-        assert len(line.handles()) == 4
-        assert len(line.ports()) == 3
+        assert len(self.line.handles()) == 4
+        assert len(self.line.ports()) == 3
  
-        print line.handles()
-        handles, ports = tool.merge_segment(line, 0, count=3)
+        print self.line.handles()
+        handles, ports = tool.merge_segment(self.line, 0, count=3)
         self.assertEquals(2, len(handles))
         self.assertEquals(3, len(ports))
-        self.assertEquals(2, len(line.handles()))
-        self.assertEquals(1, len(line.ports()))
+        self.assertEquals(2, len(self.line.handles()))
+        self.assertEquals(1, len(self.line.ports()))
 
-        self.assertTrue(set(handles).isdisjoint(set(line.handles())))
-        self.assertTrue(set(ports).isdisjoint(set(line.ports())))
+        self.assertTrue(set(handles).isdisjoint(set(self.line.handles())))
+        self.assertTrue(set(ports).isdisjoint(set(self.line.ports())))
 
         # finally, created port shall span between first and last handle
-        port = line.ports()[0]
+        port = self.line.ports()[0]
         self.assertEquals((0, 0), port.start)
         self.assertEquals((20, 16), port.end)
 
@@ -684,51 +660,47 @@ class LineMergeTestCase(TestCaseBase):
         """
         tool = LineSegmentTool()
 
-        line = Line()
-        line.handles()[1].pos = (20, 0)
+        self.line.handles()[1].pos = (20, 0)
 
         # split for merging
-        tool.split_segment(line, 0)
-        assert len(line.handles()) == 3
-        assert len(line.ports()) == 2
+        tool.split_segment(self.line, 0)
+        assert len(self.line.handles()) == 3
+        assert len(self.line.ports()) == 2
 
         # clear undo stack before merging
         del undo_list[:]
  
         # merge with empty undo stack
-        tool.merge_segment(line, 0)
-        assert len(line.handles()) == 2
-        assert len(line.ports()) == 1
+        tool.merge_segment(self.line, 0)
+        assert len(self.line.handles()) == 2
+        assert len(self.line.ports()) == 1
  
         # after merge undo, 3 handles and 2 ports are expected again
         undo()
-        self.assertEquals(3, len(line.handles()))
-        self.assertEquals(2, len(line.ports()))
+        self.assertEquals(3, len(self.line.handles()))
+        self.assertEquals(2, len(self.line.ports()))
  
  
     def test_orthogonal_line_merge(self):
         """Test orthogonal line merging
         """
         tool = LineSegmentTool()
-        canvas = Canvas()
-        line = Line()
-        line.handles()[-1].pos = 100, 100
-        canvas.add(line)
+        self.line.handles()[-1].pos = 100, 100
 
-        # prepare the line for merging
-        line.orthogonal = True
-        tool.split_segment(line, 0)
+        # prepare the self.line for merging
+        self.line.orthogonal = True
+        tool.split_segment(self.line, 0)
 
-        assert len(canvas.solver._constraints) == 3
-        assert len(line.handles()) == 4 
-        assert len(line.ports()) == 3 
+        assert len(self.canvas.solver._constraints) == 3
+        assert len(self.line.handles()) == 4 
+        assert len(self.line.ports()) == 3 
 
         # test the merging
-        line.merge_segment(0)
+        self.line.merge_segment(0)
 
-        self.assertEquals(2, len(canvas.solver._constraints))
-        self.assertEquals(3, len(line.handles()))
-        self.assertEquals(2, len(line.ports()))
+        self.assertEquals(2, len(self.canvas.solver._constraints))
+        self.assertEquals(3, len(self.line.handles()))
+        self.assertEquals(2, len(self.line.ports()))
 
  
     def test_params_errors(self):
