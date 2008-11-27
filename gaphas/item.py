@@ -259,8 +259,6 @@ class Element(Item):
         super(Element, self).__init__()
         self._handles = [ h(strength=VERY_STRONG) for h in [Handle]*4 ]
 
-        eq = EqualsConstraint
-        lt = LessThanConstraint
         handles = self._handles
         h_nw = handles[NW]
         h_ne = handles[NE]
@@ -280,11 +278,12 @@ class Element(Item):
         self._c_min_h = LessThanConstraint(smaller=h_nw.y, bigger=h_se.y, delta=10)
 
         # setup constraints
+        self.constraint(h_nw.pos, horizontal=h_ne.pos)
+        self.constraint(h_nw.pos, vertical=h_sw.pos)
+        self.constraint(h_se.pos, horizontal=h_sw.pos)
+        self.constraint(h_se.pos, vertical=h_ne.pos)
+
         self.constraints.extend([
-            eq(a=h_nw.y, b=h_ne.y),
-            eq(a=h_nw.x, b=h_sw.x),
-            eq(a=h_se.y, b=h_sw.y),
-            eq(a=h_se.x, b=h_ne.x),
             # set h_nw < h_se constraints
             # with minimal size functionality
             self._c_min_w,
@@ -294,6 +293,7 @@ class Element(Item):
         # set width/height when minimal size constraints exist
         self.width = width
         self.height = height
+
 
     def setup_canvas(self):
         super(Element, self).setup_canvas()
