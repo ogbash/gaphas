@@ -156,22 +156,38 @@ class Item(object):
         pass
 
     
-    def constraint(self, handle, horizontal=None, vertical=None, line=None, delta=0.0, align=None):
+    def constraint(self, pos, horizontal=None, vertical=None, line=None, delta=0.0, align=None):
         """
-        Utility method to create item's constraint.
+        Utility method to create item's internal constraint between
+        reference position and another position or a line.
+
+        Position is a tuple of coordinates, i.e. ``(2, 4)``.
+
+        Line is a tuple of positions, i.e. ``((2, 3), (4, 2))``.
+
+        This method shall not be used to create constraints between
+        two different items.
+
+        :Parameters:
+         pos
+            Reference position.
+         horizontal
+            Position for horizontal constraint.
+         vertical
+            Position for vertical constraint.
+         line
+            Line for constraint keeping reference position on a line.
         """
         constraint = None
         if horizontal:
-            pass
+            constraint = EqualsConstraint(pos[1], horizontal[1])
         elif vertical:
-            pass
+            constraint = EqualsConstraint(pos[0], vertical[0])
         elif len(line) == 2:
-            point = handle.pos
-            line = line[0].pos, line[1].pos
             if align is None:
-                constraint = LineConstraint(line=line, point=point)
+                constraint = LineConstraint(line=line, point=pos)
             else:
-                constraint = LineAlignConstraint(line=line, point=point, align=align, delta=delta)
+                constraint = LineAlignConstraint(line=line, point=pos, align=align, delta=delta)
         else:
             raise ValueError('Constraint incorrectly specified')
         assert constraint is not None
