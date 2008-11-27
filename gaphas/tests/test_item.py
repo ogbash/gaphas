@@ -21,7 +21,7 @@ class ItemConstraintTestCase(unittest.TestCase):
         item = Item()
         pos = Variable(1), Variable(2)
         line = (Variable(3), Variable(4)), (Variable(5), Variable(6))
-        item.constraint(pos, line=line)
+        item.constraint(line=(pos, line))
         self.assertEquals(1, len(item._constraints))
 
         c = item._constraints[0]
@@ -37,7 +37,7 @@ class ItemConstraintTestCase(unittest.TestCase):
         item = Item()
         p1 = Variable(1), Variable(2)
         p2 = Variable(3), Variable(4)
-        item.constraint(p1, horizontal=p2)
+        item.constraint(horizontal=(p1, p2))
         self.assertEquals(1, len(item._constraints))
 
         c = item._constraints[0]
@@ -54,7 +54,7 @@ class ItemConstraintTestCase(unittest.TestCase):
         item = Item()
         p1 = Variable(1), Variable(2)
         p2 = Variable(3), Variable(4)
-        item.constraint(p1, vertical=p2)
+        item.constraint(vertical=(p1, p2))
         self.assertEquals(1, len(item._constraints))
 
         c = item._constraints[0]

@@ -156,10 +156,10 @@ class Item(object):
         pass
 
     
-    def constraint(self, pos, horizontal=None, vertical=None, line=None, delta=0.0, align=None):
+    def constraint(self, horizontal=None, vertical=None, line=None, delta=0.0, align=None):
         """
         Utility method to create item's internal constraint between
-        reference position and another position or a line.
+        two positions or between a position and a line.
 
         Position is a tuple of coordinates, i.e. ``(2, 4)``.
 
@@ -169,25 +169,26 @@ class Item(object):
         two different items.
 
         :Parameters:
-         pos
-            Reference position.
-         horizontal
-            Position for horizontal constraint.
-         vertical
-            Position for vertical constraint.
-         line
-            Line for constraint keeping reference position on a line.
+         horizontal=(p1, p2)
+            Keep positions ``p1`` and ``p2`` aligned horizontally.
+         vertical=(p1, p2)
+            Keep positions ``p1`` and ``p2`` aligned vertically.
+         line=(p, l)
+            Keep position ``p`` on a line ``l``.
         """
         constraint = None
-        if horizontal:
-            constraint = EqualsConstraint(pos[1], horizontal[1])
-        elif vertical:
-            constraint = EqualsConstraint(pos[0], vertical[0])
-        elif len(line) == 2:
+        if horizontal is not None:
+            p1, p2 = horizontal
+            constraint = EqualsConstraint(p1[1], p2[1])
+        elif vertical is not None:
+            p1, p2 = vertical
+            constraint = EqualsConstraint(p1[0], p2[0])
+        elif line is not None:
+            pos, l = line
             if align is None:
-                constraint = LineConstraint(line=line, point=pos)
+                constraint = LineConstraint(line=l, point=pos)
             else:
-                constraint = LineAlignConstraint(line=line, point=pos, align=align, delta=delta)
+                constraint = LineAlignConstraint(line=l, point=pos, align=align, delta=delta)
         else:
             raise ValueError('Constraint incorrectly specified')
         assert constraint is not None
@@ -278,10 +279,10 @@ class Element(Item):
         self._c_min_h = LessThanConstraint(smaller=h_nw.y, bigger=h_se.y, delta=10)
 
         # setup constraints
-        self.constraint(h_nw.pos, horizontal=h_ne.pos)
-        self.constraint(h_nw.pos, vertical=h_sw.pos)
-        self.constraint(h_se.pos, horizontal=h_sw.pos)
-        self.constraint(h_se.pos, vertical=h_ne.pos)
+        self.constraint(horizontal=(h_nw.pos, h_ne.pos))
+        self.constraint(horizontal=(h_se.pos, h_sw.pos))
+        self.constraint(vertical=(h_nw.pos, h_sw.pos))
+        self.constraint(vertical=(h_se.pos, h_ne.pos))
 
         self.constraints.extend([
             # set h_nw < h_se constraints
