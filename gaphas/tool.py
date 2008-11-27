@@ -1237,7 +1237,7 @@ class LineSegmentTool(ConnectHandleTool):
 
     def on_button_press(self, context, event):
         """
-        In addition to the normal behavior, the button press event creates
+        In addition to the normal behaviour, the button press event creates
         new handles if it is activated on the middle of a line segment.
         """
         if super(LineSegmentTool, self).on_button_press(context, event):

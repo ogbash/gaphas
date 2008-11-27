@@ -456,8 +456,8 @@ class Line(Item):
             return
 
         h = self._handles
-        if len(h) < 3:
-            self.split_segment(0)
+        #if len(h) < 3:
+        #    self.split_segment(0)
         eq = EqualsConstraint #lambda a, b: a - b
         add = self.canvas.solver.add_constraint
         cons = []
@@ -612,10 +612,8 @@ class Line(Item):
     def point(self, pos):
         """
         >>> a = Line()
-        >>> a.handles()[1].pos = 30, 30
-        >>> a.split_segment(0)
-        [<Handle object on (15, 15)>]
         >>> a.handles()[1].pos = 25, 5
+        >>> a._handles.append(a._create_handle((30, 30)))
         >>> a.point((-1, 0))
         1.0
         >>> '%.3f' % a.point((5, 4))

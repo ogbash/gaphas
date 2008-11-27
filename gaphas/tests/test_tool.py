@@ -88,7 +88,6 @@ class TestCaseBase(unittest.TestCase):
         state.subscribers.remove(undo_handler)
 
 
-
 class ConnectHandleToolGlueTestCase(unittest.TestCase):
     """
     Test handle connection tool glue method.
@@ -527,16 +526,16 @@ class LineSplitTestCase(TestCaseBase):
         self.line.orthogonal = True
 
         # check orthogonal constraints
-        assert len(self.line._orthogonal_constraints) == 2
-        assert len(self.line.handles()) == 3
+        self.assertEquals(1, len(self.line._orthogonal_constraints))
+        self.assertEquals(2, len(self.line.handles()))
 
-        self.line.split_segment(0)
+        LineSegmentTool().split_segment(self.line, 0)
 
-        # 4 handles and 3 ports are expected
-        # 3 constraints keep the self.line orthogonal
-        self.assertEquals(3, len(self.line._orthogonal_constraints))
-        self.assertEquals(4, len(self.line.handles()))
-        self.assertEquals(3, len(self.line.ports()))
+        # 3 handles and 2 ports are expected
+        # 2 constraints keep the self.line orthogonal
+        self.assertEquals(2, len(self.line._orthogonal_constraints))
+        self.assertEquals(3, len(self.line.handles()))
+        self.assertEquals(2, len(self.line.ports()))
 
 
     def test_params_errors(self):
@@ -561,6 +560,7 @@ class LineMergeTestCase(TestCaseBase):
     """
     Tests for line merging.
     """
+
     def test_merge_first_single(self):
         """Test single line merging starting from 1st segment
         """
@@ -684,21 +684,24 @@ class LineMergeTestCase(TestCaseBase):
     def test_orthogonal_line_merge(self):
         """Test orthogonal line merging
         """
+        self.assertEquals(12, len(self.canvas.solver._constraints))
+
         tool = LineSegmentTool()
         self.line.handles()[-1].pos = 100, 100
 
         # prepare the self.line for merging
-        self.line.orthogonal = True
         tool.split_segment(self.line, 0)
+        tool.split_segment(self.line, 0)
+        self.line.orthogonal = True
 
-        assert len(self.canvas.solver._constraints) == 3
-        assert len(self.line.handles()) == 4 
-        assert len(self.line.ports()) == 3 
+        self.assertEquals(12 + 3, len(self.canvas.solver._constraints))
+        self.assertEquals(4, len(self.line.handles()))
+        self.assertEquals(3, len(self.line.ports()))
 
         # test the merging
-        self.line.merge_segment(0)
+        tool.merge_segment(self.line, 0)
 
-        self.assertEquals(2, len(self.canvas.solver._constraints))
+        self.assertEquals(12 + 2, len(self.canvas.solver._constraints))
         self.assertEquals(3, len(self.line.handles()))
         self.assertEquals(2, len(self.line.ports()))
 

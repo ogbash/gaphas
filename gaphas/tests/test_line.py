@@ -59,23 +59,23 @@ class LineTestCase(TestCaseBase):
 
         line.orthogonal = True
 
-        self.assertEquals(2, len(canvas.solver._constraints))
+        self.assertEquals(1, len(canvas.solver._constraints))
         after_ortho = set(canvas.solver._constraints)
 
         del undo_list[:]
         line.horizontal = True
 
-        self.assertEquals(2, len(canvas.solver._constraints))
+        self.assertEquals(1, len(canvas.solver._constraints))
 
         undo()
 
         self.assertFalse(line.horizontal)
-        self.assertEquals(2, len(canvas.solver._constraints))
+        self.assertEquals(1, len(canvas.solver._constraints))
 
         line.horizontal = True
 
         self.assertTrue(line.horizontal)
-        self.assertEquals(2, len(canvas.solver._constraints))
+        self.assertEquals(1, len(canvas.solver._constraints))
 
 
     def test_orthogonal_line_undo(self):
@@ -91,8 +91,8 @@ class LineTestCase(TestCaseBase):
         line.orthogonal = True
 
         # check orthogonal constraints
-        assert len(canvas.solver._constraints) == 2
-        assert len(line.handles()) == 3
+        assert len(canvas.solver._constraints) == 1
+        assert len(line.handles()) == 2
 
         undo()
 

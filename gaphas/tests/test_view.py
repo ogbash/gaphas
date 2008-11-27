@@ -33,7 +33,7 @@ class ViewTestCase(unittest.TestCase):
         line = Line()
         line.fyzzyness = 1
         line.handles()[1].pos = (30, 30)
-        line.split_segment(0, 3)
+        #line.split_segment(0, 3)
         line.matrix.translate(30, 60)
         canvas.add(line)
 
