@@ -646,8 +646,8 @@ class LineMergeTestCase(TestCaseBase):
         self.assertEquals(2, len(self.line.handles()))
         self.assertEquals(1, len(self.line.ports()))
 
-        self.assertTrue(set(handles).isdisjoint(set(self.line.handles())))
-        self.assertTrue(set(ports).isdisjoint(set(self.line.ports())))
+        self.assertTrue(not set(handles).intersection(set(self.line.handles())))
+        self.assertTrue(not set(ports).intersection(set(self.line.ports())))
 
         # finally, created port shall span between first and last handle
         port = self.line.ports()[0]
