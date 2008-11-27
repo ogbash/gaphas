@@ -1258,7 +1258,6 @@ class LineSegmentTool(ConnectHandleTool):
                     self.grab_handle(item, item.handles()[segment + 1])
                     context.grab()
                     return True
-        return True
 
 
     def on_button_release(self, context, event):
