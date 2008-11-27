@@ -6,7 +6,7 @@ import unittest
 
 from gaphas.item import Item
 from gaphas.constraint import LineAlignConstraint, LineConstraint, \
-    EqualsConstraint
+    EqualsConstraint, LessThanConstraint
 from gaphas.solver import Variable
 
 class ItemConstraintTestCase(unittest.TestCase):
@@ -62,3 +62,35 @@ class ItemConstraintTestCase(unittest.TestCase):
         # expect constraint on x-axis
         self.assertEquals(1, c.a)
         self.assertEquals(3, c.b)
+
+
+    def test_left_of_constraint(self):
+        """
+        Test "less than" constraint (horizontal) creation.
+        """
+        item = Item()
+        p1 = Variable(1), Variable(2)
+        p2 = Variable(3), Variable(4)
+        item.constraint(left_of=(p1, p2))
+        self.assertEquals(1, len(item._constraints))
+
+        c = item._constraints[0]
+        self.assertTrue(isinstance(c, LessThanConstraint))
+        self.assertEquals(2, c.smaller)
+        self.assertEquals(4, c.bigger)
+
+
+    def test_above_constraint(self):
+        """
+        Test "less than" constraint (vertical) creation.
+        """
+        item = Item()
+        p1 = Variable(1), Variable(2)
+        p2 = Variable(3), Variable(4)
+        item.constraint(above=(p1, p2))
+        self.assertEquals(1, len(item._constraints))
+
+        c = item._constraints[0]
+        self.assertTrue(isinstance(c, LessThanConstraint))
+        self.assertEquals(1, c.smaller)
+        self.assertEquals(3, c.bigger)

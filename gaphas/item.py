@@ -156,7 +156,14 @@ class Item(object):
         pass
 
     
-    def constraint(self, horizontal=None, vertical=None, line=None, delta=0.0, align=None):
+    def constraint(self,
+            horizontal=None,
+            vertical=None,
+            left_of=None,
+            above=None,
+            line=None,
+            delta=0.0,
+            align=None):
         """
         Utility method to create item's internal constraint between
         two positions or between a position and a line.
@@ -168,32 +175,44 @@ class Item(object):
         This method shall not be used to create constraints between
         two different items.
 
+        Created constraint is returned.
+
         :Parameters:
          horizontal=(p1, p2)
             Keep positions ``p1`` and ``p2`` aligned horizontally.
          vertical=(p1, p2)
             Keep positions ``p1`` and ``p2`` aligned vertically.
+         left_of=(p1, p2)
+            Keep position ``p1`` on the left side of position ``p2``.
+         above=(p1, p2)
+            Keep position ``p1`` above of postion ``p2``.
          line=(p, l)
             Keep position ``p`` on a line ``l``.
         """
-        constraint = None
+        cc = None # created constraint
         if horizontal is not None:
             p1, p2 = horizontal
-            constraint = EqualsConstraint(p1[1], p2[1])
+            cc = EqualsConstraint(p1[1], p2[1])
         elif vertical is not None:
             p1, p2 = vertical
-            constraint = EqualsConstraint(p1[0], p2[0])
+            cc = EqualsConstraint(p1[0], p2[0])
+        elif left_of is not None:
+            p1, p2 = left_of
+            cc = LessThanConstraint(p1[1], p2[1], delta)
+        elif above is not None:
+            p1, p2 = above
+            cc = LessThanConstraint(p1[0], p2[0], delta)
         elif line is not None:
             pos, l = line
             if align is None:
-                constraint = LineConstraint(line=l, point=pos)
+                cc = LineConstraint(line=l, point=pos)
             else:
-                constraint = LineAlignConstraint(line=l, point=pos, align=align, delta=delta)
+                cc = LineAlignConstraint(line=l, point=pos, align=align, delta=delta)
         else:
             raise ValueError('Constraint incorrectly specified')
-        assert constraint is not None
-        self._constraints.append(constraint)
-        return constraint
+        assert cc is not None
+        self._constraints.append(cc)
+        return cc
 
 
     def handles(self):
@@ -274,22 +293,15 @@ class Element(Item):
             LinePort(h_sw.pos, h_nw.pos)
         ]
 
-        # create minimal size constraints
-        self._c_min_w = LessThanConstraint(smaller=h_nw.x, bigger=h_se.x, delta=10)
-        self._c_min_h = LessThanConstraint(smaller=h_nw.y, bigger=h_se.y, delta=10)
-
         # setup constraints
         self.constraint(horizontal=(h_nw.pos, h_ne.pos))
         self.constraint(horizontal=(h_se.pos, h_sw.pos))
         self.constraint(vertical=(h_nw.pos, h_sw.pos))
         self.constraint(vertical=(h_se.pos, h_ne.pos))
 
-        self.constraints.extend([
-            # set h_nw < h_se constraints
-            # with minimal size functionality
-            self._c_min_w,
-            self._c_min_h,
-        ])
+        # create minimal size constraints
+        self._c_min_w = self.constraint(left_of=(h_nw.pos, h_se.pos), delta=10)
+        self._c_min_h = self.constraint(above=(h_nw.pos, h_se.pos), delta=10)
 
         # set width/height when minimal size constraints exist
         self.width = width
