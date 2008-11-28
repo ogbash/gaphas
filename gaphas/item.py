@@ -185,9 +185,9 @@ class Item(object):
          left_of=(p1, p2)
             Keep position ``p1`` on the left side of position ``p2``.
          above=(p1, p2)
-            Keep position ``p1`` above of position ``p2``.
+            Keep position ``p1`` above position ``p2``.
          line=(p, l)
-            Keep position ``p`` on a line ``l``.
+            Keep position ``p`` on line ``l``.
         """
         cc = None # created constraint
         if horizontal is not None:
