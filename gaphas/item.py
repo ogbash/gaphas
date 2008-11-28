@@ -185,7 +185,7 @@ class Item(object):
          left_of=(p1, p2)
             Keep position ``p1`` on the left side of position ``p2``.
          above=(p1, p2)
-            Keep position ``p1`` above of postion ``p2``.
+            Keep position ``p1`` above of position ``p2``.
          line=(p, l)
             Keep position ``p`` on a line ``l``.
         """
