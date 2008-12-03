@@ -34,6 +34,9 @@ from gaphas.util import text_extents
 from gaphas import painter
 #painter.DEBUG_DRAW_BOUNDING_BOX = True
 
+# Ensure data gets picked well:
+import gaphas.picklers
+
 # Global undo list
 undo_list = []
 
