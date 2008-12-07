@@ -270,7 +270,7 @@ children):
     [<gaphas.item.Item object at 0x...>]
 
 connector.py: Handle
----------------
+--------------------
 Changing the Handle's position is reversible:
 
     >>> from gaphas import Handle
