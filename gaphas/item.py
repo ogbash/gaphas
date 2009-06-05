@@ -96,8 +96,7 @@ class Item(object):
         Called when the canvas is unset for the item.
         This method can be used to dispose constraints.
         """
-        for h in self.handles():
-            h.disconnect()
+        self.canvas.disconnect_item(self)
 
         remove = self.canvas.solver.remove_constraint
         for c in self._constraints:

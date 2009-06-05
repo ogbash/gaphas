@@ -1062,9 +1062,10 @@ class ConnectHandleTool(HandleTool):
         # disconnect when
         # - no connectable item
         # - currently connected item is not connectable item
+        connected_to = line.canvas.get_connected_to(line, handle)
         if not item \
-                or item and handle.connected_to is not item:
-            handle.disconnect()
+                or item and connected_to and connected_to[0] is not item:
+            line.canvas.disconnect_item(line, handle)
 
         # no connectable item, no connection
         if not item:
@@ -1172,12 +1173,11 @@ class ConnectHandleTool(HandleTool):
         canvas = line.canvas
         solver = canvas.solver
 
-        if handle.connection_data:
-            solver.remove_constraint(handle.connection_data)
+        if canvas.get_connected_to(line, handle):
+            canvas.disconnect_item(line, handle)
 
         constraint = port.constraint(canvas, line, handle, item)
-        handle.connection_data = constraint
-        solver.add_constraint(constraint)
+        canvas.connect_item(line, handle, item, port=None, constraint=constraint)
 
 
     @staticmethod
@@ -1192,9 +1192,9 @@ class ConnectHandleTool(HandleTool):
          handle
             Handle of a line connecting to an item.
         """
-        if handle.connection_data:
-            line.canvas.solver.remove_constraint(handle.connection_data)
-            handle.connection_data = None
+        data = line.canvas.get_connection_data(line, handle)
+        if data:
+            line.canvas.solver.remove_constraint(data[0])
 
 
 
@@ -1213,7 +1213,8 @@ class DisconnectHandle(object):
         item = self.item
         handle = self.handle
         try:
-            if handle.connection_data:
+            data = canvas.get_connection_data(item, handle)
+            if data:
                 canvas.solver.remove_constraint(handle.connection_data)
         except KeyError:
             pass # constraint was alreasy removed
@@ -1381,7 +1382,7 @@ class LineSegmentTool(ConnectHandleTool):
         lines = []
         handles = []
         if item.canvas: # no canvas, no connections
-            data = item.canvas.get_connected_items(item)
+            data = list(item.canvas.get_connected_items(item))
             for line, h in data:
                 ConnectHandleTool.remove_constraint(line, h)
             if data:

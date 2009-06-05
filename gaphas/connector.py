@@ -91,14 +91,14 @@ class Handle(VariablePoint):
         self._connectable = connectable
         self._movable = movable
         self._visible = True
-        self._connected_to = None
-        self._connected_port = None
+        #self._connected_to = None
+        #self._connected_port = None
 
         # User data for the connection (e.g. constraints)
-        self._connection_data = None
+        #self._connection_data = None
         # An extra property used to disconnect the constraint. Should be set
         # by the application.
-        self._disconnect = None
+        #self._disconnect = None
 
 
     @observed
@@ -119,32 +119,32 @@ class Handle(VariablePoint):
 
     visible = reversible_property(lambda s: s._visible, _set_visible)
 
-    @observed
-    def _set_connected_to(self, connected_to):
-        self._connected_to = connected_to
+#    @observed
+#    def _set_connected_to(self, connected_to):
+#        self._connected_to = connected_to
+#
+#    connected_to = reversible_property(lambda s: s._connected_to,
+#                                       _set_connected_to)
 
-    connected_to = reversible_property(lambda s: s._connected_to,
-                                       _set_connected_to)
+#    @observed
+#    def _set_connected_port(self, port):
+#        self._connected_port = port
+#
+#    connected_port = reversible_property(lambda s: s._connected_port,
+#                                       _set_connected_port)
 
-    @observed
-    def _set_connected_port(self, port):
-        self._connected_port = port
+#    @observed
+#    def _set_connection_data(self, connection_data):
+#        self._connection_data = connection_data
+#
+#    connection_data = reversible_property(lambda s: s._connection_data,
+#                                          _set_connection_data)
 
-    connected_port = reversible_property(lambda s: s._connected_port,
-                                       _set_connected_port)
-
-    @observed
-    def _set_connection_data(self, connection_data):
-        self._connection_data = connection_data
-
-    connection_data = reversible_property(lambda s: s._connection_data,
-                                          _set_connection_data)
-
-    @observed
-    def _set_disconnect(self, disconnect):
-        self._disconnect = disconnect
-
-    disconnect = reversible_property(lambda s: s._disconnect or (lambda: None), _set_disconnect)
+#    @observed
+#    def _set_disconnect(self, disconnect):
+#        self._disconnect = disconnect
+#
+#    disconnect = reversible_property(lambda s: s._disconnect or (lambda: None), _set_disconnect)
 
 
 class Port(object):
