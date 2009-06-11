@@ -1313,8 +1313,8 @@ class LineSegmentTool(ConnectHandleTool):
             
             constraint = port.constraint(canvas, line, handle, item)
 
-            # TODO: also add callback 
-            canvas.update_connection(line, handle, constraint=constraint)
+            data = canvas.get_connection_data(line, handle)
+            canvas.update_connection(line, handle, constraint=constraint, callback=data[1])
 
 
     def on_button_press(self, context, event):
