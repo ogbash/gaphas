@@ -122,6 +122,10 @@ class Table(object):
         >>> s.insert('a', 'v', 'd')
         >>> list(s.query(foo='a'))
         [('a', 'b', 'c'), ('a', 'v', 'd')]
+        >>> list(s.query(foo='a', bar='v'))
+        [('a', 'v', 'd')]
+        >>> list(s.query(foo='a', bar='q'))
+        []
         >>> list(s.query(bar=2))
         [(1, 2, 3)]
         >>> list(s.query(foo=42))
@@ -147,7 +151,8 @@ class Table(object):
                 else:
                     rows.intersection_update(d[val])
             except KeyError:
-                pass # No such value
+                # No such value, bail out
+                return iter(())
         return iter(rows or ())
 
 

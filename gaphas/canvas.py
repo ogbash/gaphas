@@ -6,7 +6,6 @@ and a constraint solver.
 __version__ = "$Revision$"
 # $HeadURL$
 
-import cairo
 from cairo import Matrix
 from gaphas import tree
 from gaphas import solver
@@ -294,7 +293,8 @@ class Canvas(object):
     def update_connection(self, item, handle, constraint, callback=None):
         """
         Update an existing connection. This is mainly useful to provide a new
-        constraint or callback to the connection.
+        constraint or callback to the connection. ``item`` and ``handle`` are
+        the keys to the to-be-updated connection.
 
         >>> c = Canvas()
         >>> from gaphas import item
@@ -305,7 +305,8 @@ class Canvas(object):
         >>> iii = item.Line()
         >>> c.add(iii, ii)
 
-        We need a few constraints:
+        We need a few constraints, because that's what we're updating:
+
         >>> from gaphas.constraint import EqualsConstraint
         >>> cons1 = EqualsConstraint(i.handles()[0].x, i.handles()[0].x)
         >>> cons2 = EqualsConstraint(i.handles()[0].y, i.handles()[0].y)
@@ -315,20 +316,38 @@ class Canvas(object):
         (<gaphas.constraint.EqualsConstraint object ...>, None)
         >>> c.get_connection_data(i, i.handles()[0])[0] is cons1
         True
+        >>> cons1 in c.solver.constraints
+        True
         >>> c.update_connection(i, i.handles()[0], cons2, lambda: 0)
         >>> c.get_connection_data(i, i.handles()[0]) # doctest: +ELLIPSIS
         (<gaphas.constraint.EqualsConstraint object ...>, <function <lambda> ...>)
         >>> c.get_connection_data(i, i.handles()[0])[0] is cons2
         True
+        >>> cons1 in c.solver.constraints
+        False
+        >>> cons2 in c.solver.constraints
+        True
+
+        An exception is raised if no connection exists:
+
+        >>> c.update_connection(ii, ii.handles()[0], cons2, lambda: 0) # doctest: +ELLIPSIS
+        Traceback (most recent call last):
+          ...
+        ValueError: No data available for item ...
         """
+        # checks:
         connected_to = self.get_connected_to(item, handle)
         data = self.get_connection_data(item, handle)
         if not connected_to or not data:
             raise ValueError, 'No data available for item "%s" and handle "%s"' % (item, handle)
+
         if data[0]:
             self._solver.remove_constraint(data[0])
         self._connections.delete(hitem=item, handle=handle)
+
         self._connections.insert(item, handle, connected_to[0], connected_to[1], constraint, callback)
+        if constraint:
+            self._solver.add_constraint(constraint)
 
 
     def get_connected_to(self, item, handle):
@@ -346,6 +365,7 @@ class Canvas(object):
         >>> c.connect_item(i, i.handles()[0], ii, ii.ports()[0], None)
         >>> c.get_connected_to(i, i.handles()[0]) # doctest: +ELLIPSIS
         (<gaphas.item.Line ...>, <gaphas.connector.LinePort ...>)
+        >>> c.get_connected_to(i, i.handles()[1]) # doctest: +ELLIPSIS
         >>> c.get_connected_to(ii, ii.handles()[0]) # doctest: +ELLIPSIS
         """
         try:
@@ -780,6 +800,7 @@ class Canvas(object):
             except AttributeError:
                 pass
         else:
+            import cairo
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 0, 0)
             return cairo.Context(surface)
 

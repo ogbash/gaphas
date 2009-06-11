@@ -204,40 +204,47 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
         """Test connection to an item"""
         line, head = self._get_line()
         self.tool.connect(self.view, line, head, (120, 50))
-        self.assertEquals(self.box1, head.connected_to)
-        self.assertTrue(head.connected_port is self.box1.ports()[0],
-            'port %s' % head.connected_port)
-        self.assertTrue(head.connection_data is not None)
-        self.assertTrue(isinstance(head.connection_data, LineConstraint))
-        self.assertTrue(head.disconnect is not None)
+        citem, cport = self.canvas.get_connected_to(line, head)
+        self.assertEquals(self.box1, citem)
+        self.assertTrue(cport is self.box1.ports()[0],
+            'port %s' % cport)
+        connection_data = self.canvas.get_connection_data(line, head)
+        self.assertTrue(connection_data is not None)
+        self.assertTrue(isinstance(connection_data[0], LineConstraint))
+        # No default callback defined:
+        self.assertTrue(connection_data[1] is None)
 
         line, head = self._get_line()
         self.tool.connect(self.view, line, head, (90, 50))
-        self.assertTrue(head.connected_to is None)
-        self.assertTrue(head.connected_port is None)
-        self.assertTrue(head.connection_data is None)
+        connected_to = self.canvas.get_connected_to(line, head)
+        self.assertTrue(connected_to is not None)
+        self.assertTrue(connected_to[0] is not None)
+        self.assertTrue(connected_to[1] is not None)
+        self.assertTrue(self.canvas.get_connection_data(line, head) is not None)
 
 
     def test_disconnect(self):
         """Test disconnection from an item"""
         line, head = self._get_line()
         self.tool.connect(self.view, line, head, (120, 50))
-        assert head.connected_to is not None
+
+        assert line.canvas.get_connected_to(line, head) is not None
+
 
         self.tool.disconnect(self.view, line, head)
-        self.assertTrue(head.connected_to is None)
-        self.assertTrue(head.connected_port is None)
-        self.assertTrue(head.connection_data is None)
+        self.assertTrue(self.canvas.get_connected_to(line, head) is None)
+        self.assertTrue(self.canvas.get_connection_data(line, head) is None)
 
 
     def test_reconnect_another(self):
         """Test reconnection to another item"""
         line, head = self._get_line()
         self.tool.connect(self.view, line, head, (120, 50))
-        assert head.connected_to is not None
-        item = head.connected_to
-        port = head.connected_port
-        constraint = head.connection_data
+        connected_to = self.canvas.get_connected_to(line, head)
+        assert connected_to is not None
+        item = connected_to[0]
+        port = connected_to[1]
+        constraint = self.canvas.get_connection_data(line, head)
 
         assert item == self.box1
         assert port == self.box1.ports()[0]
@@ -246,24 +253,25 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
         # connect to box2, handle's connected item and connection data
         # should differ
         self.tool.connect(self.view, line, head, (120, 150))
-        assert head.connected_to is not None
-        self.assertEqual(self.box2, head.connected_to)
-        self.assertEqual(self.box2.ports()[0], head.connected_port)
+        connected_to = self.canvas.get_connected_to(line, head)
+        assert connected_to is not None
+        self.assertEqual(self.box2, connected_to[0])
+        self.assertEqual(self.box2.ports()[0], connected_to[1])
 
         # old connection does not exist
-        self.assertNotEqual(item, head.connected_to)
-        self.assertNotEqual(port, head.connected_port)
-        self.assertNotEqual(constraint, head.connection_data)
+        self.assertNotEqual(item, connected_to[0])
+        self.assertNotEqual(constraint, self.canvas.get_connection_data(line, head)[0])
 
 
     def test_reconnect_same(self):
         """Test reconnection to same item"""
         line, head = self._get_line()
         self.tool.connect(self.view, line, head, (120, 50))
-        assert head.connected_to is not None
-        item = head.connected_to
-        port = head.connected_port
-        constraint = head.connection_data
+        connected_to = self.canvas.get_connected_to(line, head)
+        assert connected_to is not None
+        item = connected_to[0]
+        port = connected_to[1]
+        constraint = self.canvas.get_connection_data(line, head)[0]
 
         assert item == self.box1
         assert item != self.box2
@@ -271,10 +279,12 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
         # connect to box1 again, handle's connected item and port should be
         # the same but connection constraint will differ
         connected = self.tool.connect(self.view, line, head, (120, 50))
-        assert head.connected_to is not None
-        self.assertEqual(self.box1, head.connected_to)
-        self.assertEqual(self.box1.ports()[0], head.connected_port)
-        self.assertNotEqual(constraint, head.connection_data)
+        connected_to = self.canvas.get_connected_to(line, head)
+        assert connected_to is not None
+        self.assertEqual(self.box1, connected_to[0])
+        self.assertEqual(self.box1.ports()[0], connected_to[1])
+        connection_data = self.canvas.get_connection_data(line, head)
+        self.assertNotEqual(constraint, connection_data[0])
 
 
     def test_find_port(self):
@@ -496,14 +506,15 @@ class LineSplitTestCase(TestCaseBase):
         self.canvas.add(line2)
         head = line2.handles()[0]
         self.tool.connect(self.view, line2, head, (25, 25))
-        self.assertEquals(self.line, head.connected_to)
+        item, port = self.canvas.get_connected_to(line2, head)
+        self.assertEquals(self.line, item)
 
         tool.split_segment(self.line, 0)
         assert len(self.line.handles()) == 3
         h1, h2, h3 = self.line.handles()
 
         # connection shall be reconstrained between 1st and 2nd handle
-        c1 = head.connection_data
+        c1, _ = self.canvas.get_connection_data(line2, head)
         self.assertEquals(h1.pos, c1._line[0]._point)
         self.assertEquals(h2.pos, c1._line[1]._point)
 
@@ -623,18 +634,19 @@ class LineMergeTestCase(TestCaseBase):
         self.canvas.add(line2)
         head = line2.handles()[0]
         self.tool.connect(self.view, line2, head, (25, 25))
-        self.assertEquals(self.line, head.connected_to)
+        connected_to = self.canvas.get_connected_to(line2, head)
+        self.assertEquals(self.line, connected_to[0])
 
         tool.split_segment(self.line, 0)
         assert len(self.line.handles()) == 3
-        c1 = head.connection_data
+        c1 = self.canvas.get_connection_data(line2, head)
 
         tool.merge_segment(self.line, 0)
         assert len(self.line.handles()) == 2
 
         h1, h2 = self.line.handles()
         # connection shall be reconstrained between 1st and 2nd handle
-        c2 = head.connection_data
+        c2, _ = self.canvas.get_connection_data(line2, head)
         self.assertEquals(c2._line[0]._point, h1.pos)
         self.assertEquals(c2._line[1]._point, h2.pos)
         self.assertFalse(c1 == c2)
@@ -724,31 +736,37 @@ class LineMergeTestCase(TestCaseBase):
         tool = LineSegmentTool()
 
         line = Line()
+        self.canvas.add(line)
         tool.split_segment(line, 0)
         # no segment -1
         self.assertRaises(ValueError, tool.merge_segment, line, -1)
  
         line = Line()
+        self.canvas.add(line)
         tool.split_segment(line, 0)
         # no segment no 2
         self.assertRaises(ValueError, tool.merge_segment, line, 2)
  
         line = Line()
+        self.canvas.add(line)
         tool.split_segment(line, 0)
         # can't merge one or less segments :)
         self.assertRaises(ValueError, tool.merge_segment, line, 0, 1)
  
         line = Line()
+        self.canvas.add(line)
         # can't merge line with one segment
         self.assertRaises(ValueError, tool.merge_segment, line, 0)
 
         line = Line()
+        self.canvas.add(line)
         tool.split_segment(line, 0)
         # 2 segments: no 0 and 1. cannot merge as there are no segments
         # after segment no 1
         self.assertRaises(ValueError, tool.merge_segment, line, 1)
 
         line = Line()
+        self.canvas.add(line)
         tool.split_segment(line, 0)
         # 2 segments: no 0 and 1. cannot merge 3 segments as there are no 3
         # segments

@@ -248,30 +248,19 @@ Changing the Handle's position is reversible:
 
 As are all other properties:
 
-    >>> handle.connectable, handle.movable, handle.visible, handle.connected_to
-    (False, True, True, None)
-    >>> handle.disconnect                               # doctest: +ELLIPSIS
-    <function <lambda> at 0x...>
+    >>> handle.connectable, handle.movable, handle.visible
+    (False, True, True)
     >>> handle.connectable = True
     >>> handle.movable = False
     >>> handle.visible = False
-    >>> handle.connected_to = item
-    >>> def my_fancy_disconnect(): pass
-    >>> handle.disconnect = my_fancy_disconnect
     >>> handle.connectable, handle.movable, handle.visible
     (True, False, False)
-    >>> handle.connected_to                             # doctest: +ELLIPSIS
-    <gaphas.item.Item object at 0x...>
-    >>> handle.disconnect                               # doctest: +ELLIPSIS
-    <function my_fancy_disconnect at 0x...>
 
 And now undo the whole lot at once:
 
     >>> undo()
-    >>> handle.connectable, handle.movable, handle.visible, handle.connected_to
-    (False, True, True, None)
-    >>> handle.disconnect                               # doctest: +ELLIPSIS
-    <function <lambda> at 0x...>
+    >>> handle.connectable, handle.movable, handle.visible
+    (False, True, True)
 
 item.py: Item
 -------------

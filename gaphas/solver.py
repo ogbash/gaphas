@@ -373,6 +373,9 @@ class Solver(object):
         self._marked_cons = []
         self._solving = False
 
+    constraints = property(lambda s: s._constraints)
+
+
     def request_resolve(self, variable, projections_only=False):
         """
         Mark a variable as "dirty". This means it it solved the next time
@@ -618,6 +621,7 @@ class Solver(object):
             self._marked_cons = []
         finally:
             self._solving = False
+
 
 class solvable(object):
     """
