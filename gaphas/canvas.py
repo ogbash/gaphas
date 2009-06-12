@@ -244,6 +244,7 @@ class Canvas(object):
         return self._tree.get_all_children(item)
 
 
+    @observed
     def connect_item(self, hitem, handle, pitem, port, constraint, callback=None):
         """
         Create a connection. The connection is registered and the constraint is
@@ -267,15 +268,23 @@ class Canvas(object):
             result = self._connections.query(hitem=item)
 
         for hi, h, pi, p, c, cb in result:
-            if c:
-                self._solver.remove_constraint(c)
-            if cb:
-                cb()
+            self._disconnect_item(hi, h, pi, p, c, cb)
 
         if handle:
             self._connections.delete(hitem=item, handle=handle)
         else:
             self._connections.delete(hitem=item)
+
+
+    @observed
+    def _disconnect_item(self, hitem, handle, pitem, port, constraint, callback):
+        # Same arguments as connect_item, makes reverser easy
+        if constraint:
+            self._solver.remove_constraint(constraint)
+        if callback:
+            callback()
+
+    reversible_pair(connect_item, _disconnect_item)
 
 
     def remove_connections_to_item(self, item):
@@ -290,7 +299,8 @@ class Canvas(object):
         self._connections.delete(pitem=item)
     
 
-    def update_connection(self, item, handle, constraint, callback=None):
+    @observed
+    def reconnect_item(self, item, handle, constraint, callback=None):
         """
         Update an existing connection. This is mainly useful to provide a new
         constraint or callback to the connection. ``item`` and ``handle`` are
@@ -318,7 +328,7 @@ class Canvas(object):
         True
         >>> cons1 in c.solver.constraints
         True
-        >>> c.update_connection(i, i.handles()[0], cons2, lambda: 0)
+        >>> c.reconnect_item(i, i.handles()[0], cons2, lambda: 0)
         >>> c.get_connection_data(i, i.handles()[0]) # doctest: +ELLIPSIS
         (<gaphas.constraint.EqualsConstraint object ...>, <function <lambda> ...>)
         >>> c.get_connection_data(i, i.handles()[0])[0] is cons2
@@ -330,7 +340,7 @@ class Canvas(object):
 
         An exception is raised if no connection exists:
 
-        >>> c.update_connection(ii, ii.handles()[0], cons2, lambda: 0) # doctest: +ELLIPSIS
+        >>> c.reconnect_item(ii, ii.handles()[0], cons2, lambda: 0) # doctest: +ELLIPSIS
         Traceback (most recent call last):
           ...
         ValueError: No data available for item ...
@@ -348,6 +358,10 @@ class Canvas(object):
         self._connections.insert(item, handle, connected_to[0], connected_to[1], constraint, callback)
         if constraint:
             self._solver.add_constraint(constraint)
+
+    reversible_method(reconnect_item, reverse=reconnect_item,
+                      bind={'constraint': lambda self, item, handle: self.get_connection_data(item, handle)[0],
+                            'callback': lambda self, item, handle: self.get_connection_data(item, handle)[1] })
 
 
     def get_connected_to(self, item, handle):
