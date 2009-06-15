@@ -11,11 +11,11 @@ from gaphas.geometry import distance_line_point, distance_point_point
 from gaphas.constraint import LineConstraint, PositionConstraint
 
 
-class VariablePoint(object):
+class Position(object):
     """
     A point constructed of two ``Variable``s.
 
-    >>> vp = VariablePoint((3, 5))
+    >>> vp = Position((3, 5))
     >>> vp.x, vp.y
     (Variable(3, 20), Variable(5, 20))
     >>> vp.pos
@@ -61,7 +61,7 @@ class VariablePoint(object):
         """
         Shorthand for returning the x(0) or y(1) component of the point.
 
-        >>> h = VariablePoint((3, 5))
+        >>> h = Position((3, 5))
         >>> h[0]
         Variable(3, 20)
         >>> h[1]
@@ -70,7 +70,7 @@ class VariablePoint(object):
         return (self.x, self.y)[index]
 
 
-class Handle(VariablePoint):
+class Handle(Position):
     """
     Handles are used to support modifications of Items.
 

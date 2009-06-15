@@ -7,7 +7,7 @@ __version__ = "$Revision$"
 # $HeadURL$
 
 from gaphas.item import Element, Item, NW, NE,SW, SE
-from gaphas.connector import Handle, PointPort, LinePort, VariablePoint
+from gaphas.connector import Handle, PointPort, LinePort, Position
 from gaphas.solver import solvable, WEAK
 import tool
 from util import text_align, text_multiline, path_ellipse
@@ -80,7 +80,7 @@ class PortoBox(Box):
         self.constraint(above=(self._hm.pos, se.pos))
 
         # static point port
-        self._sport = PointPort(VariablePoint((width / 2.0, height)))
+        self._sport = PointPort(Position((width / 2.0, height)))
         l = sw.pos, se.pos
         self.constraint(line=(self._sport.point, l))
         self._ports.append(self._sport)
