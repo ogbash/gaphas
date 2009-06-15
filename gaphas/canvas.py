@@ -742,7 +742,7 @@ class Canvas(object):
 
         and moving its first handle a bit
 
-        >>> e.handles()[0].x += 1
+        >>> e.handles()[0].pos.x += 1
         >>> map(float, e.handles()[0].pos)
         [1.0, 0.0]
 

@@ -435,7 +435,7 @@ class HandleTool(Tool):
         for h in item.handles():
             if not h.movable:
                 continue
-            wx, wy = i2v(h.x, h.y)
+            wx, wy = i2v(*h.pos)
             if -6 < (wx - x) < 6 and -6 < (wy - y) < 6:
                 return h
         return None

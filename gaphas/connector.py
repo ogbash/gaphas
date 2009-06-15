@@ -10,6 +10,7 @@ from gaphas.state import observed, reversible_property
 from gaphas.geometry import distance_line_point, distance_point_point
 from gaphas.constraint import LineConstraint, PositionConstraint
 
+from decorator import deprecated
 
 class Position(object):
     """
@@ -112,7 +113,9 @@ class Handle(object):
         """
         self._pos.x = x
 
-    x = property(lambda s: s._pos.x, _set_x)
+    def _get_x(self): self._pos.x
+
+    x = property(deprecated(_get_x), deprecated(_set_x))
 
     def _set_y(self, y):
         """
@@ -120,7 +123,9 @@ class Handle(object):
         """
         self._pos.y = y
 
-    y = property(lambda s: s._pos.y, _set_y)
+    def _get_y(self): self._pos.y
+
+    y = property(deprecated(_get_y), deprecated(_set_y))
 
 
     @observed

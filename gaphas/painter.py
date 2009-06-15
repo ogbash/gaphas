@@ -359,8 +359,9 @@ class LineSegmentPainter(Painter):
             cr = context.cairo
             h = item.handles()
             for h1, h2 in zip(h[:-1], h[1:]):
-                cx = (h1.x + h2.x) / 2
-                cy = (h1.y + h2.y) / 2
+                p1, p2 = h1.pos, h2.pos
+                cx = (p1.x + p2.x) / 2
+                cy = (p1.y + p2.y) / 2
                 cr.save()
                 cr.identity_matrix()
                 m = Matrix(*view.get_matrix_i2v(item))

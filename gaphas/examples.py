@@ -24,7 +24,7 @@ class Box(Element):
     def draw(self, context):
         #print 'Box.draw', self
         c = context.cairo
-        nw = self._handles[NW]
+        nw = self._handles[NW].pos
         c.rectangle(nw.x, nw.y, self.width, self.height)
         if context.hovered:
             c.set_source_rgba(.8,.8,1, .8)
@@ -167,12 +167,12 @@ class FatLine(Item):
 
     def _set_height(self, height):
         h1, h2 = self._handles
-        h2.y = height
+        h2.pos.y = height
 
 
     def _get_height(self):
         h1, h2 = self._handles
-        return h2.y
+        return h2.pos.y
 
 
     height = property(_get_height, _set_height)
@@ -196,13 +196,14 @@ class Circle(Item):
 
     def _set_radius(self, r):
         h1, h2 = self._handles
-        h2.x = r
-        h2.y = r
+        h2.pos.x = r
+        h2.pos.y = r
 
 
     def _get_radius(self):
         h1, h2 = self._handles
-        return ((h2.x - h1.x) ** 2 + (h2.y - h1.y) ** 2) ** 0.5
+        p1, p2 = h1.pos, h2.pos
+        return ((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2) ** 0.5
 
     radius = property(_get_radius, _set_radius)
 
