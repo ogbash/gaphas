@@ -916,14 +916,14 @@ class CanvasProjection(object):
     cairo.Matrix(1, 0, 0, 1, 30, 2)
     >>> p = CanvasProjection(a.handles()[2].pos, a)
     >>> a.handles()[2].pos
-    (Variable(10, 40), Variable(10, 40))
+    <Position object on (10, 10)>
     >>> p[0].value
     40.0
     >>> p[1].value
     12.0
     >>> p[0].value = 63
     >>> p._point
-    (Variable(33, 40), Variable(10, 40))
+    <Position object on (33, 10)>
 
     When the variables are retrieved, new values are calculated.
     """

@@ -218,8 +218,6 @@ class ConnectHandleToolConnectTestCase(unittest.TestCase):
         self.tool.connect(self.view, line, head, (90, 50))
         connected_to = self.canvas.get_connected_to(line, head)
         self.assertTrue(connected_to is None)
-        #self.assertTrue(connected_to[0] is not None)
-        #self.assertTrue(connected_to[1] is not None)
         self.assertTrue(self.canvas.get_connection_data(line, head) is None)
 
 
@@ -405,13 +403,16 @@ class LineSplitTestCase(TestCaseBase):
         assert len(self.line.ports()) == 1
 
         old_port = self.line.ports()[0]
+        h1, h2 = self.line.handles()
+        self.assertEquals(h1.pos, old_port.start)
+        self.assertEquals(h2.pos, old_port.end)
 
         tool = LineSegmentTool()
         
         handles, ports = tool.split_segment(self.line, 0)
         handle = handles[0]
         self.assertEquals(1, len(handles))
-        self.assertEquals((50, 50), handle.pos)
+        self.assertEquals((50, 50), handle.pos.pos)
         self.assertEquals(3, len(self.line.handles()))
         self.assertEquals(2, len(self.line.ports()))
 
@@ -446,9 +447,9 @@ class LineSplitTestCase(TestCaseBase):
         handles, ports = tool.split_segment(self.line, 0, count=4)
         self.assertEquals(3, len(handles))
         h1, h2, h3 = handles
-        self.assertEquals((5, 4), h1.pos)
-        self.assertEquals((10, 8), h2.pos)
-        self.assertEquals((15, 12), h3.pos)
+        self.assertEquals((5, 4), h1.pos.pos)
+        self.assertEquals((10, 8), h2.pos.pos)
+        self.assertEquals((15, 12), h3.pos.pos)
 
         # new handles between old handles
         self.assertEquals(5, len(self.line.handles()))
@@ -615,8 +616,8 @@ class LineMergeTestCase(TestCaseBase):
 
         # finally, created port shall span between first and last handle
         port = self.line.ports()[0]
-        self.assertEquals((0, 0), port.start)
-        self.assertEquals((20, 0), port.end)
+        self.assertEquals((0, 0), port.start.pos)
+        self.assertEquals((20, 0), port.end.pos)
 
 
     def test_constraints_after_merge(self):
@@ -675,8 +676,8 @@ class LineMergeTestCase(TestCaseBase):
 
         # finally, created port shall span between first and last handle
         port = self.line.ports()[0]
-        self.assertEquals((0, 0), port.start)
-        self.assertEquals((20, 16), port.end)
+        self.assertEquals((0, 0), port.start.pos)
+        self.assertEquals((20, 16), port.end.pos)
 
  
     def test_merge_undo(self):

@@ -475,7 +475,7 @@ class HandleTool(Tool):
         Move the handle to position ``(x,y)``. ``x`` and ``y`` are in
         item coordnates. ``item`` is the item whose ``handle`` is moved.
         """
-        handle.x, handle.y = pos
+        handle.pos = pos
 
 
     def glue(self, view, item, handle, vpos):
@@ -1218,14 +1218,14 @@ class LineSegmentTool(ConnectHandleTool):
 
         def do_split(segment, count):
             handles = line.handles()
-            h0 = handles[segment]
-            h1 = handles[segment + 1]
-            dx, dy = h1.x - h0.x, h1.y - h0.y
-            new_h = line._create_handle((h0.x + dx / count, h0.y + dy / count))
+            p0 = handles[segment].pos
+            p1 = handles[segment + 1].pos
+            dx, dy = p1.x - p0.x, p1.y - p0.y
+            new_h = line._create_handle((p0.x + dx / count, p0.y + dy / count))
             line._reversible_insert_handle(segment + 1, new_h)
 
-            p0 = line._create_port(h0, new_h)
-            p1 = line._create_port(new_h, h1)
+            p0 = line._create_port(p0, new_h.pos)
+            p1 = line._create_port(new_h.pos, p1)
             line._reversible_remove_port(line.ports()[segment])
             line._reversible_insert_port(segment, p0)
             line._reversible_insert_port(segment + 1, p1)
@@ -1277,9 +1277,9 @@ class LineSegmentTool(ConnectHandleTool):
 
         # create new port, which replaces old ports destroyed due to
         # deleted handle
-        h1 = line.handles()[segment]
-        h2 = line.handles()[segment + 1]
-        port = line._create_port(h1, h2)
+        p1 = line.handles()[segment].pos
+        p2 = line.handles()[segment + 1].pos
+        port = line._create_port(p1, p2)
         line._reversible_insert_port(segment, port)
 
         # force orthogonal constraints to be recreated
@@ -1331,8 +1331,8 @@ class LineSegmentTool(ConnectHandleTool):
             handles = item.handles()
             x, y = view.get_matrix_v2i(item).transform_point(event.x, event.y)
             for h1, h2 in zip(handles[:-1], handles[1:]):
-                xp = (h1.x + h2.x) / 2
-                yp = (h1.y + h2.y) / 2
+                xp = (h1.pos.x + h2.pos.x) / 2
+                yp = (h1.pos.y + h2.pos.y) / 2
                 if distance_point_point_fast((x,y), (xp, yp)) <= 4:
                     segment = handles.index(h1)
                     self.split_segment(item, segment)

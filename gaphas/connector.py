@@ -70,7 +70,7 @@ class Position(object):
         return (self.x, self.y)[index]
 
 
-class Handle(Position):
+class Handle(object):
     """
     Handles are used to support modifications of Items.
 
@@ -85,20 +85,42 @@ class Handle(Position):
     """
 
     def __init__(self, pos=(0, 0), strength=NORMAL, connectable=False, movable=True):
-        super(Handle, self).__init__(pos, strength)
-
-        # Flags.. can't have enough of those
+        self._pos = Position(pos, strength)
         self._connectable = connectable
         self._movable = movable
         self._visible = True
-        #self._connected_to = None
-        #self._connected_port = None
 
-        # User data for the connection (e.g. constraints)
-        #self._connection_data = None
-        # An extra property used to disconnect the constraint. Should be set
-        # by the application.
-        #self._disconnect = None
+
+    def _set_pos(self, pos):
+        """
+        Shortcut for ``handle.pos.pos = pos``
+
+        >>> h = Handle((10, 10))
+        >>> h.pos
+        <Position object on (10, 10)>
+        >>> h.pos = (20, 15)
+        >>> h.pos
+        <Position object on (20, 15)>
+        """
+        self._pos.pos = pos
+
+    pos = property(lambda s: s._pos, _set_pos)
+
+    def _set_x(self, x):
+        """
+        Shortcut for ``handle.pos.x = x``
+        """
+        self._pos.x = x
+
+    x = property(lambda s: s._pos.x, _set_x)
+
+    def _set_y(self, y):
+        """
+        Shortcut for ``handle.pos.y = y``
+        """
+        self._pos.y = y
+
+    y = property(lambda s: s._pos.y, _set_y)
 
 
     @observed
@@ -107,11 +129,13 @@ class Handle(Position):
 
     connectable = reversible_property(lambda s: s._connectable, _set_connectable)
 
+
     @observed
     def _set_movable(self, movable):
         self._movable = movable
 
     movable = reversible_property(lambda s: s._movable, _set_movable)
+
 
     @observed
     def _set_visible(self, visible):
@@ -119,32 +143,10 @@ class Handle(Position):
 
     visible = reversible_property(lambda s: s._visible, _set_visible)
 
-#    @observed
-#    def _set_connected_to(self, connected_to):
-#        self._connected_to = connected_to
-#
-#    connected_to = reversible_property(lambda s: s._connected_to,
-#                                       _set_connected_to)
 
-#    @observed
-#    def _set_connected_port(self, port):
-#        self._connected_port = port
-#
-#    connected_port = reversible_property(lambda s: s._connected_port,
-#                                       _set_connected_port)
-
-#    @observed
-#    def _set_connection_data(self, connection_data):
-#        self._connection_data = connection_data
-#
-#    connection_data = reversible_property(lambda s: s._connection_data,
-#                                          _set_connection_data)
-
-#    @observed
-#    def _set_disconnect(self, disconnect):
-#        self._disconnect = disconnect
-#
-#    disconnect = reversible_property(lambda s: s._disconnect or (lambda: None), _set_disconnect)
+    def __str__(self):
+        return '<%s object on (%g, %g)>' % (self.__class__.__name__, float(self._pos.x), float(self._pos.y))
+    __repr__ = __str__
 
 
 class Port(object):
@@ -233,7 +235,7 @@ class PointPort(Port):
         >>> h = Handle((10, 10))
         >>> port = PointPort(h.pos)
         >>> port.glue((10, 0))
-        ((Variable(10, 20), Variable(10, 20)), 10.0)
+        (<Position object on (10, 10)>, 10.0)
         """
         d = distance_point_point(self.point, pos)
         return self.point, d
@@ -247,7 +249,6 @@ class PointPort(Port):
         origin = canvas.project(glue_item, self.point)
         point = canvas.project(item, handle.pos)
         c = PositionConstraint(origin, point)
-        print 'PointPort', c
         return c #PositionConstraint(origin, point)
 
 

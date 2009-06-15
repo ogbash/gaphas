@@ -239,12 +239,12 @@ Changing the Handle's position is reversible:
 
     >>> from gaphas import Handle
     >>> handle = Handle()
-    >>> handle.x, handle.y = 10, 12
+    >>> handle.pos = 10, 12
     >>> handle.pos
-    (Variable(10, 20), Variable(12, 20))
+    <Position object on (10, 12)>
     >>> undo()
     >>> handle.pos
-    (Variable(0, 20), Variable(0, 20))
+    <Position object on (0, 0)>
 
 As are all other properties:
 

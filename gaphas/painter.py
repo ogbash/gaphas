@@ -245,7 +245,7 @@ class BoundingBoxPainter(ItemPainter):
         # Update bounding box with handles.
         i2v = view.get_matrix_i2v(item).transform_point
         for h in item.handles():
-            cx, cy = i2v(h.x, h.y)
+            cx, cy = i2v(*h.pos)
             bounds += (cx - 5, cy - 5, 9, 9)
 
         bounds.expand(1)
@@ -300,7 +300,7 @@ class HandlePainter(Painter):
 
             cairo.identity_matrix()
             cairo.set_antialias(ANTIALIAS_NONE)
-            cairo.translate(*i2v.transform_point(h.x, h.y))
+            cairo.translate(*i2v.transform_point(*h.pos))
             cairo.rectangle(-4, -4, 8, 8)
             cairo.set_source_rgba(r, g, b, opacity)
             cairo.fill_preserve()
