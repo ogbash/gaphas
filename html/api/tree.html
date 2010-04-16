@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tree structure &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Matrix" href="matrix.html" />
+    <link rel="prev" title="Alignment helper: Guide" href="guide.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="matrix.html" title="Matrix"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="guide.html" title="Alignment helper: Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.tree">
+<h1>Tree structure<a class="headerlink" href="#module-gaphas.tree" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.tree</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.tree.Tree">
+<em class="property">class </em><tt class="descclassname">gaphas.tree.</tt><tt class="descname">Tree</tt><a class="headerlink" href="#gaphas.tree.Tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Tree structure. Nodes are stores in a depth-first order.</p>
+<p><tt class="xref docutils literal"><span class="pre">None</span></tt> is the root node.</p>
+<p>&#64;invariant: len(self._children) == len(self._nodes) + 1</p>
+<dl class="method">
+<dt id="gaphas.tree.Tree.add">
+<tt class="descname">add</tt><big>(</big><em>node</em>, <em>parent=None</em>, <em>index=None</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add node to the tree. parent is the parent node, which may
+be None if the item should be added to the root item.</p>
+<p>For usage, see the unit tests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.get_all_children">
+<tt class="descname">get_all_children</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.get_all_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate all children (and children of children and so forth)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="go">[&#39;n2&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_all_children</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">&lt;generator object get_all_children at 0x...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">get_all_children</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">))</span>
+<span class="go">[&#39;n2&#39;, &#39;n3&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.get_ancestors">
+<tt class="descname">get_ancestors</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.get_ancestors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate all parents and parents of parents, etc.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n2&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">)</span>
+<span class="go">&#39;n2&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_ancestors</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">)</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">&lt;generator object get_ancestors at 0x...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">get_ancestors</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">))</span>
+<span class="go">[&#39;n2&#39;, &#39;n1&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">get_ancestors</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">))</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.get_children">
+<tt class="descname">get_children</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all child objects of <tt class="docutils literal"><span class="pre">node</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="go">[&#39;n2&#39;, &#39;n3&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">)</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.get_next_sibling">
+<tt class="descname">get_next_sibling</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.get_next_sibling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the node on the same level after <tt class="docutils literal"><span class="pre">node</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_next_sibling</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">)</span>
+<span class="go">&#39;n3&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_next_sibling</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">)</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="nc">IndexError</span>: <span class="n-Identifier">list index out of range</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.get_parent">
+<tt class="descname">get_parent</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.get_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the parent item of <tt class="docutils literal"><span class="pre">node</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">)</span>
+<span class="go">&#39;n1&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.get_previous_sibling">
+<tt class="descname">get_previous_sibling</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.get_previous_sibling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the node on the same level before <tt class="docutils literal"><span class="pre">node</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_previous_sibling</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">)</span>
+<span class="go">&#39;n2&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_previous_sibling</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">)</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="nc">IndexError</span>: <span class="n-Identifier">list index out of range</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.get_siblings">
+<tt class="descname">get_siblings</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.get_siblings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all siblings of <tt class="docutils literal"><span class="pre">node</span></tt>, including <tt class="docutils literal"><span class="pre">node</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_siblings</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">)</span>
+<span class="go">[&#39;n2&#39;, &#39;n3&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.index_nodes">
+<tt class="descname">index_nodes</tt><big>(</big><em>index_key</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.index_nodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide each item in the tree with an index attribute. This makes
+for fast sorting of items.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">),</span> <span class="n">parent</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">nodes</span>
+<span class="go">[a, c, b]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">index_nodes</span><span class="p">(</span><span class="s">&#39;my_key&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">my_key</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">my_key</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span><span class="o">.</span><span class="n">my_key</span>
+<span class="go">(0, 1, 2)</span>
+</pre></div>
+</div>
+<p>For sorting, see <tt class="docutils literal"><span class="pre">sort()</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.tree.Tree.nodes">
+<tt class="descname">nodes</tt><a class="headerlink" href="#gaphas.tree.Tree.nodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.remove">
+<tt class="descname">remove</tt><big>(</big><em>node</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove <tt class="docutils literal"><span class="pre">node</span></tt> from the tree.</p>
+<p>For usage, see the unit tests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.reparent">
+<tt class="descname">reparent</tt><big>(</big><em>node</em>, <em>parent</em>, <em>index=None</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.reparent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set new parent for a <tt class="docutils literal"><span class="pre">node</span></tt>. <tt class="docutils literal"><span class="pre">Parent</span></tt> can be <tt class="xref docutils literal"><span class="pre">None</span></tt>, indicating
+it&#8217;s added to the top.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">nodes</span>
+<span class="go">[&#39;n1&#39;, &#39;n2&#39;, &#39;n3&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">reparent</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">,</span> <span class="s">&#39;n3&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="s">&#39;n2&#39;</span><span class="p">)</span>
+<span class="go">&#39;n3&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="s">&#39;n3&#39;</span><span class="p">)</span>
+<span class="go">[&#39;n2&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">nodes</span>
+<span class="go">[&#39;n1&#39;, &#39;n3&#39;, &#39;n2&#39;]</span>
+</pre></div>
+</div>
+<p>If a node contains children, those are also moved:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;n4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">nodes</span>
+<span class="go">[&#39;n1&#39;, &#39;n3&#39;, &#39;n2&#39;, &#39;n4&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">reparent</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">,</span> <span class="s">&#39;n4&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="s">&#39;n1&#39;</span><span class="p">)</span>
+<span class="go">&#39;n4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">get_all_children</span><span class="p">(</span><span class="s">&#39;n4&#39;</span><span class="p">))</span>
+<span class="go">[&#39;n1&#39;, &#39;n3&#39;, &#39;n2&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tree</span><span class="o">.</span><span class="n">nodes</span>
+<span class="go">[&#39;n4&#39;, &#39;n1&#39;, &#39;n3&#39;, &#39;n2&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tree.Tree.sort">
+<tt class="descname">sort</tt><big>(</big><em>nodes</em>, <em>index_key</em>, <em>reverse=False</em><big>)</big><a class="headerlink" href="#gaphas.tree.Tree.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort a set (or list) of nodes.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Tree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">),</span> <span class="n">parent</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">nodes</span>    <span class="c"># the series from Tree.index_nodes</span>
+<span class="go">[a, c, b]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">index_nodes</span><span class="p">(</span><span class="s">&#39;my_key&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">selection</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mf">2</span><span class="p">],</span> <span class="n">t</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">selection</span><span class="p">,</span> <span class="n">index_key</span><span class="o">=</span><span class="s">&#39;my_key&#39;</span><span class="p">)</span>
+<span class="go">[c, b]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="guide.html"
+                                  title="previous chapter">Alignment helper: Guide</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="matrix.html"
+                                  title="next chapter">Matrix</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/tree.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="matrix.html" title="Matrix"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="guide.html" title="Alignment helper: Guide"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

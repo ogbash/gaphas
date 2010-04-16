@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>State management &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="index.html" />
+    <link rel="next" title="Undo - implementing basic undo behaviour with Gaphas" href="undo.html" />
+    <link rel="prev" title="Ports" href="ports.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="undo.html" title="Undo - implementing basic undo behaviour with Gaphas"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ports.html" title="Ports"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="state-management">
+<h1>State management<a class="headerlink" href="#state-management" title="Permalink to this headline">¶</a></h1>
+<p>A special word should be mentioned about state management. Managing state is
+the first step in creating an undo system.</p>
+<p>The state system consists of two parts:</p>
+<ol class="arabic simple">
+<li>A basic observer (the <tt class="docutils literal"><span class="pre">&#64;observed</span></tt> decorator)</li>
+<li>A reverser</li>
+</ol>
+<div class="section" id="observer">
+<h2>Observer<a class="headerlink" href="#observer" title="Permalink to this headline">¶</a></h2>
+<p>The observer simply dispatches the function called (as <tt class="docutils literal"><span class="pre">&lt;function</span> <span class="pre">..&gt;</span></tt>, not as
+<tt class="docutils literal"><span class="pre">&lt;unbound</span> <span class="pre">method..&gt;</span></tt>!) to each handler registered in an observers list.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">state</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Let&#8217;s start with creating a Canvas instance and some items:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.canvas</span> <span class="kn">import</span> <span class="n">Canvas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.item</span> <span class="kn">import</span> <span class="n">Item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">item1</span><span class="p">,</span> <span class="n">item2</span> <span class="o">=</span> <span class="n">Item</span><span class="p">(),</span> <span class="n">Item</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>For this demonstration let&#8217;s use the Canvas class (which contains an add/remove
+method pair).</p>
+<p>It works (see how the add method automatically schedules the item for update):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;event handled&#39;</span><span class="p">,</span> <span class="n">event</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item1</span><span class="p">)</span>                              <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">event handled (&lt;function add at ...&gt;, (&lt;gaphas.canvas.Canvas object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;, None, None), {})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item2</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">item1</span><span class="p">)</span>                <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">event handled (&lt;function add at ...&gt;, (&lt;gaphas.canvas.Canvas object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...), {})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                         <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;]</span>
+</pre></div>
+</div>
+<p>Note that the handler is invoked before the actual call is made. This is
+important if you want to store the (old) state for an undo mechanism.</p>
+<p>Remember that this observer is just a simple method call notifier and knows
+nothing about the internals of the <tt class="docutils literal"><span class="pre">Canvas</span></tt> class (in this case the
+<tt class="docutils literal"><span class="pre">remove()</span></tt> method recursively calls <tt class="docutils literal"><span class="pre">remove()</span></tt> for each of it&#8217;s children).
+Therefore some careful crafting of methods may be necessary in order to get the
+right effect (items should be removed in the right order, child first):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item1</span><span class="p">)</span>                           <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">event handled (&lt;function _remove at ...&gt;, (&lt;gaphas.canvas.Canvas object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;), {})</span>
+<span class="go">event handled (&lt;function _remove at ...&gt;, (&lt;gaphas.canvas.Canvas object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;), {})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">&#64;observed</span></tt> decorator can also be applied to properties, as is done in
+gaphas/connector.py&#8217;s Handle class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.solver</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">10</span>                                  <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">event handled (&lt;function set_value at 0x...&gt;, (Variable(0, 20), 10), {})</span>
+</pre></div>
+</div>
+<p>(this is simply done by observing the setter method).</p>
+<p>Off course handlers can be removed as well (only the default revert handler
+is present now):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">observers</span>                                 <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">set([])</span>
+</pre></div>
+</div>
+<p>What should you know:</p>
+<ol class="arabic simple">
+<li>The observer always generates events based on &#8216;function&#8217; calls. Even for
+class method invocations. This is because, when calling a method (say
+Tree.add) it&#8217;s the <tt class="docutils literal"><span class="pre">im_func</span></tt> field is executed, which is a function type
+object.</li>
+<li>It&#8217;s important to know if an event came from invoking a method or a simple
+function. With methods, the first argument always is an instance. This can
+be handy when writing an undo management systems in case multiple calls
+from the same instance do not have to be registered (e.g. if a method
+<tt class="docutils literal"><span class="pre">set_point()</span></tt> is called with exact coordinates (in stead of deltas), only
+the first call to <tt class="docutils literal"><span class="pre">set_point()</span></tt> needs to be remembered).</li>
+</ol>
+</div>
+<div class="section" id="reverser">
+<h2>Reverser<a class="headerlink" href="#reverser" title="Permalink to this headline">¶</a></h2>
+<p>The reverser requires some registration.</p>
+<ol class="arabic simple">
+<li>Property setters should be declared with <tt class="docutils literal"><span class="pre">reversible_property()</span></tt></li>
+<li>Method (or function) pairs that implement each others reverse operation
+(e.g. add and remove) should be registered as <tt class="docutils literal"><span class="pre">reversible_pair()</span></tt>&#8216;s in the
+reverser engine.
+The reverser will construct a tuple (callable, arguments) which are send
+to every handler registered in the subscribers list. Arguments is a
+<tt class="docutils literal"><span class="pre">dict()</span></tt>.</li>
+</ol>
+<p>First thing to do is to actually enable the <tt class="docutils literal"><span class="pre">revert_handler</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">revert_handler</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This handler is not enabled by default because:</p>
+<ol class="arabic simple">
+<li>it generates quite a bit of overhead if it isn&#8217;t used anyway</li>
+<li>you might want to add some additional filtering.</li>
+</ol>
+<p>Point 2 may require some explanation. First of all observers have been added
+to almost every method that involves a state change. As a result loads of
+events are generated. In most cases you&#8217;re only interested in the first event,
+since that one contains the state before it started changing.</p>
+<p>Handlers for the reverse events should be registered on the subscribers list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">handler</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;event handler&#39;</span><span class="p">,</span> <span class="n">event</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After that, signals can be received of undoable (reverse-)events:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Item</span><span class="p">())</span>                              <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">event handler (&lt;function _remove at ...&gt;, {&#39;item&#39;: &lt;gaphas.item.Item object at 0x...&gt;, &#39;self&#39;: &lt;gaphas.canvas.Canvas object at 0x...&gt;})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;]</span>
+</pre></div>
+</div>
+<p>As you can see this event is constructed of only two parameters: the function
+that does the inverse operation of <tt class="docutils literal"><span class="pre">add()</span></tt> and the arguments that should be
+applied to that function.</p>
+<p>The inverse operation is easiest performed by the function <tt class="docutils literal"><span class="pre">saveapply()</span></tt>. Of
+course an inverse operation is emitting a change event too:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">saveapply</span><span class="p">(</span><span class="o">*</span><span class="n">events</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>                  <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">event handler (&lt;function add at 0x...&gt;, {&#39;item&#39;: &lt;gaphas.item.Item object at 0x...&gt;, &#39;self&#39;: &lt;gaphas.canvas.Canvas object at 0x...&gt;, &#39;parent&#39;: None, &#39;index&#39;: 0})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+<p>Just handling method pairs is one thing. Handling properties (descriptors) in
+a simple fashion is another matter. First of all the original value should
+be retrieved before the new value is applied (this is different from applying
+the same arguments to another method in order to reverse an operation).</p>
+<p>For this a <tt class="docutils literal"><span class="pre">reversible_property</span></tt> has been introduced. It works just like a
+property (in fact it creates a plain old property descriptor), but also
+registers the property as being reversible.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">10</span>                                  <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">event handler (&lt;function set_value at 0x...&gt;, {&#39;self&#39;: Variable(0, 20), &#39;value&#39;: 0.0})</span>
+</pre></div>
+</div>
+<p>Handlers can be simply removed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">revert_handler</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-is-observed">
+<h2>What is Observed<a class="headerlink" href="#what-is-observed" title="Permalink to this headline">¶</a></h2>
+<p>As far as Gaphas is concerned, only properties and methods related to the
+model (e.g. <tt class="docutils literal"><span class="pre">Canvas</span></tt>, <tt class="docutils literal"><span class="pre">Item</span></tt>) emit state changes. Some extra effort has
+been taken to monitor the <tt class="docutils literal"><span class="pre">Matrix</span></tt> class (which is from Cairo).</p>
+<dl class="docutils">
+<dt>canvas.py:</dt>
+<dd><tt class="docutils literal"><span class="pre">Canvas</span></tt>: <tt class="docutils literal"><span class="pre">add()</span></tt> and <tt class="docutils literal"><span class="pre">remove()</span></tt></dd>
+<dt>connector.py:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">Position</span></tt>: <tt class="docutils literal"><span class="pre">x</span></tt> and <tt class="docutils literal"><span class="pre">y</span></tt> properties</p>
+<p class="last"><tt class="docutils literal"><span class="pre">Handle</span></tt>: <tt class="docutils literal"><span class="pre">connectable</span></tt>, <tt class="docutils literal"><span class="pre">movable</span></tt>, <tt class="docutils literal"><span class="pre">visible</span></tt>, <tt class="docutils literal"><span class="pre">connected_to</span></tt> and <tt class="docutils literal"><span class="pre">disconnect</span></tt> properties</p>
+</dd>
+<dt>item.py:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">Item</span></tt>: <tt class="docutils literal"><span class="pre">matrix</span></tt> property</p>
+<p><tt class="docutils literal"><span class="pre">Element</span></tt>: <tt class="docutils literal"><span class="pre">min_height</span></tt> and <tt class="docutils literal"><span class="pre">min_width</span></tt> properties</p>
+<p class="last"><tt class="docutils literal"><span class="pre">Line</span></tt>: <tt class="docutils literal"><span class="pre">line_width</span></tt>, <tt class="docutils literal"><span class="pre">fuzziness</span></tt>, <tt class="docutils literal"><span class="pre">orthogonal</span></tt> and <tt class="docutils literal"><span class="pre">horizontal</span></tt> properties</p>
+</dd>
+<dt>solver.py:</dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">Variable</span></tt>: <tt class="docutils literal"><span class="pre">strength</span></tt> and <tt class="docutils literal"><span class="pre">value</span></tt> properties</p>
+<p class="last"><tt class="docutils literal"><span class="pre">Solver</span></tt>: <tt class="docutils literal"><span class="pre">add_constraint()</span></tt> and <tt class="docutils literal"><span class="pre">remove_constraint()</span></tt></p>
+</dd>
+<dt>matrix.py:</dt>
+<dd><tt class="docutils literal"><span class="pre">Matrix</span></tt>: <tt class="docutils literal"><span class="pre">invert()</span></tt>, <tt class="docutils literal"><span class="pre">translate()</span></tt>, <tt class="docutils literal"><span class="pre">rotate()</span></tt> and <tt class="docutils literal"><span class="pre">scale()</span></tt></dd>
+</dl>
+<p>Test cases are described in undo.txt.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">State management</a><ul>
+<li><a class="reference external" href="#observer">Observer</a></li>
+<li><a class="reference external" href="#reverser">Reverser</a></li>
+<li><a class="reference external" href="#what-is-observed">What is Observed</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="ports.html"
+                                  title="previous chapter">Ports</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="undo.html"
+                                  title="next chapter">Undo - implementing basic undo behaviour with Gaphas</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/state.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="undo.html" title="Undo - implementing basic undo behaviour with Gaphas"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ports.html" title="Ports"
+             >previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

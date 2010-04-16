@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Solver &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Constraints" href="constraints.html" />
+    <link rel="prev" title="Handles and ports" href="connectors.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="constraints.html" title="Constraints"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="connectors.html" title="Handles and ports"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.solver">
+<h1>Solver<a class="headerlink" href="#module-gaphas.solver" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.solver</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.solver.Solver">
+<em class="property">class </em><tt class="descclassname">gaphas.solver.</tt><tt class="descname">Solver</tt><a class="headerlink" href="#gaphas.solver.Solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve constraints. A constraint should have accompanying
+variables.</p>
+<dl class="method">
+<dt id="gaphas.solver.Solver.add_constraint">
+<tt class="descname">add_constraint</tt><big>(</big><em>constraint</em><big>)</big><a class="headerlink" href="#gaphas.solver.Solver.add_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a constraint.
+The actual constraint is returned, so the constraint can be removed
+later on.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">constraint</span> <span class="kn">import</span> <span class="n">EquationConstraint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">))</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Variable(0, 20), b=Variable(2, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">_constraints</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">value</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">value</span>
+<span class="go">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">_constraints</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.solver.Solver.constraints">
+<tt class="descname">constraints</tt><a class="headerlink" href="#gaphas.solver.Solver.constraints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.solver.Solver.constraints_with_variable">
+<tt class="descname">constraints_with_variable</tt><big>(</big><em>*variables</em><big>)</big><a class="headerlink" href="#gaphas.solver.Solver.constraints_with_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterator of constraints that work with variable.
+The variable in question should be exposed by the constraints
+<cite>constraint.Constraint.variables()</cite> method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">constraint</span> <span class="kn">import</span> <span class="n">EquationConstraint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_b</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_b</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Variable(0, 20), b=Variable(2, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_c</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">c</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_c</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Variable(0, 20), b=Variable(4, 20))</span>
+</pre></div>
+</div>
+<p>And now for some testing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_b</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_c</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_b</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_c</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>Using another variable with the same value does not work:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_a_b</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>This also works for projections:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">eq_pr_a_b</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">Projection</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">b</span><span class="o">=</span><span class="n">Projection</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_pr_a_b</span>   <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Projection(Variable(0, 20)), b=Projection(Variable(2, 20)))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">eq_pr_a_b</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_pr_a_b</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eq_pr_a_b</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.solver.Solver.remove_constraint">
+<tt class="descname">remove_constraint</tt><big>(</big><em>constraint</em><big>)</big><a class="headerlink" href="#gaphas.solver.Solver.remove_constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a constraint from the solver</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">constraint</span> <span class="kn">import</span> <span class="n">EquationConstraint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">-</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Variable(0, 20), b=Variable(2, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">remove_constraint</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">_marked_cons</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">_constraints</span>
+<span class="go">set([])</span>
+</pre></div>
+</div>
+<p>Removing a constraint twice has no effect:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">remove_constraint</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.solver.Solver.request_resolve">
+<tt class="descname">request_resolve</tt><big>(</big><em>variable</em>, <em>projections_only=False</em><big>)</big><a class="headerlink" href="#gaphas.solver.Solver.request_resolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mark a variable as &#8220;dirty&#8221;. This means it it solved the next time
+the constraints are resolved.</p>
+<p>If projections_only is set to True, only constraints using the
+variable through a Projection instance (e.i. variable itself is not
+in <cite>constraint.Constraint.variables()</cite>) are marked.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">constraint</span> <span class="kn">import</span> <span class="n">EquationConstraint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c_eq</span> <span class="o">=</span> <span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">c_eq</span><span class="p">)</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Variable(1, 20), b=Variable(2, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c_eq</span><span class="o">.</span><span class="n">_weakest</span>
+<span class="go">[Variable(1, 20), Variable(2, 20)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">_marked_cons</span>
+<span class="go">[EquationConstraint(&lt;lambda&gt;, a=Variable(1, 20), b=Variable(2, 20))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">value</span><span class="o">=</span><span class="mf">5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c_eq</span><span class="o">.</span><span class="n">weakest</span><span class="p">()</span>
+<span class="go">Variable(2, 20)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">value</span><span class="o">=</span><span class="mf">2.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c_eq</span><span class="o">.</span><span class="n">weakest</span><span class="p">()</span>
+<span class="go">Variable(2, 20)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">value</span><span class="o">=</span><span class="mf">5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c_eq</span><span class="o">.</span><span class="n">weakest</span><span class="p">()</span>
+<span class="go">Variable(2, 20)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.solver.Solver.request_resolve_constraint">
+<tt class="descname">request_resolve_constraint</tt><big>(</big><em>c</em><big>)</big><a class="headerlink" href="#gaphas.solver.Solver.request_resolve_constraint" title="Permalink to this definition">¶</a></dt>
+<dd>Request resolving a constraint.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.solver.Solver.solve">
+<tt class="descname">solve</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.solver.Solver.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">constraint</span> <span class="kn">import</span> <span class="n">EquationConstraint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">))</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Variable(1, 20), b=Variable(2, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">_marked_cons</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">_value</span>
+<span class="go">-5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">c</span><span class="p">))</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Variable(-5, 20), b=Variable(3, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">_constraints</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">_marked_cons</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">_value</span>
+<span class="go">-5.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">_value</span>
+<span class="go">-3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">_value</span>
+<span class="go">10.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="connectors.html"
+                                  title="previous chapter">Handles and ports</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="constraints.html"
+                                  title="next chapter">Constraints</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/solver.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="constraints.html" title="Constraints"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="connectors.html" title="Handles and ports"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

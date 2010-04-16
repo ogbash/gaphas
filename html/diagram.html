@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Class diagram &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="index.html" />
+    <link rel="next" title="Interacting with diagrams" href="tools.html" />
+    <link rel="prev" title="Gaphas Documentation" href="contents.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Interacting with diagrams"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="contents.html" title="Gaphas Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="class-diagram">
+<h1>Class diagram<a class="headerlink" href="#class-diagram" title="Permalink to this headline">¶</a></h1>
+<p>This class diagram describes the basic layout of Gaphas.</p>
+<img alt="_images/gaphas-canvas.png" src="_images/gaphas-canvas.png" style="width: 700px;" />
+<p>One-oh-one:</p>
+<dl class="docutils">
+<dt><a class="reference external" href="api/canvas.html"><em>Canvas</em></a></dt>
+<dd>The main canvas class (container for Items)</dd>
+<dt><a class="reference external" href="api/items.html"><em>Items</em></a></dt>
+<dd>Objects placed on a Canvas. Items can draw themselves, but not act on user events</dd>
+<dt><a class="reference external" href="api/solver.html"><em>Solver</em></a></dt>
+<dd>A constraint solver. Nice to have when you want to connect items together in a generic way.</dd>
+<dt><a class="reference external" href="api/view.html"><em>View</em></a></dt>
+<dd>Base class that renders content (<cite>paint()</cite>). The view is responsible for the calculation of bounding boxes. This information is stored in a <a class="reference external" href="quadtree.html">quadtree</a> data structure for fast access.</dd>
+<dt><a class="reference external" href="api/gtkview.html"><em>GTK+ View</em></a></dt>
+<dd>A view to be used in GTK+ applications. This view class is interactive. Interaction with users is handled by Tools.</dd>
+<dt><a class="reference external" href="api/painters.html"><em>Painters</em></a></dt>
+<dd>Painters are the workers when it comes to painting items.</dd>
+<dt><a class="reference external" href="api/tools.html"><em>Tools</em></a></dt>
+<dd>Tools are used to handle user events (such as mouse movement and button presses).</dd>
+<dt><a class="reference external" href="api/aspects.html"><em>Aspects</em></a></dt>
+<dd>Tools do not modify the items directly. They use aspects (not the AOP kind) as intermediate step. Since aspects are defined as generic functions, the behaviour for each diagram item type can be slightly different.</dd>
+</dl>
+<div class="section" id="tools">
+<h2>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h2>
+<p>Several <a class="reference external" href="tools.html">tools</a> are used to make the overall user experience complete.</p>
+<img alt="_images/tools.png" src="_images/tools.png" style="width: 532px;" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Class diagram</a><ul>
+<li><a class="reference external" href="#tools">Tools</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="contents.html"
+                                  title="previous chapter">Gaphas Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="tools.html"
+                                  title="next chapter">Interacting with diagrams</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/diagram.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Interacting with diagrams"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="contents.html" title="Gaphas Documentation"
+             >previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

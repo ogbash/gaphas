@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Various utility functions &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="View" href="view.html" />
+    <link rel="prev" title="Constraints" href="constraints.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="view.html" title="View"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="constraints.html" title="Constraints"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.util">
+<h1>Various utility functions<a class="headerlink" href="#module-gaphas.util" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.util</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="function">
+<dt id="gaphas.util.text_extents">
+<tt class="descclassname">gaphas.util.</tt><tt class="descname">text_extents</tt><big>(</big><em>cr</em>, <em>text</em>, <em>font=None</em>, <em>multiline=False</em>, <em>padding=1</em><big>)</big><a class="headerlink" href="#gaphas.util.text_extents" title="Permalink to this definition">¶</a></dt>
+<dd>Simple way to determine the size of a piece of text.</dd></dl>
+
+<dl class="function">
+<dt id="gaphas.util.text_center">
+<tt class="descclassname">gaphas.util.</tt><tt class="descname">text_center</tt><big>(</big><em>cr</em>, <em>x</em>, <em>y</em>, <em>text</em><big>)</big><a class="headerlink" href="#gaphas.util.text_center" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="gaphas.util.text_align">
+<tt class="descclassname">gaphas.util.</tt><tt class="descname">text_align</tt><big>(</big><em>cr</em>, <em>x</em>, <em>y</em>, <em>text</em>, <em>align_x=0</em>, <em>align_y=0</em>, <em>padding_x=0</em>, <em>padding_y=0</em><big>)</big><a class="headerlink" href="#gaphas.util.text_align" title="Permalink to this definition">¶</a></dt>
+<dd>Draw text relative to (x, y).
+x, y - coordinates
+text - text to print (utf8)
+align_x - -1 (top), 0 (middle), 1 (bottom)
+align_y - -1 (left), 0 (center), 1 (right)
+padding_x - padding (extra offset), always &gt; 0
+padding_y - padding (extra offset), always &gt; 0</dd></dl>
+
+<dl class="function">
+<dt id="gaphas.util.text_multiline">
+<tt class="descclassname">gaphas.util.</tt><tt class="descname">text_multiline</tt><big>(</big><em>cr</em>, <em>x</em>, <em>y</em>, <em>text</em>, <em>padding=1</em><big>)</big><a class="headerlink" href="#gaphas.util.text_multiline" title="Permalink to this definition">¶</a></dt>
+<dd>Draw a string of text with embedded newlines.
+cr - cairo context
+x - leftmost x
+y - topmost y
+text - text to draw
+padding - additional padding between lines.</dd></dl>
+
+<dl class="function">
+<dt id="gaphas.util.text_underline">
+<tt class="descclassname">gaphas.util.</tt><tt class="descname">text_underline</tt><big>(</big><em>cr</em>, <em>x</em>, <em>y</em>, <em>text</em>, <em>offset=1.5</em><big>)</big><a class="headerlink" href="#gaphas.util.text_underline" title="Permalink to this definition">¶</a></dt>
+<dd>Draw text with underline.</dd></dl>
+
+<dl class="function">
+<dt id="gaphas.util.text_set_font">
+<tt class="descclassname">gaphas.util.</tt><tt class="descname">text_set_font</tt><big>(</big><em>cr</em>, <em>font</em><big>)</big><a class="headerlink" href="#gaphas.util.text_set_font" title="Permalink to this definition">¶</a></dt>
+<dd>Set the font from a string. E.g. &#8216;sans 10&#8217; or &#8216;sans italic bold 12&#8217;
+only restriction is that the font name should be the first option and
+the font size as last argument</dd></dl>
+
+<dl class="function">
+<dt id="gaphas.util.path_ellipse">
+<tt class="descclassname">gaphas.util.</tt><tt class="descname">path_ellipse</tt><big>(</big><em>cr</em>, <em>x</em>, <em>y</em>, <em>width</em>, <em>height</em>, <em>angle=0</em><big>)</big><a class="headerlink" href="#gaphas.util.path_ellipse" title="Permalink to this definition">¶</a></dt>
+<dd>Draw an ellipse.
+x      - center x
+y      - center y
+width  - width of ellipse  (in x direction when angle=0)
+height - height of ellipse (in y direction when angle=0)
+angle  - angle in radians to rotate, clockwise</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="constraints.html"
+                                  title="previous chapter">Constraints</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="view.html"
+                                  title="next chapter">View</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/utils.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="view.html" title="View"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="constraints.html" title="Constraints"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

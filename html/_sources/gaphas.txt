@@ -1,0 +1,53 @@
+= Gaphas =
+
+Gaphas is Gaphor's diagram drawing widget.
+
+Gaphas has been built with some extensibility in mind. It can be used for many drawing purposes, including vector drawing applications, diagram drawing tools and we even have a geographical map demo in our repository.
+
+The basic idea is:
+
+ - Items (canvas items) can be added to a Canvas.
+ - A Canvas can be visualized by one or more Views.
+ - The canvas maintains the tree structure (parent-child relationships between
+   items).
+ - A constraint solver is used to maintain item constraints and inter-item
+   constraints.
+ - The item (and user) should not be bothered with things like bounding-box
+   calculations.
+ - Very modular: e.g. handle support could be swapped in and swapped out.
+ - Rendering using [http://cairographics.org Cairo].
+
+Gaphas is released under the terms of the GNU Library General Public License
+(LGPL).
+
+Read more about Gaphas in the [wiki:Tech Tech section].
+
+Gaphas has been build using setuptools and can be installed as Python Egg.
+
+ * Subversion: http://svn.devjavu.com/gaphor/gaphas/trunk
+ * Python Package index (PyPI): http://cheeseshop.python.org/pypi/gaphas
+
+== Class diagram ==
+
+This class diagram describes the basic layout of Gaphas.
+
+[[Image(gaphas-0.3.0-classes.png, nolink)]]
+
+Some highlights:
+
+ Canvas::
+   The main canvas class (container for Items)
+ Item::
+   Objects placed on a Canvas. Items can draw themselves, but not act on user events
+ Solver::
+   A constraint solver. Nice to have when you want to connect items together in a generic way.
+ View::
+   Base class that renders content ({{{paint()}}}). The view is responsible for the calculation of bounding boxes. This information is stored in a [wiki:Tech/Quadtree quadtree] data structure for fast access.
+ !GtkView::
+   A view to be used in GTK+ applications. This view class is interactive. Interaction with users is handled by Tools.
+ Painter::
+   Painters are the workers when it comes to painting items.
+ Tool::
+   Tools are used to handle user events (such as mouse movement and button presses).
+
+The original model file can be found in the subversion repository: source:gaphas/trunk/gaphor-canvas.gaphor

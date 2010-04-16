@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Ports &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="index.html" />
+    <link rel="next" title="State management" href="state.html" />
+    <link rel="prev" title="Interacting with diagrams" href="tools.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="state.html" title="State management"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Interacting with diagrams"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="ports">
+<h1>Ports<a class="headerlink" href="#ports" title="Permalink to this headline">¶</a></h1>
+<p>Port is a part of an item, which defines connectable part of an item.
+This concept has been introduced Gaphas version 0.4.0 to make Gaphas
+connection system more flexible.</p>
+<div class="section" id="port-types">
+<h2>Port Types<a class="headerlink" href="#port-types" title="Permalink to this headline">¶</a></h2>
+<p>There are two types of ports implemented in Gaphor (see <cite>gaphas.connector</cite>
+module).</p>
+<p>First one is point port, as is often use in
+<a class="reference external" href="http://en.wikipedia.org/wiki/Electronic_design_automation">EDA</a>
+applications, a handle connecting to such port is always kept at specific
+position, which equals to port&#8217;s position.</p>
+<p>Other port type is line port. A handle connecting to such port is kept on
+a line defined by start and end positions of line port.</p>
+<p>Line port is used by items provided by <cite>gaphas.item</cite> module. <cite>Element</cite>
+item has one port defined at every edge of its rectangular shape (this is 4
+ports). <cite>Line</cite> item has one port per line segment.</p>
+<p>Different types of ports can be invented like circle port or area port, they
+should implement interface defined by <cite>gaphas.connector.Port</cite> class to fit
+into Gaphas&#8217; connection system.</p>
+</div>
+<div class="section" id="ports-and-constraints-covering-handles">
+<h2>Ports and Constraints (Covering Handles)<a class="headerlink" href="#ports-and-constraints-covering-handles" title="Permalink to this headline">¶</a></h2>
+<p>Diagram items can have internal constraints, which can be used to position
+item&#8217;s ports within an item itself.</p>
+<p>For example, <cite>Element</cite> item could create constraints to position ports over
+its edges of rectanglular area. The result is duplication of constraints as
+<cite>Element</cite> already constraints position of handles to keep them in
+a rectangle.</p>
+<p><em>Therefore, when port covers handles, then it should reference handle
+positions</em>.</p>
+<p>For example, an item, which is a horizontal line could be implemented
+like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">HorizontalLine</span><span class="p">(</span><span class="n">gaphas</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HorizontalLine</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">Handle</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">Handle</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">LinePort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraint</span><span class="p">(</span><span class="n">horizontal</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">pos</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In case of <cite>Element</cite> item, each line port references positions of two
+handles, which keeps ports to lie over edges of rectangle. The same applies
+to <cite>Line</cite> item - every port is defined between positions of two neighbour
+handles. When <cite>Line</cite> item is orthogonal, then handle and ports share the
+same constraints, which guard line orthogonality.</p>
+<p>This way, item&#8217;s constraints are reused and their amount is limited to
+minimum.</p>
+</div>
+<div class="section" id="connections">
+<h2>Connections<a class="headerlink" href="#connections" title="Permalink to this headline">¶</a></h2>
+<p>Connection between two items is established by creating a constraint
+between handle&#8217;s postion and port&#8217;s positions (positions are constraint
+solver variables).</p>
+<p><cite>ConnectHandleTool</cite> class provides functionality to allow an user to
+perform connections between items.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Examples of ports can be found in Gaphas and Gaphor source code</p>
+<ul class="simple">
+<li><cite>gaphas.item.Line</cite> and <cite>gaphas.item.Element</cite> classes</li>
+<li><cite>gaphas.examples.PortoBox</cite> class has an example of movable port</li>
+<li>Gaphor interface and lifeline items have own specific ports</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Ports</a><ul>
+<li><a class="reference external" href="#port-types">Port Types</a></li>
+<li><a class="reference external" href="#ports-and-constraints-covering-handles">Ports and Constraints (Covering Handles)</a></li>
+<li><a class="reference external" href="#connections">Connections</a></li>
+<li><a class="reference external" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="tools.html"
+                                  title="previous chapter">Interacting with diagrams</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="state.html"
+                                  title="next chapter">State management</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/ports.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="state.html" title="State management"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Interacting with diagrams"
+             >previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

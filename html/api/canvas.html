@@ -1,0 +1,592 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Canvas &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Items" href="items.html" />
+    <link rel="prev" title="API reference" href="../api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="items.html" title="Items"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../api.html" title="API reference"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.canvas">
+<h1>Canvas<a class="headerlink" href="#module-gaphas.canvas" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.canvas</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.canvas.Canvas">
+<em class="property">class </em><tt class="descclassname">gaphas.canvas.</tt><tt class="descname">Canvas</tt><a class="headerlink" href="#gaphas.canvas.Canvas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Container class for items.</p>
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.add">
+<tt class="descname">add</tt><big>(</big><em>item</em>, <em>parent=None</em>, <em>index=None</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an item to the canvas.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">_tree</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span><span class="o">.</span><span class="n">_canvas</span> <span class="ow">is</span> <span class="n">c</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.connect_item">
+<tt class="descname">connect_item</tt><big>(</big><em>item</em>, <em>handle</em>, <em>connected</em>, <em>port</em>, <em>constraint=None</em>, <em>callback=None</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.connect_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a connection between two items. The connection is registered
+and the constraint is added to the constraint solver.</p>
+<p>The pair (item, handle) should be unique and not yet connected.</p>
+<p>The callback is invoked when the connection is broken.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt>item</dt>
+<dd><p class="first last">Connecting item (i.e. a line).</p>
+</dd>
+<dt>handle</dt>
+<dd><p class="first last">Handle of connecting item.</p>
+</dd>
+<dt>connected</dt>
+<dd><p class="first last">Connected item (i.e. a box).</p>
+</dd>
+<dt>port</dt>
+<dd><p class="first last">Port of connected item.</p>
+</dd>
+<dt>constraint</dt>
+<dd><p class="first last">Constraint to keep the connection in place.</p>
+</dd>
+<dt>callback</dt>
+<dd><p class="first last">Function to be called on disconnection.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p>ConnectionError is raised in case handle is already registered on a
+connection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.disconnect_item">
+<tt class="descname">disconnect_item</tt><big>(</big><em>item</em>, <em>handle=None</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.disconnect_item" title="Permalink to this definition">¶</a></dt>
+<dd>Disconnect the connections of an item. If handle is not None, only the
+connection for that handle is disconnected.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_all_children">
+<tt class="descname">get_all_children</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_all_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>tree.Tree.get_all_children()</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">iii</span><span class="p">,</span> <span class="n">ii</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_all_children</span><span class="p">(</span><span class="n">iii</span><span class="p">))</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_all_children</span><span class="p">(</span><span class="n">ii</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item ...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_all_children</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item ...&gt;, &lt;gaphas.item.Item ...&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_all_items">
+<tt class="descname">get_all_items</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_all_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of all items.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item ...&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_ancestors">
+<tt class="descname">get_ancestors</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_ancestors" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>tree.Tree.get_ancestors()</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">iii</span><span class="p">,</span> <span class="n">ii</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_ancestors</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_ancestors</span><span class="p">(</span><span class="n">ii</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item ...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_ancestors</span><span class="p">(</span><span class="n">iii</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item ...&gt;, &lt;gaphas.item.Item ...&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_children">
+<tt class="descname">get_children</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>tree.Tree.get_children()</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">iii</span><span class="p">,</span> <span class="n">ii</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="n">iii</span><span class="p">))</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="n">ii</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item ...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item ...&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_connection">
+<tt class="descname">get_connection</tt><big>(</big><em>handle</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get connection information for specified handle.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.item</span> <span class="kn">import</span> <span class="n">Line</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">connect_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ii</span><span class="o">.</span><span class="n">ports</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span>     <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">Connection(item=&lt;gaphas.item.Line object at 0x...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">1</span><span class="p">])</span>     <span class="c"># doctest: +ELLIPSIS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">ii</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span>    <span class="c"># doctest: +ELLIPSIS</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_connections">
+<tt class="descname">get_connections</tt><big>(</big><em>item=None</em>, <em>handle=None</em>, <em>connected=None</em>, <em>port=None</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterator of connection information.</p>
+<p>The list contains  (item, handle). As a result an item may be
+in the list more than once (depending on the number of handles that
+are connected). If <tt class="docutils literal"><span class="pre">item</span></tt> is connected to itself it will also appear
+in the list.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span> <span class="p">(</span><span class="n">iii</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">connect_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ii</span><span class="o">.</span><span class="n">ports</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">i</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[Connection(item=&lt;gaphas.item.Line object at 0x...]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">connected</span><span class="o">=</span><span class="n">i</span><span class="p">))</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">connected</span><span class="o">=</span><span class="n">ii</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[Connection(item=&lt;gaphas.item.Line object at 0x...]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">connect_item</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">ii</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="n">iii</span><span class="p">,</span> <span class="n">iii</span><span class="o">.</span><span class="n">ports</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="bp">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">item</span><span class="o">=</span><span class="n">ii</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[Connection(item=&lt;gaphas.item.Line object at 0x...]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">connected</span><span class="o">=</span><span class="n">iii</span><span class="p">))</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[Connection(item=&lt;gaphas.item.Line object at 0x...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_matrix_c2i">
+<tt class="descname">get_matrix_c2i</tt><big>(</big><em>item</em>, <em>calculate=False</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_matrix_c2i" title="Permalink to this definition">¶</a></dt>
+<dd>Get the Canvas to Item matrix for <tt class="docutils literal"><span class="pre">item</span></tt>.
+See <cite>get_matrix_i2c()</cite>.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_matrix_i2c">
+<tt class="descname">get_matrix_i2c</tt><big>(</big><em>item</em>, <em>calculate=False</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_matrix_i2c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the Item to Canvas matrix for <tt class="docutils literal"><span class="pre">item</span></tt>.</p>
+<dl class="docutils">
+<dt>item:</dt>
+<dd>The item who&#8217;s item-to-canvas transformation matrix should be
+found</dd>
+<dt>calculate:</dt>
+<dd>True will allow this function to actually calculate it,
+in stead of raising an <cite>AttributeError</cite> when no matrix is present
+yet. Note that out-of-date matrices are not recalculated.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_matrix_i2i">
+<tt class="descname">get_matrix_i2i</tt><big>(</big><em>from_item</em>, <em>to_item</em>, <em>calculate=False</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_matrix_i2i" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_parent">
+<tt class="descname">get_parent</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <cite>tree.Tree.get_parent()</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">&lt;gaphas.item.Item ...&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.get_root_items">
+<tt class="descname">get_root_items</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.get_root_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the root items of the canvas.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_root_items</span><span class="p">()</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item ...&gt;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.project">
+<tt class="descname">project</tt><big>(</big><em>item</em>, <em>*points</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Project item&#8217;s points into canvas coordinate system.</p>
+<p>If there is only one point returned than projected point is
+returned. If there are more than one points, then tuple of
+projected points is returned.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.reconnect_item">
+<tt class="descname">reconnect_item</tt><big>(</big><em>item</em>, <em>handle</em>, <em>constraint=None</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.reconnect_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update an existing connection. This is mainly useful to provide a new
+constraint or callback to the connection. <tt class="docutils literal"><span class="pre">item</span></tt> and <tt class="docutils literal"><span class="pre">handle</span></tt> are
+the keys to the to-be-updated connection.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">iii</span><span class="p">,</span> <span class="n">ii</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We need a few constraints, because that&#8217;s what we&#8217;re updating:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.constraint</span> <span class="kn">import</span> <span class="n">EqualsConstraint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cons1</span> <span class="o">=</span> <span class="n">EqualsConstraint</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cons2</span> <span class="o">=</span> <span class="n">EqualsConstraint</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">connect_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="n">ii</span><span class="p">,</span> <span class="n">ii</span><span class="o">.</span><span class="n">ports</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="n">cons1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">Connection(item=&lt;gaphas.item.Line object at 0x...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span><span class="o">.</span><span class="n">constraint</span> <span class="ow">is</span> <span class="n">cons1</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cons1</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">constraints</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">reconnect_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="n">cons2</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="mf">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span> <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">Connection(item=&lt;gaphas.item.Line object at 0x...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span><span class="o">.</span><span class="n">constraint</span> <span class="ow">is</span> <span class="n">cons2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cons1</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">constraints</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cons2</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">constraints</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>An exception is raised if no connection exists:
+&gt;&gt;&gt; c.reconnect_item(ii, ii.handles()[0], cons2, lambda: 0) # doctest: +ELLIPSIS
+Traceback (most recent call last):
+...
+ValueError: No data available for item ...</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.register_view">
+<tt class="descname">register_view</tt><big>(</big><em>view</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.register_view" title="Permalink to this definition">¶</a></dt>
+<dd>Register a view on this canvas. This method is called when setting
+a canvas on a view and should not be called directly from user code.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.remove">
+<tt class="descname">remove</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove item from the canvas.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">_tree</span><span class="o">.</span><span class="n">nodes</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span><span class="o">.</span><span class="n">_canvas</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.remove_connections_to_item">
+<tt class="descname">remove_connections_to_item</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.remove_connections_to_item" title="Permalink to this definition">¶</a></dt>
+<dd>Remove all connections (handles connected to and constraints)
+for a specific item (to and from the item).
+This is some brute force cleanup (e.g. if constraints are referenced
+by items, those references are not cleaned up).</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.reparent">
+<tt class="descname">reparent</tt><big>(</big><em>item</em>, <em>parent</em>, <em>index=None</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.reparent" title="Permalink to this definition">¶</a></dt>
+<dd>Set new parent for an item.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.request_matrix_update">
+<tt class="descname">request_matrix_update</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.request_matrix_update" title="Permalink to this definition">¶</a></dt>
+<dd>Schedule only the matrix to be updated.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.request_update">
+<tt class="descname">request_update</tt><big>(</big><em>item</em>, <em>update=True</em>, <em>matrix=True</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.request_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set an update request for the item.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ii</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">_dirty_items</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">update_now</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">_dirty_items</span><span class="p">)</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.require_update">
+<tt class="descname">require_update</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.require_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> or <tt class="xref docutils literal"><span class="pre">False</span></tt> depending on if an update is needed.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">=</span><span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">require_update</span><span class="p">()</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">require_update</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>Since we&#8217;re not in a GTK+ mainloop, the update is not scheduled
+asynchronous. Therefore <tt class="docutils literal"><span class="pre">require_update()</span></tt> returns <tt class="xref docutils literal"><span class="pre">False</span></tt>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.canvas.Canvas.solver">
+<tt class="descname">solver</tt><a class="headerlink" href="#gaphas.canvas.Canvas.solver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.sort">
+<tt class="descname">sort</tt><big>(</big><em>items</em>, <em>reverse=False</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort a list of items in the order in which they are traversed in
+the canvas (Depth first).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i1</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i2</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">i2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i3</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">add</span> <span class="p">(</span><span class="n">i3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">update</span><span class="p">()</span> <span class="c"># ensure items are indexed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">i1</span><span class="o">.</span><span class="n">_canvas_index</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="n">i2</span><span class="p">,</span> <span class="n">i3</span><span class="p">,</span> <span class="n">i1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span> <span class="ow">is</span> <span class="n">i1</span> <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span> <span class="ow">is</span> <span class="n">i2</span> <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="mf">2</span><span class="p">]</span> <span class="ow">is</span> <span class="n">i3</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.unregister_view">
+<tt class="descname">unregister_view</tt><big>(</big><em>view</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.unregister_view" title="Permalink to this definition">¶</a></dt>
+<dd>Unregister a view on this canvas. This method is called when setting
+a canvas on a view and should not be called directly from user code.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.update_constraints">
+<tt class="descname">update_constraints</tt><big>(</big><em>items</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.update_constraints" title="Permalink to this definition">¶</a></dt>
+<dd>Update constraints. Also variables may be marked as dirty before the
+constraint solver kicks in.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.update_index">
+<tt class="descname">update_index</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.update_index" title="Permalink to this definition">¶</a></dt>
+<dd>Provide each item in the canvas with an index attribute. This makes
+for fast searching of items.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.update_matrices">
+<tt class="descname">update_matrices</tt><big>(</big><em>items</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.update_matrices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recalculate matrices of the items. Items&#8217; children matrices are
+recalculated, too.</p>
+<p>Return items, which matrices were recalculated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.update_matrix">
+<tt class="descname">update_matrix</tt><big>(</big><em>item</em>, <em>parent=None</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.update_matrix" title="Permalink to this definition">¶</a></dt>
+<dd>Update matrices of an item.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.canvas.Canvas.update_now">
+<tt class="descname">update_now</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#gaphas.canvas.Canvas.update_now" title="Permalink to this definition">¶</a></dt>
+<dd>Decorate function with a mutex that prohibits recursice execution.</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="../api.html"
+                                  title="previous chapter">API reference</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="items.html"
+                                  title="next chapter">Items</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/canvas.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="items.html" title="Items"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../api.html" title="API reference"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

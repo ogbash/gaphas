@@ -1,0 +1,596 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Undo - implementing basic undo behaviour with Gaphas &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="index.html" />
+    <link rel="next" title="Quadtree implementation" href="quadtree.html" />
+    <link rel="prev" title="State management" href="state.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="quadtree.html" title="Quadtree implementation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="state.html" title="State management"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="undo-implementing-basic-undo-behaviour-with-gaphas">
+<h1><a class="toc-backref" href="#id1">Undo - implementing basic undo behaviour with Gaphas</a><a class="headerlink" href="#undo-implementing-basic-undo-behaviour-with-gaphas" title="Permalink to this headline">¶</a></h1>
+<p>This document describes a basic undo system and tests Gaphas&#8217; classes with this
+system.</p>
+<p>This document contains a set of test cases that is used to prove that it really
+works.</p>
+<p>See state.txt about how state is recorded.</p>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#undo-implementing-basic-undo-behaviour-with-gaphas" id="id1">Undo - implementing basic undo behaviour with Gaphas</a><ul>
+<li><a class="reference internal" href="#undo-functionality-tests" id="id2">Undo functionality tests</a><ul>
+<li><a class="reference internal" href="#tree-py-tree" id="id3">tree.py: Tree</a></li>
+<li><a class="reference internal" href="#matrix-py-matrix" id="id4">matrix.py: Matrix</a></li>
+<li><a class="reference internal" href="#canvas-py-canvas" id="id5">canvas.py: Canvas</a></li>
+<li><a class="reference internal" href="#connector-py-handle" id="id6">connector.py: Handle</a></li>
+<li><a class="reference internal" href="#item-py-item" id="id7">item.py: Item</a></li>
+<li><a class="reference internal" href="#item-py-element" id="id8">item.py: Element</a></li>
+<li><a class="reference internal" href="#item-py-line" id="id9">item.py: Line</a></li>
+<li><a class="reference internal" href="#solver-py-variable" id="id10">solver.py: Variable</a></li>
+<li><a class="reference internal" href="#solver-py-solver" id="id11">solver.py: Solver</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<p>For this to work, some boilerplate has to be configured:</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">state</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">redo_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">undo_handler</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">undo_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">observers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">revert_handler</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">subscribers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">undo_handler</span><span class="p">)</span>
+</pre></div>
+</div>
+</blockquote>
+<p>This simple undo function will revert all states collected in the undo_list:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">undo</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="n">apply_me</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">undo_list</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">del</span> <span class="n">undo_list</span><span class="p">[:]</span>
+<span class="gp">... </span>    <span class="n">apply_me</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">apply_me</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">state</span><span class="o">.</span><span class="n">saveapply</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">redo_list</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">undo_list</span><span class="p">[:]</span>
+<span class="gp">... </span>    <span class="k">del</span> <span class="n">undo_list</span><span class="p">[:]</span>
+</pre></div>
+</div>
+<div class="section" id="undo-functionality-tests">
+<h2><a class="toc-backref" href="#id2">Undo functionality tests</a><a class="headerlink" href="#undo-functionality-tests" title="Permalink to this headline">¶</a></h2>
+<p>The following sections contain most of the basis unit tests for undo
+management.</p>
+<div class="section" id="tree-py-tree">
+<h3><a class="toc-backref" href="#id3">tree.py: Tree</a><a class="headerlink" href="#tree-py-tree" title="Permalink to this headline">¶</a></h3>
+<p>Tree has no observed methods.</p>
+</div>
+<div class="section" id="matrix-py-matrix">
+<h3><a class="toc-backref" href="#id4">matrix.py: Matrix</a><a class="headerlink" href="#matrix-py-matrix" title="Permalink to this headline">¶</a></h3>
+<p>Matrix is used by Item classes.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.matrix</span> <span class="kn">import</span> <span class="n">Matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix(1, 0, 0, 1, 0, 0)</span>
+</pre></div>
+</div>
+<p>translate(tx, ty):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="mf">12</span><span class="p">,</span> <span class="mf">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix(1, 0, 0, 1, 12, 16)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix(1, 0, 0, 1, 0, 0)</span>
+</pre></div>
+</div>
+<p>scale(sx, sy):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix(1.5, 0, 0, 1.5, 0, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix(1, 0, 0, 1, 0, 0)</span>
+</pre></div>
+</div>
+<p>rotate(radians):</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">matrix_approx</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">a</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="o">-</span><span class="mf">1e-10</span> <span class="o">&lt;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mf">1e-10</span><span class="p">:</span> <span class="n">i</span><span class="o">=</span><span class="mf">0</span>
+<span class="gp">... </span>        <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix(0.877583, 0.479426, -0.479426, 0.877583, 0, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrix_approx</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="go">(1.0, 0, 0, 1.0, 0, 0)</span>
+</pre></div>
+</div>
+</blockquote>
+<p>Okay, nearly, close enough IMHO...</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="mf">12</span><span class="p">,</span> <span class="mf">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix(1.31637, 0.719138, -0.719138, 1.31637, 12, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">invert</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">Matrix(0.585055, -0.319617, 0.319617, 0.585055, -10.2168, -2.01515)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrix_approx</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="go">(1.0, 0, 0, 1.0, 0, 0)</span>
+</pre></div>
+</div>
+<p>Again, rotate does not result in an exact match, but it&#8217;s close enough.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo_list</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="canvas-py-canvas">
+<h3><a class="toc-backref" href="#id5">canvas.py: Canvas</a><a class="headerlink" href="#canvas-py-canvas" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">Canvas</span><span class="p">,</span> <span class="n">Item</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">item</span> <span class="o">=</span> <span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">request_update()</span></tt> method is observed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">undo_list</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">request_update</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">undo_list</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<p>On the canvas only <tt class="docutils literal"><span class="pre">add()</span></tt> and <tt class="docutils literal"><span class="pre">remove()</span></tt> are monitored:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">item</span><span class="o">.</span><span class="n">canvas</span> <span class="ow">is</span> <span class="n">canvas</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">item</span><span class="o">.</span><span class="n">canvas</span> <span class="ow">is</span> <span class="bp">None</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">undo_list</span><span class="p">[:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo_list</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+<p>Parent-child relationships are restored as well:</p>
+<p>TODO!</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">child</span> <span class="o">=</span> <span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">item</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">child</span><span class="o">.</span><span class="n">canvas</span> <span class="ow">is</span> <span class="n">canvas</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="n">child</span><span class="p">)</span> <span class="ow">is</span> <span class="n">item</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">child</span><span class="o">.</span><span class="n">canvas</span> <span class="ow">is</span> <span class="bp">None</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">child</span> <span class="ow">in</span> <span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>Now redo the previous undo action:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo_list</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">redo_list</span><span class="p">[:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">child</span><span class="o">.</span><span class="n">canvas</span> <span class="ow">is</span> <span class="n">canvas</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_parent</span><span class="p">(</span><span class="n">child</span><span class="p">)</span> <span class="ow">is</span> <span class="n">item</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;]</span>
+</pre></div>
+</div>
+<p>Remove also works when items are removed recursively (an item and it&#8217;s
+children):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">child</span> <span class="o">=</span> <span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">item</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">undo_list</span><span class="p">[:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;, &lt;gaphas.item.Item object at 0x...&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>                       <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">[&lt;gaphas.item.Item object at 0x...&gt;]</span>
+</pre></div>
+</div>
+<p>As well as the reparent() method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">NameItem</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="nb">super</span><span class="p">(</span><span class="n">NameItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ni1</span> <span class="o">=</span> <span class="n">NameItem</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ni1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ni2</span> <span class="o">=</span> <span class="n">NameItem</span><span class="p">(</span><span class="s">&#39;b&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ni2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ni3</span> <span class="o">=</span> <span class="n">NameItem</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ni3</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">ni1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ni4</span> <span class="o">=</span> <span class="n">NameItem</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ni4</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">ni3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[&lt;a&gt;, &lt;c&gt;, &lt;d&gt;, &lt;b&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">undo_list</span><span class="p">[:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">reparent</span><span class="p">(</span><span class="n">ni3</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">ni2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[&lt;a&gt;, &lt;b&gt;, &lt;c&gt;, &lt;d&gt;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">undo_list</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[&lt;a&gt;, &lt;c&gt;, &lt;d&gt;, &lt;b&gt;]</span>
+</pre></div>
+</div>
+<p>Redo should work too:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo_list</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">redo_list</span><span class="p">[:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_all_items</span><span class="p">()</span>
+<span class="go">[&lt;a&gt;, &lt;b&gt;, &lt;c&gt;, &lt;d&gt;]</span>
+</pre></div>
+</div>
+<p>Undo/redo a connection: see gaphas/tests/test_undo.py</p>
+</div>
+<div class="section" id="connector-py-handle">
+<h3><a class="toc-backref" href="#id6">connector.py: Handle</a><a class="headerlink" href="#connector-py-handle" title="Permalink to this headline">¶</a></h3>
+<p>Changing the Handle&#8217;s position is reversible:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">Handle</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span> <span class="o">=</span> <span class="n">Handle</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="mf">10</span><span class="p">,</span> <span class="mf">12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">pos</span>
+<span class="go">&lt;Position object on (10, 12)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">pos</span>
+<span class="go">&lt;Position object on (0, 0)&gt;</span>
+</pre></div>
+</div>
+<p>As are all other properties:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">connectable</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">movable</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">visible</span>
+<span class="go">(False, True, True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">connectable</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">movable</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">connectable</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">movable</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">visible</span>
+<span class="go">(True, False, False)</span>
+</pre></div>
+</div>
+<p>And now undo the whole lot at once:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">handle</span><span class="o">.</span><span class="n">connectable</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">movable</span><span class="p">,</span> <span class="n">handle</span><span class="o">.</span><span class="n">visible</span>
+<span class="go">(False, True, True)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="item-py-item">
+<h3><a class="toc-backref" href="#id7">item.py: Item</a><a class="headerlink" href="#item-py-item" title="Permalink to this headline">¶</a></h3>
+<p>The basic Item properties are canvas and matrix. Canvas has been tested before,
+while testing the Canvas class.</p>
+<p>The Matrix has been tested in section matrix.py: Matrix.</p>
+</div>
+<div class="section" id="item-py-element">
+<h3><a class="toc-backref" href="#id8">item.py: Element</a><a class="headerlink" href="#item-py-element" title="Permalink to this headline">¶</a></h3>
+<p>An element has <tt class="docutils literal"><span class="pre">min_height</span></tt> and <tt class="docutils literal"><span class="pre">min_width</span></tt> properties.</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Element</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">min_height</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">min_width</span>
+<span class="go">(10, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">min_height</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">min_width</span> <span class="o">=</span> <span class="mf">30</span><span class="p">,</span> <span class="mf">40</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">min_height</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">min_width</span>
+<span class="go">(30, 40)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">min_height</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">min_width</span>
+<span class="go">(10, 10)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">canvas</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="item-py-line">
+<h3><a class="toc-backref" href="#id9">item.py: Line</a><a class="headerlink" href="#item-py-line" title="Permalink to this headline">¶</a></h3>
+<p>A line has the following properties: <tt class="docutils literal"><span class="pre">line_width</span></tt>, <tt class="docutils literal"><span class="pre">fuzziness</span></tt>,
+<tt class="docutils literal"><span class="pre">orthogonal</span></tt> and <tt class="docutils literal"><span class="pre">horizontal</span></tt>. Each one of then is observed for changes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas</span> <span class="kn">import</span> <span class="n">Line</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.segment</span> <span class="kn">import</span> <span class="n">Segment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span> <span class="o">=</span> <span class="n">Line</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Let&#8217;s first add a segment to the line, to test orthogonal lines as well.</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">split_segment</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">fuzziness</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">orthogonal</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">horizontal</span>
+<span class="go">(2, 0, False, False)</span>
+</pre></div>
+</div>
+</blockquote>
+<p>Now change the properties:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">line_width</span> <span class="o">=</span> <span class="mf">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">fuzziness</span> <span class="o">=</span> <span class="mf">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">orthogonal</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">horizontal</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">fuzziness</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">orthogonal</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">horizontal</span>
+<span class="go">(4, 2, True, True)</span>
+</pre></div>
+</div>
+<p>And undo the changes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">fuzziness</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">orthogonal</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">horizontal</span>
+<span class="go">(2, 0, False, False)</span>
+</pre></div>
+</div>
+<p>In addition to those properties, line segments can be split and merged.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="mf">10</span><span class="p">,</span> <span class="mf">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()</span>
+<span class="go">[&lt;Handle object on (0, 0)&gt;, &lt;Handle object on (10, 10)&gt;]</span>
+</pre></div>
+</div>
+<p>This is our basis for further testing.</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">undo_list</span><span class="p">[:]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span><span class="o">.</span><span class="n">split_segment</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>      <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">([&lt;Handle object on (5, 5)&gt;], [&lt;gaphas.connector.LinePort object at 0x...&gt;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()</span>
+<span class="go">[&lt;Handle object on (0, 0)&gt;, &lt;Handle object on (5, 5)&gt;, &lt;Handle object on (10, 10)&gt;]</span>
+</pre></div>
+</div>
+</blockquote>
+<p>The opposite operation is performed with the merge_segment() method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()</span>
+<span class="go">[&lt;Handle object on (0, 0)&gt;, &lt;Handle object on (10, 10)&gt;]</span>
+</pre></div>
+</div>
+<p>Also creation and removal of connected lines is recorded and can be undone:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span> <span class="o">=</span> <span class="n">Canvas</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">real_connect</span><span class="p">(</span><span class="n">hitem</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">real_disconnect</span><span class="p">():</span>
+<span class="gp">... </span>        <span class="k">pass</span>
+<span class="gp">... </span>    <span class="n">canvas</span><span class="o">.</span><span class="n">connect_item</span><span class="p">(</span><span class="n">hitem</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">constraint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">real_disconnect</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b0</span> <span class="o">=</span> <span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b1</span> <span class="o">=</span> <span class="n">Item</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span> <span class="o">=</span> <span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">real_connect</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">],</span> <span class="n">b0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">real_connect</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">1</span><span class="p">],</span> <span class="n">b1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span>      <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">Connection(item=&lt;gaphas.item.Line object at 0x...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">1</span><span class="p">])</span>      <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">Connection(item=&lt;gaphas.item.Line object at 0x...&gt;)</span>
+</pre></div>
+</div>
+<p>Clear already collected undo data:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">undo_list</span><span class="p">[:]</span>
+</pre></div>
+</div>
+<p>Now remove the line from the canvas:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The handles are disconnected:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">canvas</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Undoing the remove() action should put everything back in place again:</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">canvas</span>                                        <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">&lt;gaphas.canvas.Canvas object at 0x...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">0</span><span class="p">])</span>      <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">Connection(item=&lt;gaphas.item.Line object at 0x...&gt;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">canvas</span><span class="o">.</span><span class="n">get_connection</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">1</span><span class="p">])</span>      <span class="c"># doctest: +ELLIPSIS</span>
+<span class="go">Connection(item=&lt;gaphas.item.Line object at 0x...&gt;)</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+<div class="section" id="solver-py-variable">
+<h3><a class="toc-backref" href="#id10">solver.py: Variable</a><a class="headerlink" href="#solver-py-variable" title="Permalink to this headline">¶</a></h3>
+<p>Variable&#8217;s strength and value properties are observed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.solver</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">strength</span> <span class="o">=</span> <span class="mf">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span>
+<span class="go">Variable(10, 100)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span>
+<span class="go">Variable(0, 20)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="solver-py-solver">
+<h3><a class="toc-backref" href="#id11">solver.py: Solver</a><a class="headerlink" href="#solver-py-solver" title="Permalink to this headline">¶</a></h3>
+<p>Solvers <tt class="docutils literal"><span class="pre">add_constraint()</span></tt> and <tt class="docutils literal"><span class="pre">remove_constraint()</span></tt> are observed.</p>
+<blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.solver</span> <span class="kn">import</span> <span class="n">Solver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gaphas.constraint</span> <span class="kn">import</span> <span class="n">EquationConstraint</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Solver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">EquationConstraint</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">))</span>
+<span class="go">EquationConstraint(&lt;lambda&gt;, a=Variable(1, 20), b=Variable(2, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+<span class="go">[EquationConstraint(&lt;lambda&gt;, a=Variable(1, 20), b=Variable(2, 20))]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">undo_list</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">redo_list</span><span class="p">[:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">undo</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">constraints_with_variable</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+<span class="go">[EquationConstraint(&lt;lambda&gt;, a=Variable(1, 20), b=Variable(2, 20))]</span>
+</pre></div>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Undo - implementing basic undo behaviour with Gaphas</a><ul>
+<li><a class="reference external" href="#undo-functionality-tests">Undo functionality tests</a><ul>
+<li><a class="reference external" href="#tree-py-tree">tree.py: Tree</a></li>
+<li><a class="reference external" href="#matrix-py-matrix">matrix.py: Matrix</a></li>
+<li><a class="reference external" href="#canvas-py-canvas">canvas.py: Canvas</a></li>
+<li><a class="reference external" href="#connector-py-handle">connector.py: Handle</a></li>
+<li><a class="reference external" href="#item-py-item">item.py: Item</a></li>
+<li><a class="reference external" href="#item-py-element">item.py: Element</a></li>
+<li><a class="reference external" href="#item-py-line">item.py: Line</a></li>
+<li><a class="reference external" href="#solver-py-variable">solver.py: Variable</a></li>
+<li><a class="reference external" href="#solver-py-solver">solver.py: Solver</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="state.html"
+                                  title="previous chapter">State management</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="quadtree.html"
+                                  title="next chapter">Quadtree implementation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/undo.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quadtree.html" title="Quadtree implementation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="state.html" title="State management"
+             >previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

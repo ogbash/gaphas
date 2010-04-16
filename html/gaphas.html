@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title><no title> &mdash; Gaphas v0.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.4 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="contents.html">Gaphas v0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <p>= Gaphas =</p>
+<p>Gaphas is Gaphor&#8217;s diagram drawing widget.</p>
+<p>Gaphas has been built with some extensibility in mind. It can be used for many drawing purposes, including vector drawing applications, diagram drawing tools and we even have a geographical map demo in our repository.</p>
+<p>The basic idea is:</p>
+<blockquote>
+<ul class="simple">
+<li>Items (canvas items) can be added to a Canvas.</li>
+<li>A Canvas can be visualized by one or more Views.</li>
+<li>The canvas maintains the tree structure (parent-child relationships between
+items).</li>
+<li>A constraint solver is used to maintain item constraints and inter-item
+constraints.</li>
+<li>The item (and user) should not be bothered with things like bounding-box
+calculations.</li>
+<li>Very modular: e.g. handle support could be swapped in and swapped out.</li>
+<li>Rendering using [<a class="reference external" href="http://cairographics.org">http://cairographics.org</a> Cairo].</li>
+</ul>
+</blockquote>
+<p>Gaphas is released under the terms of the GNU Library General Public License
+(LGPL).</p>
+<p>Read more about Gaphas in the [wiki:Tech Tech section].</p>
+<p>Gaphas has been build using setuptools and can be installed as Python Egg.</p>
+<blockquote>
+<ul class="simple">
+<li>Subversion: <a class="reference external" href="http://svn.devjavu.com/gaphor/gaphas/trunk">http://svn.devjavu.com/gaphor/gaphas/trunk</a></li>
+<li>Python Package index (PyPI): <a class="reference external" href="http://cheeseshop.python.org/pypi/gaphas">http://cheeseshop.python.org/pypi/gaphas</a></li>
+</ul>
+</blockquote>
+<p>== Class diagram ==</p>
+<p>This class diagram describes the basic layout of Gaphas.</p>
+<p>[[Image(gaphas-0.3.0-classes.png, nolink)]]</p>
+<p>Some highlights:</p>
+<blockquote>
+<dl class="docutils">
+<dt>Canvas::</dt>
+<dd>The main canvas class (container for Items)</dd>
+<dt>Item::</dt>
+<dd>Objects placed on a Canvas. Items can draw themselves, but not act on user events</dd>
+<dt>Solver::</dt>
+<dd>A constraint solver. Nice to have when you want to connect items together in a generic way.</dd>
+<dt>View::</dt>
+<dd>Base class that renders content ({{{paint()}}}). The view is responsible for the calculation of bounding boxes. This information is stored in a [wiki:Tech/Quadtree quadtree] data structure for fast access.</dd>
+<dt>!GtkView::</dt>
+<dd>A view to be used in GTK+ applications. This view class is interactive. Interaction with users is handled by Tools.</dd>
+<dt>Painter::</dt>
+<dd>Painters are the workers when it comes to painting items.</dd>
+<dt>Tool::</dt>
+<dd>Tools are used to handle user events (such as mouse movement and button presses).</dd>
+</dl>
+</blockquote>
+<p>The original model file can be found in the subversion repository: source:gaphas/trunk/gaphor-canvas.gaphor</p>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/gaphas.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="contents.html">Gaphas v0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.3.
+    </div>
+  </body>
+</html>

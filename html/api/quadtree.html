@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quadtree &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Lines, points and rectangles" href="geometry.html" />
+    <link rel="prev" title="Table structure" href="table.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="geometry.html" title="Lines, points and rectangles"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="table.html" title="Table structure"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.quadtree">
+<h1>Quadtree<a class="headerlink" href="#module-gaphas.quadtree" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.quadtree</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.quadtree.Quadtree">
+<em class="property">class </em><tt class="descclassname">gaphas.quadtree.</tt><tt class="descname">Quadtree</tt><big>(</big><em>bounds=(0</em>, <em>0</em>, <em>0</em>, <em>0)</em>, <em>capacity=10</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Quad-tree.</p>
+<p>Rectangles use the same scheme throughout Gaphas: (x, y, width, height).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span> <span class="o">=</span> <span class="n">Quadtree</span><span class="p">((</span><span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">100</span><span class="p">,</span> <span class="mf">100</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">20</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">qtree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">i</span> <span class="o">*</span> <span class="mf">4</span><span class="p">)</span> <span class="o">%</span> <span class="mf">90</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mf">10</span><span class="p">)</span> <span class="o">%</span> <span class="mf">90</span><span class="p">,</span> <span class="mf">10</span><span class="p">,</span> <span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">qtree</span><span class="p">)</span>
+<span class="go">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">dump</span><span class="p">()</span> <span class="c"># doctest: +ELLIPSIS +NORMALIZE_WHITESPACE</span>
+<span class="go"> &lt;....QuadtreeBucket object at 0x...&gt; (0, 0, 100, 100)</span>
+<span class="go">   11 (44, 20, 10, 10)</span>
+<span class="go">   12 (48, 30, 10, 10)</span>
+<span class="go">   &lt;....QuadtreeBucket object at 0x...&gt; (0, 0, 50.0, 50.0)</span>
+<span class="go">     0 (0, 0, 10, 10)</span>
+<span class="go">     1 (4, 10, 10, 10)</span>
+<span class="go">     10 (40, 10, 10, 10)</span>
+<span class="go">     2 (8, 20, 10, 10)</span>
+<span class="go">     3 (12, 30, 10, 10)</span>
+<span class="go">     4 (16, 40, 10, 10)</span>
+<span class="go">     9 (36, 0, 10, 10)</span>
+<span class="go">   &lt;....QuadtreeBucket object at 0x...&gt; (50.0, 0, 50.0, 50.0)</span>
+<span class="go">     13 (52, 40, 10, 10)</span>
+<span class="go">     18 (72, 0, 10, 10)</span>
+<span class="go">     19 (76, 10, 10, 10)</span>
+<span class="go">   &lt;....QuadtreeBucket object at 0x...&gt; (0, 50.0, 50.0, 50.0)</span>
+<span class="go">     5 (20, 50, 10, 10)</span>
+<span class="go">     6 (24, 60, 10, 10)</span>
+<span class="go">     7 (28, 70, 10, 10)</span>
+<span class="go">     8 (32, 80, 10, 10)</span>
+<span class="go">   &lt;....QuadtreeBucket object at 0x...&gt; (50.0, 50.0, 50.0, 50.0)</span>
+<span class="go">     14 (56, 50, 10, 10)</span>
+<span class="go">     15 (60, 60, 10, 10)</span>
+<span class="go">     16 (64, 70, 10, 10)</span>
+<span class="go">     17 (68, 80, 10, 10)</span>
+</pre></div>
+</div>
+<p>Find all items in the tree:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sorted</span><span class="p">(</span><span class="n">qtree</span><span class="o">.</span><span class="n">find_inside</span><span class="p">((</span><span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">100</span><span class="p">,</span> <span class="mf">100</span><span class="p">)))</span>
+<span class="go">[&#39;0&#39;, &#39;1&#39;, &#39;10&#39;, &#39;11&#39;, &#39;12&#39;, &#39;13&#39;, &#39;14&#39;, &#39;15&#39;, &#39;16&#39;, &#39;17&#39;, &#39;18&#39;, &#39;19&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;6&#39;, &#39;7&#39;, &#39;8&#39;, &#39;9&#39;]</span>
+</pre></div>
+</div>
+<p>Or just the items in a section of the tree:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sorted</span><span class="p">(</span><span class="n">qtree</span><span class="o">.</span><span class="n">find_inside</span><span class="p">((</span><span class="mf">40</span><span class="p">,</span> <span class="mf">40</span><span class="p">,</span> <span class="mf">40</span><span class="p">,</span> <span class="mf">40</span><span class="p">)))</span>
+<span class="go">[&#39;13&#39;, &#39;14&#39;, &#39;15&#39;, &#39;16&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sorted</span><span class="p">([</span><span class="n">qtree</span><span class="o">.</span><span class="n">get_bounds</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">qtree</span><span class="o">.</span><span class="n">find_inside</span><span class="p">((</span><span class="mf">40</span><span class="p">,</span> <span class="mf">40</span><span class="p">,</span> <span class="mf">40</span><span class="p">,</span> <span class="mf">40</span><span class="p">))])</span>
+<span class="go">[(52, 40, 10, 10), (56, 50, 10, 10), (60, 60, 10, 10), (64, 70, 10, 10)]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sorted</span><span class="p">(</span><span class="n">qtree</span><span class="o">.</span><span class="n">find_intersect</span><span class="p">((</span><span class="mf">40</span><span class="p">,</span> <span class="mf">40</span><span class="p">,</span> <span class="mf">20</span><span class="p">,</span> <span class="mf">20</span><span class="p">)))</span>
+<span class="go">[&#39;12&#39;, &#39;13&#39;, &#39;14&#39;, &#39;15&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sorted</span><span class="p">([</span><span class="n">qtree</span><span class="o">.</span><span class="n">get_bounds</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">qtree</span><span class="o">.</span><span class="n">find_intersect</span><span class="p">((</span><span class="mf">40</span><span class="p">,</span> <span class="mf">40</span><span class="p">,</span> <span class="mf">20</span><span class="p">,</span> <span class="mf">20</span><span class="p">))])</span>
+<span class="go">[(48, 30, 10, 10), (52, 40, 10, 10), (56, 50, 10, 10), (60, 60, 10, 10)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">rebuild</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.add">
+<tt class="descname">add</tt><big>(</big><em>item</em>, <em>bounds</em>, <em>data=None</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.add" title="Permalink to this definition">¶</a></dt>
+<dd>Add an item to the tree.
+If an item already exists, its bounds are updated and the item is
+moved to the right bucket.
+Data can be used to add some extra info to the item</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.quadtree.Quadtree.bounds">
+<tt class="descname">bounds</tt><a class="headerlink" href="#gaphas.quadtree.Quadtree.bounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.clear" title="Permalink to this definition">¶</a></dt>
+<dd>Remove all items from the tree.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.dump">
+<tt class="descname">dump</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.dump" title="Permalink to this definition">¶</a></dt>
+<dd>Print structure to stdout.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.find_inside">
+<tt class="descname">find_inside</tt><big>(</big><em>rect</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.find_inside" title="Permalink to this definition">¶</a></dt>
+<dd>Find all items in the given rectangle (x, y, with, height).
+Returns a set.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.find_intersect">
+<tt class="descname">find_intersect</tt><big>(</big><em>rect</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.find_intersect" title="Permalink to this definition">¶</a></dt>
+<dd>Find all items that intersect with the given rectangle
+(x, y, width, height).
+Returns a set.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.get_bounds">
+<tt class="descname">get_bounds</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.get_bounds" title="Permalink to this definition">¶</a></dt>
+<dd>Return the bounding box for the given item.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.get_clipped_bounds">
+<tt class="descname">get_clipped_bounds</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.get_clipped_bounds" title="Permalink to this definition">¶</a></dt>
+<dd>Return the bounding box for the given item. The bounding box is clipped
+on the boundries of the tree (provided on construction or with
+resize()).</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.get_data">
+<tt class="descname">get_data</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.get_data" title="Permalink to this definition">¶</a></dt>
+<dd>Return the data for the given item, None if no data was provided.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.get_soft_bounds">
+<tt class="descname">get_soft_bounds</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.get_soft_bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the size of all items in the tree. This size may be beyond
+the limits of the tree itself.</p>
+<p>Returns a tuple (x, y, width, height).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span> <span class="o">=</span> <span class="n">Quadtree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="mf">20</span><span class="p">,</span> <span class="mf">30</span><span class="p">,</span> <span class="mf">40</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;2&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="mf">30</span><span class="p">,</span> <span class="mf">40</span><span class="p">,</span> <span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">bounds</span>
+<span class="go">(0, 0, 0, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">soft_bounds</span>
+<span class="go">(10, 20, 50, 40)</span>
+</pre></div>
+</div>
+<p>Quadtree&#8217;s bounding box is not adjusted:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">bounds</span>
+<span class="go">(0, 0, 0, 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.rebuild">
+<tt class="descname">rebuild</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.rebuild" title="Permalink to this definition">¶</a></dt>
+<dd>Rebuild the tree structure.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.remove">
+<tt class="descname">remove</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.remove" title="Permalink to this definition">¶</a></dt>
+<dd>Remove an item from the tree.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.quadtree.Quadtree.resize">
+<tt class="descname">resize</tt><big>(</big><em>bounds</em><big>)</big><a class="headerlink" href="#gaphas.quadtree.Quadtree.resize" title="Permalink to this definition">¶</a></dt>
+<dd>Resize the tree.
+The tree structure is rebuild.</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.quadtree.Quadtree.soft_bounds">
+<tt class="descname">soft_bounds</tt><a class="headerlink" href="#gaphas.quadtree.Quadtree.soft_bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the size of all items in the tree. This size may be beyond
+the limits of the tree itself.</p>
+<p>Returns a tuple (x, y, width, height).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span> <span class="o">=</span> <span class="n">Quadtree</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mf">10</span><span class="p">,</span> <span class="mf">20</span><span class="p">,</span> <span class="mf">30</span><span class="p">,</span> <span class="mf">40</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;2&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mf">20</span><span class="p">,</span> <span class="mf">30</span><span class="p">,</span> <span class="mf">40</span><span class="p">,</span> <span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">bounds</span>
+<span class="go">(0, 0, 0, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">soft_bounds</span>
+<span class="go">(10, 20, 50, 40)</span>
+</pre></div>
+</div>
+<p>Quadtree&#8217;s bounding box is not adjusted:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">qtree</span><span class="o">.</span><span class="n">bounds</span>
+<span class="go">(0, 0, 0, 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="table.html"
+                                  title="previous chapter">Table structure</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="geometry.html"
+                                  title="next chapter">Lines, points and rectangles</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/quadtree.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geometry.html" title="Lines, points and rectangles"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="table.html" title="Table structure"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

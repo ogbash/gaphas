@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Table structure &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Quadtree" href="quadtree.html" />
+    <link rel="prev" title="Matrix" href="matrix.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="quadtree.html" title="Quadtree"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="matrix.html" title="Matrix"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.table">
+<h1>Table structure<a class="headerlink" href="#module-gaphas.table" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.table</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.table.Table">
+<em class="property">class </em><tt class="descclassname">gaphas.table.</tt><tt class="descname">Table</tt><big>(</big><em>columns</em>, <em>indexes</em><big>)</big><a class="headerlink" href="#gaphas.table.Table" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Table structure with indexing. Optimized for lookups.</p>
+<dl class="attribute">
+<dt id="gaphas.table.Table.columns">
+<tt class="descname">columns</tt><a class="headerlink" href="#gaphas.table.Table.columns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.table.Table.delete">
+<tt class="descname">delete</tt><big>(</big><em>*_row</em>, <em>**kv</em><big>)</big><a class="headerlink" href="#gaphas.table.Table.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove value from the table. Either a complete set may be given or
+just one entry in &#8220;column=value&#8221; style.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&quot;foo bar baz&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;v&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">))</span>
+<span class="go">[C(foo=&#39;a&#39;, bar=&#39;b&#39;, baz=&#39;c&#39;), C(foo=&#39;a&#39;, bar=&#39;v&#39;, baz=&#39;d&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">))</span>
+<span class="go">[C(foo=&#39;a&#39;, bar=&#39;v&#39;, baz=&#39;d&#39;)]</span>
+</pre></div>
+</div>
+<p>Query style:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">))</span>
+<span class="go">[C(foo=&#39;a&#39;, bar=&#39;b&#39;, baz=&#39;c&#39;), C(foo=&#39;a&#39;, bar=&#39;v&#39;, baz=&#39;d&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">))</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="mf">1</span><span class="p">))</span>
+<span class="go">[C(foo=1, bar=2, baz=3)]</span>
+</pre></div>
+</div>
+<p>Delete a non existent value:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;notPresent&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Cannot provide both a row and a query value:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">delete</span><span class="p">((</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="s">&#39;z&#39;</span><span class="p">),</span> <span class="n">foo</span><span class="o">=</span><span class="mf">1</span><span class="p">)</span>                  <span class="c"># doctest: +ELLIPSIS</span>
+<span class="gp">...</span>
+<span class="go">ValueError: Should either provide a row or a query statement, not both</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.table.Table.insert">
+<tt class="descname">insert</tt><big>(</big><em>*values</em><big>)</big><a class="headerlink" href="#gaphas.table.Table.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a set of values to the store.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&quot;foo bar baz&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The number of values should match the number of columns defined at
+construction time.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="s">&#39;z&#39;</span><span class="p">)</span>                          <span class="c"># doctest: +ELLIPSIS</span>
+<span class="gp">...</span>
+<span class="go">ValueError: Number of arguments doesn&#39;t match the number of columns (2 != 3)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.table.Table.query">
+<tt class="descname">query</tt><big>(</big><em>**kv</em><big>)</big><a class="headerlink" href="#gaphas.table.Table.query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rows (tuples) for each key defined. An iterator is returned.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">,</span> <span class="s">&quot;foo bar baz&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="mf">1</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="mf">2</span><span class="p">,</span> <span class="mf">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;v&#39;</span><span class="p">,</span> <span class="s">&#39;d&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">))</span>
+<span class="go">[C(foo=&#39;a&#39;, bar=&#39;b&#39;, baz=&#39;c&#39;), C(foo=&#39;a&#39;, bar=&#39;v&#39;, baz=&#39;d&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="s">&#39;v&#39;</span><span class="p">))</span>
+<span class="go">[C(foo=&#39;a&#39;, bar=&#39;v&#39;, baz=&#39;d&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="s">&#39;q&#39;</span><span class="p">))</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">bar</span><span class="o">=</span><span class="mf">2</span><span class="p">))</span>
+<span class="go">[C(foo=1, bar=2, baz=3)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="mf">42</span><span class="p">))</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">invalid_column_name</span><span class="o">=</span><span class="mf">42</span><span class="p">))</span>         <span class="c"># doctest: +ELLIPSIS</span>
+<span class="gp">...</span>
+<span class="go">KeyError: &quot;Invalid column &#39;invalid_column_name&#39;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">baz</span><span class="o">=</span><span class="mf">42</span><span class="p">))</span>                         <span class="c"># doctest: +ELLIPSIS</span>
+<span class="gp">...</span>
+<span class="go">AttributeError: Column &#39;baz&#39; is not indexed</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="matrix.html"
+                                  title="previous chapter">Matrix</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="quadtree.html"
+                                  title="next chapter">Quadtree</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/table.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quadtree.html" title="Quadtree"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="matrix.html" title="Matrix"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

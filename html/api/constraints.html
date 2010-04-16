@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Constraints &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Various utility functions" href="utils.html" />
+    <link rel="prev" title="Solver" href="solver.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Various utility functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="solver.html" title="Solver"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.constraint">
+<h1>Constraints<a class="headerlink" href="#module-gaphas.constraint" title="Permalink to this headline">¶</a></h1>
+<p>The default constraint classes provided by Gaphas</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.constraint</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.constraint.Constraint">
+<em class="property">class </em><tt class="descclassname">gaphas.constraint.</tt><tt class="descname">Constraint</tt><big>(</big><em>*variables</em><big>)</big><a class="headerlink" href="#gaphas.constraint.Constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constraint base class.</p>
+<ul class="simple">
+<li>_variables - list of all variables</li>
+<li>_weakest   - list of weakest variables</li>
+</ul>
+<dl class="method">
+<dt id="gaphas.constraint.Constraint.create_weakest_list">
+<tt class="descname">create_weakest_list</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.constraint.Constraint.create_weakest_list" title="Permalink to this definition">¶</a></dt>
+<dd>Create list of weakest variables.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.constraint.Constraint.mark_dirty">
+<tt class="descname">mark_dirty</tt><big>(</big><em>v</em><big>)</big><a class="headerlink" href="#gaphas.constraint.Constraint.mark_dirty" title="Permalink to this definition">¶</a></dt>
+<dd>Mark variable v dirty and if possible move it to the end of
+Constraint._weakest list to maintain weakest variable invariants
+(see gaphas.solver module documentation).</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.constraint.Constraint.solve_for">
+<tt class="descname">solve_for</tt><big>(</big><em>var</em><big>)</big><a class="headerlink" href="#gaphas.constraint.Constraint.solve_for" title="Permalink to this definition">¶</a></dt>
+<dd>Solve the constraint for a given variable.
+The variable itself is updated.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.constraint.Constraint.variables">
+<tt class="descname">variables</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.constraint.Constraint.variables" title="Permalink to this definition">¶</a></dt>
+<dd>Return an iterator which iterates over the variables that are
+held by this constraint.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.constraint.Constraint.weakest">
+<tt class="descname">weakest</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.constraint.Constraint.weakest" title="Permalink to this definition">¶</a></dt>
+<dd>Return the weakest variable. The weakest variable should be always
+as first element of Constraint._weakest list.</dd></dl>
+
+</dd></dl>
+
+<p>TODO: And the rest</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="solver.html"
+                                  title="previous chapter">Solver</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="utils.html"
+                                  title="next chapter">Various utility functions</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/constraints.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Various utility functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="solver.html" title="Solver"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

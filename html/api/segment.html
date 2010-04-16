@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Line segmentation &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Alignment helper: Guide" href="guide.html" />
+    <link rel="prev" title="Aspects" href="aspects.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="guide.html" title="Alignment helper: Guide"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="aspects.html" title="Aspects"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.segment">
+<h1>Line segmentation<a class="headerlink" href="#module-gaphas.segment" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.segment</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.segment.Segment">
+<em class="property">class </em><tt class="descclassname">gaphas.segment.</tt><tt class="descname">Segment</tt><big>(</big><em>item</em>, <em>view</em><big>)</big><a class="headerlink" href="#gaphas.segment.Segment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="gaphas.segment.Segment.default">
+<tt class="descname">default</tt><a class="headerlink" href="#gaphas.segment.Segment.default" title="Permalink to this definition">¶</a></dt>
+<dd>alias of <a title="gaphas.segment.Segment" class="reference internal" href="#gaphas.segment.Segment"><tt class="xref docutils literal"><span class="pre">Segment</span></tt></a></dd></dl>
+
+<dl class="staticmethod">
+<dt id="gaphas.segment.Segment.has_object">
+<em class="property">static </em><tt class="descname">has_object</tt><big>(</big><em>o</em><big>)</big><a class="headerlink" href="#gaphas.segment.Segment.has_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="gaphas.segment.Segment.has_type">
+<em class="property">static </em><tt class="descname">has_type</tt><big>(</big><em>t</em><big>)</big><a class="headerlink" href="#gaphas.segment.Segment.has_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="gaphas.segment.Segment.when_object">
+<em class="property">static </em><tt class="descname">when_object</tt><big>(</big><em>o</em><big>)</big><a class="headerlink" href="#gaphas.segment.Segment.when_object" title="Permalink to this definition">¶</a></dt>
+<dd>Decorator to add a method that will be called for object <cite>o</cite></dd></dl>
+
+<dl class="staticmethod">
+<dt id="gaphas.segment.Segment.when_type">
+<em class="property">static </em><tt class="descname">when_type</tt><big>(</big><em>t</em><big>)</big><a class="headerlink" href="#gaphas.segment.Segment.when_type" title="Permalink to this definition">¶</a></dt>
+<dd>Decorator to add a method that will be called for type <cite>t</cite></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.segment.LineSegment">
+<em class="property">class </em><tt class="descclassname">gaphas.segment.</tt><tt class="descname">LineSegment</tt><big>(</big><em>item</em>, <em>view</em><big>)</big><a class="headerlink" href="#gaphas.segment.LineSegment" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="gaphas.segment.LineSegment.merge_segment">
+<tt class="descname">merge_segment</tt><big>(</big><em>segment</em>, <em>count=2</em><big>)</big><a class="headerlink" href="#gaphas.segment.LineSegment.merge_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge two (or more) item segments.</p>
+<p>Tuple of two lists is returned, list of deleted handles and list of
+deleted ports.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt>segment</dt>
+<dd><p class="first last">Segment number to start merging from (starting from zero).</p>
+</dd>
+<dt>count</dt>
+<dd><p class="first last">Amount of segments to be merged (minimum 2).</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.segment.LineSegment.split">
+<tt class="descname">split</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.segment.LineSegment.split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.segment.LineSegment.split_segment">
+<tt class="descname">split_segment</tt><big>(</big><em>segment</em>, <em>count=2</em><big>)</big><a class="headerlink" href="#gaphas.segment.LineSegment.split_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split one item segment into <tt class="docutils literal"><span class="pre">count</span></tt> equal pieces.</p>
+<p>Two lists are returned</p>
+<ul class="simple">
+<li>list of created handles</li>
+<li>list of created ports</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt>segment</dt>
+<dd><p class="first last">Segment number to split (starting from zero).</p>
+</dd>
+<dt>count</dt>
+<dd><p class="first last">Amount of new segments to be created (minimum 2).</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.segment.SegmentHandleFinder">
+<em class="property">class </em><tt class="descclassname">gaphas.segment.</tt><tt class="descname">SegmentHandleFinder</tt><big>(</big><em>item</em>, <em>view</em><big>)</big><a class="headerlink" href="#gaphas.segment.SegmentHandleFinder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a handle on a line, create a new one if the mouse is located
+between two handles. The position aligns with the points drawn by
+the SegmentPainter.</p>
+<dl class="method">
+<dt id="gaphas.segment.SegmentHandleFinder.get_handle_at_point">
+<tt class="descname">get_handle_at_point</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.segment.SegmentHandleFinder.get_handle_at_point" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.segment.SegmentHandleSelection">
+<em class="property">class </em><tt class="descclassname">gaphas.segment.</tt><tt class="descname">SegmentHandleSelection</tt><big>(</big><em>item</em>, <em>handle</em>, <em>view</em><big>)</big><a class="headerlink" href="#gaphas.segment.SegmentHandleSelection" title="Permalink to this definition">¶</a></dt>
+<dd><p>In addition to the default behaviour, merge segments if the handle is
+released.</p>
+<dl class="method">
+<dt id="gaphas.segment.SegmentHandleSelection.unselect">
+<tt class="descname">unselect</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.segment.SegmentHandleSelection.unselect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.segment.LineSegmentPainter">
+<em class="property">class </em><tt class="descclassname">gaphas.segment.</tt><tt class="descname">LineSegmentPainter</tt><big>(</big><em>item</em>, <em>view</em><big>)</big><a class="headerlink" href="#gaphas.segment.LineSegmentPainter" title="Permalink to this definition">¶</a></dt>
+<dd><p>This painter draws pseudo-hanldes on gaphas.item.Line objects. Each
+line can be split by dragging those points, which will result in
+a new handle.</p>
+<p>ConnectHandleTool take care of performing the user
+interaction required for this feature.</p>
+<dl class="method">
+<dt id="gaphas.segment.LineSegmentPainter.paint">
+<tt class="descname">paint</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.segment.LineSegmentPainter.paint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="aspects.html"
+                                  title="previous chapter">Aspects</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="guide.html"
+                                  title="next chapter">Alignment helper: Guide</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/segment.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="guide.html" title="Alignment helper: Guide"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="aspects.html" title="Aspects"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Decorators &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="prev" title="Lines, points and rectangles" href="geometry.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="geometry.html" title="Lines, points and rectangles"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.decorators">
+<h1>Decorators<a class="headerlink" href="#module-gaphas.decorators" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.decorators</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.decorators.async">
+<em class="property">class </em><tt class="descclassname">gaphas.decorators.</tt><tt class="descname">async</tt><big>(</big><em>single=False</em>, <em>timeout=0</em>, <em>priority=0</em><big>)</big><a class="headerlink" href="#gaphas.decorators.async" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instead of calling the function, schedule an idle handler at a given
+priority. This requires the async&#8217;ed method to be called from within
+the GTK main loop. Otherwise the method is executed directly.</p>
+<dl class="docutils">
+<dt>Note:</dt>
+<dd>the current implementation of async single mode only works for
+methods, not functions.</dd>
+</dl>
+<p>Calling the async function from outside the gtk main loop will yield
+imediate execution:</p>
+<p>async just works on functions (as long as <tt class="docutils literal"><span class="pre">single=False</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">async</span><span class="p">()(</span><span class="k">lambda</span><span class="p">:</span> <span class="s">&#39;Hi&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">()</span>
+<span class="go">&#39;Hi&#39;</span>
+</pre></div>
+</div>
+<p>Simple method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@async</span><span class="p">(</span><span class="n">single</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="n">gobject</span><span class="o">.</span><span class="n">PRIORITY_HIGH</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&#39;idle-a&#39;</span><span class="p">,</span> <span class="n">gobject</span><span class="o">.</span><span class="n">main_depth</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Methods can also set single mode to True (the method is only scheduled one).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@async</span><span class="p">(</span><span class="n">single</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">b</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&#39;idle-b&#39;</span><span class="p">,</span> <span class="n">gobject</span><span class="o">.</span><span class="n">main_depth</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Also a timeout property can be provided:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@async</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">50</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">c1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&#39;idle-c1&#39;</span><span class="p">,</span> <span class="n">gobject</span><span class="o">.</span><span class="n">main_depth</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="nd">@async</span><span class="p">(</span><span class="n">single</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">60</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">c2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&#39;idle-c2&#39;</span><span class="p">,</span> <span class="n">gobject</span><span class="o">.</span><span class="n">main_depth</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This is a helper function used to test classes A and B from within the GTK+
+main loop:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">delayed</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;before&#39;</span>
+<span class="gp">... </span>    <span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">b</span> <span class="o">=</span> <span class="n">B</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">c</span> <span class="o">=</span> <span class="n">C</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">c</span><span class="o">.</span><span class="n">c1</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">c</span><span class="o">.</span><span class="n">c1</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">c</span><span class="o">.</span><span class="n">c2</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">c</span><span class="o">.</span><span class="n">c2</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">a</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">b</span><span class="o">.</span><span class="n">b</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">a</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">b</span><span class="o">.</span><span class="n">b</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">a</span><span class="o">.</span><span class="n">a</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">b</span><span class="o">.</span><span class="n">b</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;after&#39;</span>
+<span class="gp">... </span>    <span class="n">gobject</span><span class="o">.</span><span class="n">timeout_add</span><span class="p">(</span><span class="mf">100</span><span class="p">,</span> <span class="n">gtk</span><span class="o">.</span><span class="n">main_quit</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gobject</span><span class="o">.</span><span class="n">timeout_add</span><span class="p">(</span><span class="mf">1</span><span class="p">,</span> <span class="n">delayed</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0</span> <span class="c"># timeout id may vary</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gtk</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gtk</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+<span class="go">before</span>
+<span class="go">after</span>
+<span class="go">idle-a 1</span>
+<span class="go">idle-a 1</span>
+<span class="go">idle-a 1</span>
+<span class="go">idle-b 1</span>
+<span class="go">idle-c1 1</span>
+<span class="go">idle-c1 1</span>
+<span class="go">idle-c2 1</span>
+</pre></div>
+</div>
+<p>As you can see, although <tt class="docutils literal"><span class="pre">b.b()</span></tt> has been called three times, it&#8217;s only
+executed once.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gaphas.decorators.nonrecursive">
+<tt class="descclassname">gaphas.decorators.</tt><tt class="descname">nonrecursive</tt><big>(</big><em>func</em><big>)</big><a class="headerlink" href="#gaphas.decorators.nonrecursive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enforce a function or method is not executed recursively:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@nonrecursive</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">1</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="n">x</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mf">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">()</span><span class="o">.</span><span class="n">a</span><span class="p">()</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span><span class="p">()</span><span class="o">.</span><span class="n">a</span><span class="p">()</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.decorators.recursive">
+<em class="property">class </em><tt class="descclassname">gaphas.decorators.</tt><tt class="descname">recursive</tt><big>(</big><em>limit=10000</em><big>)</big><a class="headerlink" href="#gaphas.decorators.recursive" title="Permalink to this definition">¶</a></dt>
+<dd><p>This decorator limits the recursion for a specific function</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="mf">0</span>
+<span class="gp">... </span>   <span class="nd">@recursive</span><span class="p">(</span><span class="mf">10</span><span class="p">)</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mf">0</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">+=</span> <span class="mf">1</span>
+<span class="gp">... </span>       <span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">a</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">r</span>
+<span class="go">10</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="geometry.html"
+                                  title="previous chapter">Lines, points and rectangles</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/decorators.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="geometry.html" title="Lines, points and rectangles"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

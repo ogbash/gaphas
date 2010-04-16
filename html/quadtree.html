@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quadtree implementation &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="index.html" />
+    <link rel="next" title="Constraint Solver" href="solver.html" />
+    <link rel="prev" title="Undo - implementing basic undo behaviour with Gaphas" href="undo.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="solver.html" title="Constraint Solver"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="undo.html" title="Undo - implementing basic undo behaviour with Gaphas"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quadtree-implementation">
+<h1>Quadtree implementation<a class="headerlink" href="#quadtree-implementation" title="Permalink to this headline">¶</a></h1>
+<p>In order to find items and handles fast on a 2D surface, a geometric structure is required.</p>
+<p>There are two popular variants: <a class="reference external" href="http://en.wikipedia.org/wiki/Quadtree">Quadtrees</a> and <a class="reference external" href="http://en.wikipedia.org/wiki/R-tree">R-trees</a>. R-trees are tough and
+well suited for non-moving data. Quadtrees are easier to understand and easier
+to maintain.</p>
+<p>Idea:</p>
+<ul class="simple">
+<li>Divide the view in 4 quadrants and place each item in a quadrant.</li>
+<li>When a quadrant has more than &#8216;&#8217;x&#8217;&#8217; elements, divide it again.</li>
+<li>When an item overlaps more than one quadrant, it&#8217;s added to the owner.</li>
+</ul>
+<p>Gaphas uses item bounding boxed to determine where items should be put.</p>
+<p>It is also possible to relocate or remove items to the tree.</p>
+<p>The Quadtree itself is added as part of Gaphas&#8217; View. The view is aware of
+item&#8217;s bounding boxes as it is responsible for user interaction. The Quadtree
+is set to the size of the window. As a result items which are part of the
+diagram, may be placed outside the window and thus will not be added to the
+quadtree. Item&#8217;s that are partly in- and partly outside the window will be
+clipped.</p>
+<div class="section" id="interface">
+<h2>Interface<a class="headerlink" href="#interface" title="Permalink to this headline">¶</a></h2>
+<p>The Quadtree interface is simple and tailored towards the use cases of
+gaphas.</p>
+<p>Important properties:</p>
+<ul class="simple">
+<li>bounds: boundaries of the canvas/view</li>
+</ul>
+<p>Methods for working with items in the quadtree:</p>
+<ul class="simple">
+<li><cite>add(item, bounds)</cite>: add an item to the quadtree</li>
+<li><cite>remove(item)</cite>: remove item from the tree</li>
+<li><cite>update(item, new_bounds)</cite>: replace an item in the quadtree, using it&#8217;s new boundaries.</li>
+<li>Multiple ways of finding items have been implemented:
+1. Find item closest to point
+2. Find all items within distance <cite>d</cite> of a point
+3. Find all items inside a rectangle
+4. Find all items inside or intersecting with a rectangle</li>
+</ul>
+<p>Methods working on the quadtree itself:</p>
+<ul class="simple">
+<li><cite>resize(new_bounds)</cite>: stretch the boundaries of the quadtree if necessary.</li>
+</ul>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>The implementation of gaphas&#8217; Quadtree can be found at <a class="reference external" href="http://github.com/amolenaar/gaphas/trees/blob/gaphas/quadtree.py">http://github.com/amolenaar/gaphas/trees/blob/gaphas/quadtree.py</a>.</p>
+<p>Here&#8217;s an example of the Quadtree in action (Gaphas&#8217; demo app with <cite>gaphas.view.DEBUG_DRAW_QUADTREE</cite> enabled):</p>
+<img alt="_images/quadtree.png" src="_images/quadtree.png" />
+<p>The screen is divided into four equal quadrants. The first quadrant has many items, therefore it has been divided again.</p>
+<div class="section" id="references">
+<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
+<p>(Roids)
+<a class="reference external" href="http://roids.slowchop.com/roids/browser/trunk/src/quadtree.py">http://roids.slowchop.com/roids/browser/trunk/src/quadtree.py</a></p>
+<p>(???)
+<a class="reference external" href="http://mu.arete.cc/pcr/syntax/quadtree/1/quadtree.py">http://mu.arete.cc/pcr/syntax/quadtree/1/quadtree.py</a></p>
+<p>(!PyGame)
+<a class="reference external" href="http://www.pygame.org/wiki/QuadTree?parent=CookBook">http://www.pygame.org/wiki/QuadTree?parent=CookBook</a></p>
+<p>(PythonCAD)
+<a class="reference external" href="http://www.koders.com/python/fidB93B4D02B1C4E9F90F351736873DF6BE4D8D5783.aspx">http://www.koders.com/python/fidB93B4D02B1C4E9F90F351736873DF6BE4D8D5783.aspx</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Quadtree implementation</a><ul>
+<li><a class="reference external" href="#interface">Interface</a></li>
+<li><a class="reference external" href="#implementation">Implementation</a><ul>
+<li><a class="reference external" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="undo.html"
+                                  title="previous chapter">Undo - implementing basic undo behaviour with Gaphas</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="solver.html"
+                                  title="next chapter">Constraint Solver</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/quadtree.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="solver.html" title="Constraint Solver"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="undo.html" title="Undo - implementing basic undo behaviour with Gaphas"
+             >previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

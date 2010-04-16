@@ -1,0 +1,15 @@
+##########
+Decorators
+##########
+
+:mod: `gaphor.decorators`
+---------------------
+
+.. module:: gaphas.decorators
+
+.. autoclass:: async
+
+.. autofunction:: nonrecursive
+
+.. autoclass:: recursive
+

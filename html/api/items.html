@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Items &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Handles and ports" href="connectors.html" />
+    <link rel="prev" title="Canvas" href="canvas.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="connectors.html" title="Handles and ports"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="canvas.html" title="Canvas"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.item">
+<h1>Items<a class="headerlink" href="#module-gaphas.item" title="Permalink to this headline">¶</a></h1>
+<p>Items are put on a Canvas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.item</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.item.Item">
+<em class="property">class </em><tt class="descclassname">gaphas.item.</tt><tt class="descname">Item</tt><a class="headerlink" href="#gaphas.item.Item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class (or interface) for items on a canvas.Canvas.</p>
+<p>Attributes:</p>
+<ul class="simple">
+<li>matrix: item&#8217;s transformation matrix</li>
+<li>canvas: canvas, which owns an item</li>
+<li>constraints: list of item constraints, automatically registered
+when the item is added to a canvas; may be extended in subclasses</li>
+</ul>
+<p>Private:</p>
+<ul class="simple">
+<li>_canvas:      canvas, which owns an item</li>
+<li>_handles:     list of handles owned by an item</li>
+<li>_ports:       list of ports, connectable areas of an item</li>
+<li>_matrix_i2c:  item to canvas coordinates matrix</li>
+<li>_matrix_c2i:  canvas to item coordinates matrix</li>
+<li>_matrix_i2v:  item to view coordinates matrices</li>
+<li>_matrix_v2i:  view to item coordinates matrices</li>
+<li>_sort_key:  used to sort items</li>
+<li>_canvas_projections:  used to sort items</li>
+</ul>
+<dl class="attribute">
+<dt id="gaphas.item.Item.canvas">
+<tt class="descname">canvas</tt><a class="headerlink" href="#gaphas.item.Item.canvas" title="Permalink to this definition">¶</a></dt>
+<dd>Canvas owning this item</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.constraint">
+<tt class="descname">constraint</tt><big>(</big><em>horizontal=None</em>, <em>vertical=None</em>, <em>left_of=None</em>, <em>above=None</em>, <em>line=None</em>, <em>delta=0.0</em>, <em>align=None</em><big>)</big><a class="headerlink" href="#gaphas.item.Item.constraint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility (factory) method to create item&#8217;s internal constraint between
+two positions or between a position and a line.</p>
+<p>Position is a tuple of coordinates, i.e. <tt class="docutils literal"><span class="pre">(2,</span> <span class="pre">4)</span></tt>.</p>
+<p>Line is a tuple of positions, i.e. <tt class="docutils literal"><span class="pre">((2,</span> <span class="pre">3),</span> <span class="pre">(4,</span> <span class="pre">2))</span></tt>.</p>
+<p>This method shall not be used to create constraints between
+two different items.</p>
+<p>Created constraint is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt>horizontal=(p1, p2)</dt>
+<dd><p class="first last">Keep positions <tt class="docutils literal"><span class="pre">p1</span></tt> and <tt class="docutils literal"><span class="pre">p2</span></tt> aligned horizontally.</p>
+</dd>
+<dt>vertical=(p1, p2)</dt>
+<dd><p class="first last">Keep positions <tt class="docutils literal"><span class="pre">p1</span></tt> and <tt class="docutils literal"><span class="pre">p2</span></tt> aligned vertically.</p>
+</dd>
+<dt>left_of=(p1, p2)</dt>
+<dd><p class="first last">Keep position <tt class="docutils literal"><span class="pre">p1</span></tt> on the left side of position <tt class="docutils literal"><span class="pre">p2</span></tt>.</p>
+</dd>
+<dt>above=(p1, p2)</dt>
+<dd><p class="first last">Keep position <tt class="docutils literal"><span class="pre">p1</span></tt> above position <tt class="docutils literal"><span class="pre">p2</span></tt>.</p>
+</dd>
+<dt>line=(p, l)</dt>
+<dd><p class="first last">Keep position <tt class="docutils literal"><span class="pre">p</span></tt> on line <tt class="docutils literal"><span class="pre">l</span></tt>.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Item.constraints">
+<tt class="descname">constraints</tt><a class="headerlink" href="#gaphas.item.Item.constraints" title="Permalink to this definition">¶</a></dt>
+<dd>Item constraints</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.draw">
+<tt class="descname">draw</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.item.Item.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render the item to a canvas view.
+Context contains the following attributes:</p>
+<ul class="simple">
+<li>cairo: the Cairo Context use this one to draw</li>
+<li>view: the view that is to be rendered to</li>
+<li>selected, focused, hovered, dropzone: view state of items (True/False)</li>
+<li>draw_all: a request to draw everything, for bounding box calculations</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.handles">
+<tt class="descname">handles</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.item.Item.handles" title="Permalink to this definition">¶</a></dt>
+<dd>Return a list of handles owned by the item.</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Item.matrix">
+<tt class="descname">matrix</tt><a class="headerlink" href="#gaphas.item.Item.matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.normalize">
+<tt class="descname">normalize</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.item.Item.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update handle positions of the item, so the first handle is always
+located at (0, 0).</p>
+<p>Note that, since this method basically does some housekeeping during
+the update phase, there&#8217;s no need to keep track of the changes.</p>
+<p>Alternative implementation can also be created, e.g. set (0, 0) in
+the center of a circle or change it depending on the location of a
+rotation point.</p>
+<p>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if some updates have been done, <tt class="xref docutils literal"><span class="pre">False</span></tt> otherwise.</p>
+<p>See <tt class="docutils literal"><span class="pre">canvas._normalize()</span></tt> for tests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.point">
+<tt class="descname">point</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.item.Item.point" title="Permalink to this definition">¶</a></dt>
+<dd>Get the distance from a point (<tt class="docutils literal"><span class="pre">x</span></tt>, <tt class="docutils literal"><span class="pre">y</span></tt>) to the item.
+<tt class="docutils literal"><span class="pre">x</span></tt> and <tt class="docutils literal"><span class="pre">y</span></tt> are in item coordinates.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.ports">
+<tt class="descname">ports</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.item.Item.ports" title="Permalink to this definition">¶</a></dt>
+<dd>Return list of ports.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.post_update">
+<tt class="descname">post_update</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.item.Item.post_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called after item update.</p>
+<p>If some variables should be used during drawing or in another
+update, then they should be calculated in post method.</p>
+<p>Changing matrix or moving handles programmatically is really not
+advised to be performed here.</p>
+<p>All canvas invariants are true.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.pre_update">
+<tt class="descname">pre_update</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.item.Item.pre_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform any changes before item update here, for example:</p>
+<ul class="simple">
+<li>change matrix</li>
+<li>move handles</li>
+</ul>
+<p>Gaphas does not guarantee that any canvas invariant is valid at
+this point (i.e. constraints are not solved, first handle is not in
+position (0, 0), etc).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.request_update">
+<tt class="descname">request_update</tt><big>(</big><em>update=True</em>, <em>matrix=True</em><big>)</big><a class="headerlink" href="#gaphas.item.Item.request_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.setup_canvas">
+<tt class="descname">setup_canvas</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.item.Item.setup_canvas" title="Permalink to this definition">¶</a></dt>
+<dd>Called when the canvas is set for the item.
+This method can be used to create constraints.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Item.teardown_canvas">
+<tt class="descname">teardown_canvas</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.item.Item.teardown_canvas" title="Permalink to this definition">¶</a></dt>
+<dd>Called when the canvas is unset for the item.
+This method can be used to dispose constraints.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.item.Element">
+<em class="property">class </em><tt class="descclassname">gaphas.item.</tt><tt class="descname">Element</tt><big>(</big><em>width=10</em>, <em>height=10</em><big>)</big><a class="headerlink" href="#gaphas.item.Element" title="Permalink to this definition">¶</a></dt>
+<dd><p>An Element has 4 handles (for a start):</p>
+<div class="highlight-python"><pre>NW +---+ NE
+   |   |
+SW +---+ SE</pre>
+</div>
+<dl class="attribute">
+<dt id="gaphas.item.Element.height">
+<tt class="descname">height</tt><a class="headerlink" href="#gaphas.item.Element.height" title="Permalink to this definition">¶</a></dt>
+<dd>Height.</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Element.min_height">
+<tt class="descname">min_height</tt><a class="headerlink" href="#gaphas.item.Element.min_height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Element.min_width">
+<tt class="descname">min_width</tt><a class="headerlink" href="#gaphas.item.Element.min_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Element.point">
+<tt class="descname">point</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.item.Element.point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Distance from the point (x, y) to the item.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Element</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">point</span><span class="p">((</span><span class="mf">20</span><span class="p">,</span> <span class="mf">10</span><span class="p">))</span>
+<span class="go">10.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Element.setup_canvas">
+<tt class="descname">setup_canvas</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.item.Element.setup_canvas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Element.width">
+<tt class="descname">width</tt><a class="headerlink" href="#gaphas.item.Element.width" title="Permalink to this definition">¶</a></dt>
+<dd>Width of the box, calculated as the distance from the left and
+right handle.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.item.Line">
+<em class="property">class </em><tt class="descclassname">gaphas.item.</tt><tt class="descname">Line</tt><a class="headerlink" href="#gaphas.item.Line" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Line item.</p>
+<dl class="docutils">
+<dt>Properties:</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>fuzziness (0.0..n): an extra margin that should be taken into account</dt>
+<dd><p class="first last">when calculating the distance from the line (using point()).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>orthogonal (bool): wherther or not the line should be orthogonal</dt>
+<dd><p class="first last">(only straight angles)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">horizontal: first line segment is horizontal</p>
+</li>
+<li><p class="first">line_width: width of the line to be drawn</p>
+</li>
+</ul>
+</dd>
+</dl>
+<p>This line also supports arrow heads on both the begin and end of the
+line. These are drawn with the methods draw_head(context) and
+draw_tail(context). The coordinate system is altered so the methods do
+not have to know about the angle of the line segment (e.g. drawing a line
+from (10, 10) via (0, 0) to (10, -10) will draw an arrow point).</p>
+<dl class="method">
+<dt id="gaphas.item.Line.closest_segment">
+<tt class="descname">closest_segment</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.item.Line.closest_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain a tuple (distance, point_on_line, segment).
+Distance is the distance from point to the closest line segment 
+Point_on_line is the reflection of the point on the line.
+Segment is the line segment closest to (x, y)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">closest_segment</span><span class="p">((</span><span class="mf">4</span><span class="p">,</span> <span class="mf">5</span><span class="p">))</span>
+<span class="go">(0.70710678118654757, (4.5, 4.5), 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Line.draw">
+<tt class="descname">draw</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.item.Line.draw" title="Permalink to this definition">¶</a></dt>
+<dd>Draw the line itself.
+See Item.draw(context).</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Line.draw_head">
+<tt class="descname">draw_head</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.item.Line.draw_head" title="Permalink to this definition">¶</a></dt>
+<dd>Default head drawer: move cursor to the first handle.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Line.draw_tail">
+<tt class="descname">draw_tail</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.item.Line.draw_tail" title="Permalink to this definition">¶</a></dt>
+<dd>Default tail drawer: draw line to the last handle.</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Line.fuzziness">
+<tt class="descname">fuzziness</tt><a class="headerlink" href="#gaphas.item.Line.fuzziness" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Line.horizontal">
+<tt class="descname">horizontal</tt><a class="headerlink" href="#gaphas.item.Line.horizontal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Line.line_width">
+<tt class="descname">line_width</tt><a class="headerlink" href="#gaphas.item.Line.line_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Line.opposite">
+<tt class="descname">opposite</tt><big>(</big><em>handle</em><big>)</big><a class="headerlink" href="#gaphas.item.Line.opposite" title="Permalink to this definition">¶</a></dt>
+<dd>Given the handle of one end of the line, return the other end.</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.item.Line.orthogonal">
+<tt class="descname">orthogonal</tt><a class="headerlink" href="#gaphas.item.Line.orthogonal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Line.point">
+<tt class="descname">point</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.item.Line.point" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Line</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">handles</span><span class="p">()[</span><span class="mf">1</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="mf">25</span><span class="p">,</span> <span class="mf">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">_handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">_create_handle</span><span class="p">((</span><span class="mf">30</span><span class="p">,</span> <span class="mf">30</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">point</span><span class="p">((</span><span class="o">-</span><span class="mf">1</span><span class="p">,</span> <span class="mf">0</span><span class="p">))</span>
+<span class="go">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s">&#39;</span><span class="si">%.3f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">a</span><span class="o">.</span><span class="n">point</span><span class="p">((</span><span class="mf">5</span><span class="p">,</span> <span class="mf">4</span><span class="p">))</span>
+<span class="go">&#39;2.942&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s">&#39;</span><span class="si">%.3f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">a</span><span class="o">.</span><span class="n">point</span><span class="p">((</span><span class="mf">29</span><span class="p">,</span> <span class="mf">29</span><span class="p">))</span>
+<span class="go">&#39;0.784&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Line.post_update">
+<tt class="descname">post_update</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.item.Line.post_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Line.setup_canvas">
+<tt class="descname">setup_canvas</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.item.Line.setup_canvas" title="Permalink to this definition">¶</a></dt>
+<dd>Setup constraints. In this case orthogonal.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.item.Line.teardown_canvas">
+<tt class="descname">teardown_canvas</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.item.Line.teardown_canvas" title="Permalink to this definition">¶</a></dt>
+<dd>Remove constraints created in setup_canvas().</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="canvas.html"
+                                  title="previous chapter">Canvas</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="connectors.html"
+                                  title="next chapter">Handles and ports</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/items.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="connectors.html" title="Handles and ports"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="canvas.html" title="Canvas"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

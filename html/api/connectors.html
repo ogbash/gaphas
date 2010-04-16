@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Handles and ports &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Solver" href="solver.html" />
+    <link rel="prev" title="Items" href="items.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="solver.html" title="Solver"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="items.html" title="Items"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.connector">
+<h1>Handles and ports<a class="headerlink" href="#module-gaphas.connector" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.connector</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.connector.Position">
+<em class="property">class </em><tt class="descclassname">gaphas.connector.</tt><tt class="descname">Position</tt><big>(</big><em>pos</em>, <em>strength=20</em><big>)</big><a class="headerlink" href="#gaphas.connector.Position" title="Permalink to this definition">¶</a></dt>
+<dd><p>A point constructed of two <cite>Variable</cite>&#8216;s.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">vp</span> <span class="o">=</span> <span class="n">Position</span><span class="p">((</span><span class="mf">3</span><span class="p">,</span> <span class="mf">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vp</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="o">.</span><span class="n">y</span>
+<span class="go">(Variable(3, 20), Variable(5, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vp</span><span class="o">.</span><span class="n">pos</span>
+<span class="go">(Variable(3, 20), Variable(5, 20))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vp</span><span class="p">[</span><span class="mf">0</span><span class="p">],</span> <span class="n">vp</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span>
+<span class="go">(Variable(3, 20), Variable(5, 20))</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="gaphas.connector.Position.pos">
+<tt class="descname">pos</tt><a class="headerlink" href="#gaphas.connector.Position.pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.connector.Position.x">
+<tt class="descname">x</tt><a class="headerlink" href="#gaphas.connector.Position.x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.connector.Position.y">
+<tt class="descname">y</tt><a class="headerlink" href="#gaphas.connector.Position.y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.connector.Handle">
+<em class="property">class </em><tt class="descclassname">gaphas.connector.</tt><tt class="descname">Handle</tt><big>(</big><em>pos=(0</em>, <em>0)</em>, <em>strength=20</em>, <em>connectable=False</em>, <em>movable=True</em><big>)</big><a class="headerlink" href="#gaphas.connector.Handle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles are used to support modifications of Items.</p>
+<p>If the handle is connected to an item, the <tt class="docutils literal"><span class="pre">connected_to</span></tt> property should
+refer to the item. A <tt class="docutils literal"><span class="pre">disconnect</span></tt> handler should be provided that handles
+all disconnect behaviour (e.g. clean up constraints and <tt class="docutils literal"><span class="pre">connected_to</span></tt>).</p>
+<blockquote>
+Note for those of you that use the Pickle module to persist a canvas:
+The property <tt class="docutils literal"><span class="pre">disconnect</span></tt> should contain a callable object (with
+__call__() method), so the pickle handler can also pickle that. Pickle is
+not capable of pickling <tt class="docutils literal"><span class="pre">instancemethod</span></tt> or <tt class="docutils literal"><span class="pre">function</span></tt> objects.</blockquote>
+<dl class="attribute">
+<dt id="gaphas.connector.Handle.connectable">
+<tt class="descname">connectable</tt><a class="headerlink" href="#gaphas.connector.Handle.connectable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.connector.Handle.movable">
+<tt class="descname">movable</tt><a class="headerlink" href="#gaphas.connector.Handle.movable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.connector.Handle.pos">
+<tt class="descname">pos</tt><a class="headerlink" href="#gaphas.connector.Handle.pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.connector.Handle.visible">
+<tt class="descname">visible</tt><a class="headerlink" href="#gaphas.connector.Handle.visible" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.connector.Handle.x">
+<tt class="descname">x</tt><a class="headerlink" href="#gaphas.connector.Handle.x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.connector.Handle.y">
+<tt class="descname">y</tt><a class="headerlink" href="#gaphas.connector.Handle.y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.connector.Port">
+<em class="property">class </em><tt class="descclassname">gaphas.connector.</tt><tt class="descname">Port</tt><a class="headerlink" href="#gaphas.connector.Port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Port connectable part of an item. Item&#8217;s handle connects to a port.</p>
+<dl class="attribute">
+<dt id="gaphas.connector.Port.connectable">
+<tt class="descname">connectable</tt><a class="headerlink" href="#gaphas.connector.Port.connectable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.connector.Port.constraint">
+<tt class="descname">constraint</tt><big>(</big><em>canvas</em>, <em>item</em>, <em>handle</em>, <em>glue_item</em><big>)</big><a class="headerlink" href="#gaphas.connector.Port.constraint" title="Permalink to this definition">¶</a></dt>
+<dd>Create connection constraint between item&#8217;s handle and glue item.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.connector.Port.glue">
+<tt class="descname">glue</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.connector.Port.glue" title="Permalink to this definition">¶</a></dt>
+<dd>Get glue point on the port and distance to the port.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.connector.PointPort">
+<em class="property">class </em><tt class="descclassname">gaphas.connector.</tt><tt class="descname">PointPort</tt><big>(</big><em>point</em><big>)</big><a class="headerlink" href="#gaphas.connector.PointPort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Port defined as a point.</p>
+<dl class="method">
+<dt id="gaphas.connector.PointPort.constraint">
+<tt class="descname">constraint</tt><big>(</big><em>canvas</em>, <em>item</em>, <em>handle</em>, <em>glue_item</em><big>)</big><a class="headerlink" href="#gaphas.connector.PointPort.constraint" title="Permalink to this definition">¶</a></dt>
+<dd>Return connection position constraint between item&#8217;s handle and the
+port.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.connector.PointPort.glue">
+<tt class="descname">glue</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.connector.PointPort.glue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get glue point on the port and distance to the port.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">h</span> <span class="o">=</span> <span class="n">Handle</span><span class="p">((</span><span class="mf">10</span><span class="p">,</span> <span class="mf">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">port</span> <span class="o">=</span> <span class="n">PointPort</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">pos</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">port</span><span class="o">.</span><span class="n">glue</span><span class="p">((</span><span class="mf">10</span><span class="p">,</span> <span class="mf">0</span><span class="p">))</span>
+<span class="go">(&lt;Position object on (10, 10)&gt;, 10.0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.connector.LinePort">
+<em class="property">class </em><tt class="descclassname">gaphas.connector.</tt><tt class="descname">LinePort</tt><big>(</big><em>start</em>, <em>end</em><big>)</big><a class="headerlink" href="#gaphas.connector.LinePort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Port defined as a line between two handles.</p>
+<dl class="method">
+<dt id="gaphas.connector.LinePort.constraint">
+<tt class="descname">constraint</tt><big>(</big><em>canvas</em>, <em>item</em>, <em>handle</em>, <em>glue_item</em><big>)</big><a class="headerlink" href="#gaphas.connector.LinePort.constraint" title="Permalink to this definition">¶</a></dt>
+<dd>Create connection line constraint between item&#8217;s handle and the
+port.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.connector.LinePort.glue">
+<tt class="descname">glue</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.connector.LinePort.glue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get glue point on the port and distance to the port.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">port</span> <span class="o">=</span> <span class="n">LinePort</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">port</span><span class="o">.</span><span class="n">glue</span><span class="p">((</span><span class="mf">50</span><span class="p">,</span> <span class="mf">50</span><span class="p">))</span>
+<span class="go">((50.0, 50.0), 0.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">port</span><span class="o">.</span><span class="n">glue</span><span class="p">((</span><span class="mf">0</span><span class="p">,</span> <span class="mf">10</span><span class="p">))</span>
+<span class="go">((5.0, 5.0), 7.0710678118654755)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="items.html"
+                                  title="previous chapter">Items</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="solver.html"
+                                  title="next chapter">Solver</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/connectors.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="solver.html" title="Solver"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="items.html" title="Items"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

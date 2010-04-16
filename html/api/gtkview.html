@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>GTK+ View &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Painters" href="painters.html" />
+    <link rel="prev" title="View" href="view.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="painters.html" title="Painters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="view.html" title="View"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.view">
+<h1>GTK+ View<a class="headerlink" href="#module-gaphas.view" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.view</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.view.GtkView">
+<em class="property">class </em><tt class="descclassname">gaphas.view.</tt><tt class="descname">GtkView</tt><big>(</big><em>canvas=None</em>, <em>hadjustment=None</em>, <em>vadjustment=None</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView" title="Permalink to this definition">¶</a></dt>
+<dd><p>GTK+ widget for rendering a canvas.Canvas to a screen.
+The view uses Tools from <cite>tool.py</cite> to handle events and Painters
+from <cite>painter.py</cite> to draw. Both are configurable.</p>
+<p>The widget already contains adjustment objects (<cite>hadjustment</cite>,
+<cite>vadjustment</cite>) to be used for scrollbars.</p>
+<p>This view registers itself on the canvas, so it will receive update events.</p>
+<dl class="attribute">
+<dt id="gaphas.view.GtkView.canvas">
+<tt class="descname">canvas</tt><a class="headerlink" href="#gaphas.view.GtkView.canvas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.do_event">
+<tt class="descname">do_event</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.do_event" title="Permalink to this definition">¶</a></dt>
+<dd>Handle GDK events. Events are delegated to a <cite>tool.Tool</cite>.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.do_expose_event">
+<tt class="descname">do_expose_event</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.do_expose_event" title="Permalink to this definition">¶</a></dt>
+<dd>Render canvas to the screen.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.do_realize">
+<tt class="descname">do_realize</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.do_realize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.do_set_scroll_adjustments">
+<tt class="descname">do_set_scroll_adjustments</tt><big>(</big><em>hadjustment</em>, <em>vadjustment</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.do_set_scroll_adjustments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.do_size_allocate">
+<tt class="descname">do_size_allocate</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.do_size_allocate" title="Permalink to this definition">¶</a></dt>
+<dd>Decorate function with a mutex that prohibits recursice execution.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.do_unrealize">
+<tt class="descname">do_unrealize</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.do_unrealize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.emit">
+<tt class="descname">emit</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.emit" title="Permalink to this definition">¶</a></dt>
+<dd>Delegate signal emissions to the DrawingArea (=GTK+)</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.GtkView.hadjustment">
+<tt class="descname">hadjustment</tt><a class="headerlink" href="#gaphas.view.GtkView.hadjustment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.on_adjustment_changed">
+<tt class="descname">on_adjustment_changed</tt><big>(</big><em>adj</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.on_adjustment_changed" title="Permalink to this definition">¶</a></dt>
+<dd>Change the transformation matrix of the view to reflect the
+value of the x/y adjustment (scrollbar).</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.queue_draw_area">
+<tt class="descname">queue_draw_area</tt><big>(</big><em>x</em>, <em>y</em>, <em>w</em>, <em>h</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.queue_draw_area" title="Permalink to this definition">¶</a></dt>
+<dd>Wrap draw_area to convert all values to ints.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.queue_draw_item">
+<tt class="descname">queue_draw_item</tt><big>(</big><em>*items</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.queue_draw_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <tt class="docutils literal"><span class="pre">DrawingArea.queue_draw_area</span></tt>, but use the bounds of the
+item as update areas. Of course with a pythonic flavor: update
+any number of items at once.</p>
+<p>TODO: Should we also create a (sorted) list of items that need redrawal?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.queue_draw_refresh">
+<tt class="descname">queue_draw_refresh</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.queue_draw_refresh" title="Permalink to this definition">¶</a></dt>
+<dd>Redraw the entire view.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.request_update">
+<tt class="descname">request_update</tt><big>(</big><em>items</em>, <em>matrix_only_items=()</em>, <em>removed_items=()</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.request_update" title="Permalink to this definition">¶</a></dt>
+<dd>Request update for items. Items will get a full update treatment, while
+<tt class="docutils literal"><span class="pre">matrix_only_items</span></tt> will only have their bounding box recalculated.</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.GtkView.tool">
+<tt class="descname">tool</tt><a class="headerlink" href="#gaphas.view.GtkView.tool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.update">
+<tt class="descname">update</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.update_adjustments">
+<tt class="descname">update_adjustments</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.update_adjustments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.update_bounding_box">
+<tt class="descname">update_bounding_box</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.update_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.GtkView.vadjustment">
+<tt class="descname">vadjustment</tt><a class="headerlink" href="#gaphas.view.GtkView.vadjustment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.GtkView.zoom">
+<tt class="descname">zoom</tt><big>(</big><em>factor</em><big>)</big><a class="headerlink" href="#gaphas.view.GtkView.zoom" title="Permalink to this definition">¶</a></dt>
+<dd>Zoom in/out by factor <tt class="docutils literal"><span class="pre">factor</span></tt>.</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="view.html"
+                                  title="previous chapter">View</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="painters.html"
+                                  title="next chapter">Painters</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/gtkview.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="painters.html" title="Painters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="view.html" title="View"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

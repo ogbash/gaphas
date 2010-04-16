@@ -1,0 +1,485 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tools &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Aspects" href="aspects.html" />
+    <link rel="prev" title="Painters" href="painters.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="aspects.html" title="Aspects"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="painters.html" title="Painters"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.tool">
+<h1>Tools<a class="headerlink" href="#module-gaphas.tool" title="Permalink to this headline">¶</a></h1>
+<p>This part describes the API of Gaphas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.tool</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.tool.Tool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">Tool</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.Tool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for a tool. This class 
+A word on click events:</p>
+<p>Mouse (pointer) button click. A button press is normally followed by
+a button release. Double and triple clicks should work together with
+the button methods.</p>
+<dl class="docutils">
+<dt>A single click is emited as:</dt>
+<dd>on_button_press
+on_button_release</dd>
+<dt>In case of a double click:</dt>
+<dd>on_button_press (x 2)
+on_double_click
+on_button_release</dd>
+<dt>In case of a tripple click:</dt>
+<dd>on_button_press (x 3)
+on_triple_click
+on_button_release</dd>
+</dl>
+<dl class="method">
+<dt id="gaphas.tool.Tool.draw">
+<tt class="descname">draw</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.tool.Tool.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some tools (such as Rubberband selection) may need to draw something
+on the canvas. This can be done through the draw() method. This is
+called after all items are drawn.
+The context contains the following fields:</p>
+<ul class="simple">
+<li>context: the render context (contains context.view and context.cairo)</li>
+<li>cairo: the Cairo drawing context</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.Tool.handle">
+<tt class="descname">handle</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.Tool.handle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.Tool.set_view">
+<tt class="descname">set_view</tt><big>(</big><em>view</em><big>)</big><a class="headerlink" href="#gaphas.tool.Tool.set_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.ToolChain">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">ToolChain</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.ToolChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>A ToolChain can be used to chain tools together, for example HoverTool,
+HandleTool, SelectionTool.</p>
+<p>The grabbed item is bypassed in case a double or tripple click event
+is received. Should make sure this doesn&#8217;t end up in dangling states.</p>
+<dl class="method">
+<dt id="gaphas.tool.ToolChain.append">
+<tt class="descname">append</tt><big>(</big><em>tool</em><big>)</big><a class="headerlink" href="#gaphas.tool.ToolChain.append" title="Permalink to this definition">¶</a></dt>
+<dd>Append a tool to the chain. Self is returned.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ToolChain.draw">
+<tt class="descname">draw</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.tool.ToolChain.draw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ToolChain.grab">
+<tt class="descname">grab</tt><big>(</big><em>tool</em><big>)</big><a class="headerlink" href="#gaphas.tool.ToolChain.grab" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ToolChain.handle">
+<tt class="descname">handle</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ToolChain.handle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle the event by calling each tool until the event is handled
+or grabbed.</p>
+<p>If a tool is returning True on a button press event, the motion and
+button release events are also passed to this</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ToolChain.set_view">
+<tt class="descname">set_view</tt><big>(</big><em>view</em><big>)</big><a class="headerlink" href="#gaphas.tool.ToolChain.set_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ToolChain.ungrab">
+<tt class="descname">ungrab</tt><big>(</big><em>tool</em><big>)</big><a class="headerlink" href="#gaphas.tool.ToolChain.ungrab" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ToolChain.validate_grabbed_tool">
+<tt class="descname">validate_grabbed_tool</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ToolChain.validate_grabbed_tool" title="Permalink to this definition">¶</a></dt>
+<dd>Check if it&#8217;s valid to have a grabbed tool on an event. If not the
+grabbed tool will be released.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.ItemTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">ItemTool</tt><big>(</big><em>view=None</em>, <em>buttons=(1</em>, <em>)</em><big>)</big><a class="headerlink" href="#gaphas.tool.ItemTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>ItemTool does selection and dragging of items. On a button click,
+the currently &#8220;hovered item&#8221; is selected. If CTRL or SHIFT are pressed,
+already selected items remain selected. The last selected item gets the
+focus (e.g. receives key press events).</p>
+<p>The roles used are Selection (select, unselect) and InMotion (move).</p>
+<dl class="method">
+<dt id="gaphas.tool.ItemTool.get_item">
+<tt class="descname">get_item</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.tool.ItemTool.get_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ItemTool.movable_items">
+<tt class="descname">movable_items</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.tool.ItemTool.movable_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the items that should eventually be moved.</p>
+<p>Returns InMotion aspects for the items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ItemTool.on_button_press">
+<tt class="descname">on_button_press</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ItemTool.on_button_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ItemTool.on_button_release">
+<tt class="descname">on_button_release</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ItemTool.on_button_release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ItemTool.on_motion_notify">
+<tt class="descname">on_motion_notify</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ItemTool.on_motion_notify" title="Permalink to this definition">¶</a></dt>
+<dd>Normally do nothing.
+If a button is pressed move the items around.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.HandleTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">HandleTool</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.HandleTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tool for moving handles around.</p>
+<p>By default this tool does not provide connecting handles to another item
+(see <cite>ConnectHandleTool</cite>).</p>
+<dl class="method">
+<dt id="gaphas.tool.HandleTool.grab_handle">
+<tt class="descname">grab_handle</tt><big>(</big><em>item</em>, <em>handle</em><big>)</big><a class="headerlink" href="#gaphas.tool.HandleTool.grab_handle" title="Permalink to this definition">¶</a></dt>
+<dd>Grab a specific handle. This can be used from the PlacementTool
+to set the state of the handle tool.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.HandleTool.on_button_press">
+<tt class="descname">on_button_press</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.HandleTool.on_button_press" title="Permalink to this definition">¶</a></dt>
+<dd>Handle button press events. If the (mouse) button is pressed on
+top of a Handle (item.Handle), that handle is grabbed and can be
+dragged around.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.HandleTool.on_button_release">
+<tt class="descname">on_button_release</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.HandleTool.on_button_release" title="Permalink to this definition">¶</a></dt>
+<dd>Release a grabbed handle.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.HandleTool.on_motion_notify">
+<tt class="descname">on_motion_notify</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.HandleTool.on_motion_notify" title="Permalink to this definition">¶</a></dt>
+<dd>Handle motion events. If a handle is grabbed: drag it around,
+else, if the pointer is over a handle, make the owning item the
+hovered-item.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.HandleTool.ungrab_handle">
+<tt class="descname">ungrab_handle</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.tool.HandleTool.ungrab_handle" title="Permalink to this definition">¶</a></dt>
+<dd>Reset grabbed_handle and grabbed_item.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.ConnectHandleTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">ConnectHandleTool</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.ConnectHandleTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tool for connecting two items.</p>
+<p>There are two items involved. Handle of connecting item (usually
+a line) is being dragged by an user towards another item (item in
+short). Port of an item is found by the tool and connection is
+established by creating a constraint between line&#8217;s handle and item&#8217;s
+port.</p>
+<dl class="method">
+<dt id="gaphas.tool.ConnectHandleTool.connect">
+<tt class="descname">connect</tt><big>(</big><em>item</em>, <em>handle</em>, <em>vpos</em><big>)</big><a class="headerlink" href="#gaphas.tool.ConnectHandleTool.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect a handle of a item to connectable item.</p>
+<p>Connectable item is found by <cite>ConnectHandleTool.glue</cite> method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt>item</dt>
+<dd><p class="first last">Connecting item.</p>
+</dd>
+<dt>handle</dt>
+<dd><p class="first last">Handle of connecting item.</p>
+</dd>
+<dt>vpos</dt>
+<dd><p class="first last">Position to connect to (or near at least)</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ConnectHandleTool.glue">
+<tt class="descname">glue</tt><big>(</big><em>item</em>, <em>handle</em>, <em>vpos</em><big>)</big><a class="headerlink" href="#gaphas.tool.ConnectHandleTool.glue" title="Permalink to this definition">¶</a></dt>
+<dd>Perform a small glue action to ensure the handle is at a proper
+location for connecting.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ConnectHandleTool.on_button_release">
+<tt class="descname">on_button_release</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ConnectHandleTool.on_button_release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.HoverTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">HoverTool</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.HoverTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the item under the mouse cursor the &#8220;hovered item&#8221;.</p>
+<dl class="method">
+<dt id="gaphas.tool.HoverTool.on_motion_notify">
+<tt class="descname">on_motion_notify</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.HoverTool.on_motion_notify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.RubberbandTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">RubberbandTool</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.RubberbandTool" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="gaphas.tool.RubberbandTool.draw">
+<tt class="descname">draw</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.tool.RubberbandTool.draw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.RubberbandTool.on_button_press">
+<tt class="descname">on_button_press</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.RubberbandTool.on_button_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.RubberbandTool.on_button_release">
+<tt class="descname">on_button_release</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.RubberbandTool.on_button_release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.RubberbandTool.on_motion_notify">
+<tt class="descname">on_motion_notify</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.RubberbandTool.on_motion_notify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.RubberbandTool.queue_draw">
+<tt class="descname">queue_draw</tt><big>(</big><em>view</em><big>)</big><a class="headerlink" href="#gaphas.tool.RubberbandTool.queue_draw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.PanTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">PanTool</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.PanTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Captures drag events with the middle mouse button and uses them to
+translate the canvas within the view. Trumps the ZoomTool, so should be
+placed later in the ToolChain.</p>
+<dl class="method">
+<dt id="gaphas.tool.PanTool.on_button_press">
+<tt class="descname">on_button_press</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.PanTool.on_button_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.PanTool.on_button_release">
+<tt class="descname">on_button_release</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.PanTool.on_button_release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.PanTool.on_motion_notify">
+<tt class="descname">on_motion_notify</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.PanTool.on_motion_notify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.PanTool.on_scroll">
+<tt class="descname">on_scroll</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.PanTool.on_scroll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.ZoomTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">ZoomTool</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.ZoomTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tool for zooming using either of two techniques:</p>
+<ul class="simple">
+<li>ctrl + middle-mouse dragging in the up-down direction.</li>
+<li>ctrl + mouse-wheeel</li>
+</ul>
+<dl class="method">
+<dt id="gaphas.tool.ZoomTool.on_button_press">
+<tt class="descname">on_button_press</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ZoomTool.on_button_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ZoomTool.on_button_release">
+<tt class="descname">on_button_release</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ZoomTool.on_button_release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ZoomTool.on_motion_notify">
+<tt class="descname">on_motion_notify</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ZoomTool.on_motion_notify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.ZoomTool.on_scroll">
+<tt class="descname">on_scroll</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.ZoomTool.on_scroll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.PlacementTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">PlacementTool</tt><big>(</big><em>view</em>, <em>factory</em>, <em>handle_tool</em>, <em>handle_index</em><big>)</big><a class="headerlink" href="#gaphas.tool.PlacementTool" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="gaphas.tool.PlacementTool.handle_index">
+<tt class="descname">handle_index</tt><a class="headerlink" href="#gaphas.tool.PlacementTool.handle_index" title="Permalink to this definition">¶</a></dt>
+<dd>Index of handle to be used by handle_tool</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.tool.PlacementTool.new_item">
+<tt class="descname">new_item</tt><a class="headerlink" href="#gaphas.tool.PlacementTool.new_item" title="Permalink to this definition">¶</a></dt>
+<dd>The newly created item</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.PlacementTool.on_button_press">
+<tt class="descname">on_button_press</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.PlacementTool.on_button_press" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.PlacementTool.on_button_release">
+<tt class="descname">on_button_release</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.PlacementTool.on_button_release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.tool.PlacementTool.on_motion_notify">
+<tt class="descname">on_motion_notify</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.PlacementTool.on_motion_notify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.tool.TextEditTool">
+<em class="property">class </em><tt class="descclassname">gaphas.tool.</tt><tt class="descname">TextEditTool</tt><big>(</big><em>view=None</em><big>)</big><a class="headerlink" href="#gaphas.tool.TextEditTool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Demo of a text edit tool (just displays a text edit box at the cursor
+position.</p>
+<dl class="method">
+<dt id="gaphas.tool.TextEditTool.on_double_click">
+<tt class="descname">on_double_click</tt><big>(</big><em>event</em><big>)</big><a class="headerlink" href="#gaphas.tool.TextEditTool.on_double_click" title="Permalink to this definition">¶</a></dt>
+<dd>Create a popup window with some editable text.</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="painters.html"
+                                  title="previous chapter">Painters</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="aspects.html"
+                                  title="next chapter">Aspects</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/tools.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aspects.html" title="Aspects"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="painters.html" title="Painters"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

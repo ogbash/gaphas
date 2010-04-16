@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Constraint Solver &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="index.html" />
+    <link rel="next" title="API reference" href="api.html" />
+    <link rel="prev" title="Quadtree implementation" href="quadtree.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quadtree.html" title="Quadtree implementation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="constraint-solver">
+<h1>Constraint Solver<a class="headerlink" href="#constraint-solver" title="Permalink to this headline">¶</a></h1>
+<p>Gaphas&#8217; constraint solver can be consider the hart of the Canvas (The Canvas instance holds and orders the items that are drawn on it and in the end will be displayed to the user).</p>
+<p>The constraint solver (&#8216;solver&#8217; for short) is called during the update of the canvas.</p>
+<p>A solver contains a set of constraints. Each constraint in itself is pretty straightforward (e.g. variable &#8216;&#8217;a&#8217;&#8217; equals variable &#8216;&#8217;b&#8217;&#8216;). Did I say variable? Yes I did. Let&#8217;s start at the bottom and work our way to the solver.</p>
+<p>A Variable is a simple class, contains a value. It behaves like a &#8216;&#8217;float&#8217;&#8217; in many ways. There is one typical thing about Variables: they can be added to Constraints.</p>
+<p>A Constraint is an equation. The trick is to make all constraints true when solving a set of constraints. That can be pretty tricky, since a Variable can play a role in more than one Constraint. Constraint solving is governed by the Solver (ah, there it is).</p>
+<p>Constraints are instances of Constraint class (more specific: subclasses of the Constraint class). A Constraint can perform a specific trick: e.g. centre one Variable between two other Variables or make one Variable equal to another Variable.</p>
+<p>It&#8217;s the Solver&#8217;s job to make sure all constraint are true in the end. In some cases this means a constraint needs to be resolved twice, but the Solver sees to it that no deadlocks occur.</p>
+<div class="section" id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<p>When a variable is assigned a value it marks itself &#8216;&#8217;dirty&#8217;&#8216;. As a result it will be resolved the next time the solver is asked to.</p>
+<p>Each variable has a specific &#8216;&#8217;strength&#8217;&#8216;. String variables can not be changed by weak variables, but weak variables can change when a new value is assigned to a stronger variable. The Solver always tries to solve a constraint for the weakest variable. If two variables have equal strength, however, the variable that is most recently changed is considered slightly stronger than the not (or earlier) changed variable.</p>
+</div>
+<div class="section" id="projections">
+<h2>Projections<a class="headerlink" href="#projections" title="Permalink to this headline">¶</a></h2>
+<p>There&#8217;s one special thing about Variables: since each item has it&#8217;s own coordinate system ((0, 0) point, handy when the item is rendered), it&#8217;s pretty hard to make sure (for example) a line can connect to a box and &#8216;&#8217;stays&#8217;&#8217; connected, even when the box is dragged around. How can such a constraint be maintained? This is where Projections come into play. A Projection can be used to project a variable on another space (read: coordinate system).</p>
+<p>The default projection (to canvas coordinates) is located in <cite>gaphas.canvas</cite> and is known as <cite>CanvasProjection</cite>.</p>
+<p>When a constraint contains projections, it is most likely that this constraint connects two items together. At least the constraint is not entirely bound to the item&#8217;s coordinate space. This knowledge is used when an item is moved. A move operation typically only requires a change in coordinates, relative to the item&#8217;s parent item (this is why having a (0,0) point per item is so handy). This means that constraints local to the item not not need to be resolved. Constraints with links outside the item&#8217;s space should be solved though. Projections play an important role in determining which constraints should be resolved.</p>
+<hr class="docutils" />
+<p>The Solver can be found at: <a class="reference external" href="http://github.com/amolenaar/gaphas/trees/blobs/gaphas/solver.py">http://github.com/amolenaar/gaphas/trees/blobs/gaphas/solver.py</a>, along with Variables and Projections.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Constraint Solver</a><ul>
+<li><a class="reference external" href="#variables">Variables</a></li>
+<li><a class="reference external" href="#projections">Projections</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="quadtree.html"
+                                  title="previous chapter">Quadtree implementation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="api.html"
+                                  title="next chapter">API reference</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/solver.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quadtree.html" title="Quadtree implementation"
+             >previous</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

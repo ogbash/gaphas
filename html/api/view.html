@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>View &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="GTK+ View" href="gtkview.html" />
+    <link rel="prev" title="Various utility functions" href="utils.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="gtkview.html" title="GTK+ View"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Various utility functions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.view">
+<h1>View<a class="headerlink" href="#module-gaphas.view" title="Permalink to this headline">¶</a></h1>
+<p>The View is the base class for viewing related operations. A good example is
+the <tt class="docutils literal"><span class="pre">GtkView</span></tt>, which provides a GTK+ widget for viewing (and editing) the
+canvas. Views are also used for rendering to images (for example SVG or PNG).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.view</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.view.View">
+<em class="property">class </em><tt class="descclassname">gaphas.view.</tt><tt class="descname">View</tt><big>(</big><em>canvas=None</em><big>)</big><a class="headerlink" href="#gaphas.view.View" title="Permalink to this definition">¶</a></dt>
+<dd><p>View class for gaphas.Canvas objects.</p>
+<dl class="attribute">
+<dt id="gaphas.view.View.bounding_box">
+<tt class="descname">bounding_box</tt><a class="headerlink" href="#gaphas.view.View.bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.View.bounding_box_painter">
+<tt class="descname">bounding_box_painter</tt><a class="headerlink" href="#gaphas.view.View.bounding_box_painter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.View.canvas">
+<tt class="descname">canvas</tt><a class="headerlink" href="#gaphas.view.View.canvas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.View.dropzone_item">
+<tt class="descname">dropzone_item</tt><a class="headerlink" href="#gaphas.view.View.dropzone_item" title="Permalink to this definition">¶</a></dt>
+<dd>The item which can group other items</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.emit">
+<tt class="descname">emit</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#gaphas.view.View.emit" title="Permalink to this definition">¶</a></dt>
+<dd>Placeholder method for signal emission functionality.</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.View.focused_item">
+<tt class="descname">focused_item</tt><a class="headerlink" href="#gaphas.view.View.focused_item" title="Permalink to this definition">¶</a></dt>
+<dd>The item with focus (receives key events a.o.)</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.get_handle_at_point">
+<tt class="descname">get_handle_at_point</tt><big>(</big><em>pos</em>, <em>distance=6</em><big>)</big><a class="headerlink" href="#gaphas.view.View.get_handle_at_point" title="Permalink to this definition">¶</a></dt>
+<dd>Look for a handle at <tt class="docutils literal"><span class="pre">pos</span></tt> and return the
+tuple (item, handle).</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.get_item_at_point">
+<tt class="descname">get_item_at_point</tt><big>(</big><em>pos</em>, <em>selected=True</em><big>)</big><a class="headerlink" href="#gaphas.view.View.get_item_at_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the topmost item located at <tt class="docutils literal"><span class="pre">pos</span></tt> (x, y).</p>
+<dl class="docutils">
+<dt>Parameters:</dt>
+<dd><ul class="first last simple">
+<li>selected: if False returns first non-selected item</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.get_item_bounding_box">
+<tt class="descname">get_item_bounding_box</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.view.View.get_item_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd>Get the bounding box for the item, in view coordinates.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.get_items_in_rectangle">
+<tt class="descname">get_items_in_rectangle</tt><big>(</big><em>rect</em>, <em>intersect=True</em>, <em>reverse=False</em><big>)</big><a class="headerlink" href="#gaphas.view.View.get_items_in_rectangle" title="Permalink to this definition">¶</a></dt>
+<dd>Return the items in the rectangle &#8216;rect&#8217;.
+Items are automatically sorted in canvas&#8217; processing order.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.get_matrix_i2v">
+<tt class="descname">get_matrix_i2v</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.view.View.get_matrix_i2v" title="Permalink to this definition">¶</a></dt>
+<dd>Get Item to View matrix for <tt class="docutils literal"><span class="pre">item</span></tt>.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.get_matrix_v2i">
+<tt class="descname">get_matrix_v2i</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.view.View.get_matrix_v2i" title="Permalink to this definition">¶</a></dt>
+<dd>Get View to Item matrix for <tt class="docutils literal"><span class="pre">item</span></tt>.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.get_port_at_point">
+<tt class="descname">get_port_at_point</tt><big>(</big><em>vpos</em>, <em>distance=10</em>, <em>exclude=None</em><big>)</big><a class="headerlink" href="#gaphas.view.View.get_port_at_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find item with port closest to specified position.</p>
+<p>List of items to be ignored can be specified with <cite>exclude</cite>
+parameter.</p>
+<p>Tuple is returned</p>
+<ul class="simple">
+<li>found item</li>
+<li>closest, connectable port</li>
+<li>closest point on found port (in view coordinates)</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt>vpos</dt>
+<dd><p class="first last">Position specified in view coordinates.</p>
+</dd>
+<dt>distance</dt>
+<dd><p class="first last">Max distance from point to a port (default 10)</p>
+</dd>
+<dt>exclude</dt>
+<dd><p class="first last">Set of items to ignore.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.View.hovered_item">
+<tt class="descname">hovered_item</tt><a class="headerlink" href="#gaphas.view.View.hovered_item" title="Permalink to this definition">¶</a></dt>
+<dd>The item directly under the mouse pointer</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.View.matrix">
+<tt class="descname">matrix</tt><a class="headerlink" href="#gaphas.view.View.matrix" title="Permalink to this definition">¶</a></dt>
+<dd>Canvas to view transformation matrix</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.paint">
+<tt class="descname">paint</tt><big>(</big><em>cr</em><big>)</big><a class="headerlink" href="#gaphas.view.View.paint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.View.painter">
+<tt class="descname">painter</tt><a class="headerlink" href="#gaphas.view.View.painter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.queue_draw_item">
+<tt class="descname">queue_draw_item</tt><big>(</big><em>*items</em><big>)</big><a class="headerlink" href="#gaphas.view.View.queue_draw_item" title="Permalink to this definition">¶</a></dt>
+<dd>Placeholder for item redraw queueing.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.select_all">
+<tt class="descname">select_all</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.view.View.select_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.select_in_rectangle">
+<tt class="descname">select_in_rectangle</tt><big>(</big><em>rect</em><big>)</big><a class="headerlink" href="#gaphas.view.View.select_in_rectangle" title="Permalink to this definition">¶</a></dt>
+<dd>Select all items who have their bounding box within the
+rectangle &#64;rect.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.select_item">
+<tt class="descname">select_item</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.view.View.select_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select an item. This adds &#64;item to the set of selected items. Do:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">del</span> <span class="n">view</span><span class="o">.</span><span class="n">selected_items</span>
+</pre></div>
+</div>
+<p>to clear the selected items list.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="gaphas.view.View.selected_items">
+<tt class="descname">selected_items</tt><a class="headerlink" href="#gaphas.view.View.selected_items" title="Permalink to this definition">¶</a></dt>
+<dd>Items selected by the view</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.set_item_bounding_box">
+<tt class="descname">set_item_bounding_box</tt><big>(</big><em>item</em>, <em>bounds</em><big>)</big><a class="headerlink" href="#gaphas.view.View.set_item_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the bounding box of the item.</p>
+<p><tt class="docutils literal"><span class="pre">bounds</span></tt> is in view coordinates.</p>
+<p>Coordinates are calculated back to item coordinates, so matrix-only
+updates can occur.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.unselect_all">
+<tt class="descname">unselect_all</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.view.View.unselect_all" title="Permalink to this definition">¶</a></dt>
+<dd>Clearing the selected_item also clears the focused_item.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.unselect_item">
+<tt class="descname">unselect_item</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.view.View.unselect_item" title="Permalink to this definition">¶</a></dt>
+<dd>Unselect an item.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.update_bounding_box">
+<tt class="descname">update_bounding_box</tt><big>(</big><em>cr</em>, <em>items=None</em><big>)</big><a class="headerlink" href="#gaphas.view.View.update_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd>Update the bounding boxes of the canvas items for this view, in 
+canvas coordinates.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.update_matrix">
+<tt class="descname">update_matrix</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.view.View.update_matrix" title="Permalink to this definition">¶</a></dt>
+<dd>Update item matrices related to view.</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.view.View.zoom">
+<tt class="descname">zoom</tt><big>(</big><em>factor</em><big>)</big><a class="headerlink" href="#gaphas.view.View.zoom" title="Permalink to this definition">¶</a></dt>
+<dd>Zoom in/out by factor &#64;factor.</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="utils.html"
+                                  title="previous chapter">Various utility functions</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="gtkview.html"
+                                  title="next chapter">GTK+ View</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/view.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="gtkview.html" title="GTK+ View"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Various utility functions"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

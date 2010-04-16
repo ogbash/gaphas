@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Constraints &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="constraints">
+<h1>Constraints<a class="headerlink" href="#constraints" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>There are problems related to canvas items, which can be solved in
+<a class="reference external" href="http://en.wikipedia.org/wiki/Declarative_programming">declarative way</a>
+allowing for simpler and less error prone implementation of canvas item.</p>
+<p>For example, if an item should be a rectangle, then it could be declared
+that</p>
+<ul class="simple">
+<li>bottom-right vertex should be below and on the right side of top-left
+vertex</li>
+<li>two top rectangle vertices should be always at the same y-axis</li>
+<li>two left rectangle vertices should be always at the same x-axis</li>
+<li>...</li>
+</ul>
+<p>Above rules are constraints, which need to be applied to a rectangular
+item. The rules can be satisfied (constraints can be solved) using
+<a class="reference external" href="http://en.wikipedia.org/wiki/Constraint_satisfaction_problem">constraint solver</a>.</p>
+<p>Gaphas implements its own constraint solver (<cite>gaphas.solver</cite> module).
+Items can be constrained using APIs defined in <cite>Canvas</cite> and <cite>Item</cite> classes.</p>
+</div>
+<div class="section" id="constraints-api">
+<h2>Constraints API<a class="headerlink" href="#constraints-api" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>Canvas</cite> class constraints API supports adding a constraint to
+constraint solver.  Instance of a constraint has to be created and then
+added using <cite>Canvas.add_constraint</cite> method. For example, it allows to
+declare that two variables should be equal.</p>
+<p>The <cite>Item</cite> class constraint API is more abstract, it allows to constraint
+positions, i.e.</p>
+<ul class="simple">
+<li>positions of two item handles should be on the same x-axis</li>
+<li>position should be always on a line</li>
+</ul>
+<p>If this API does not provide some constraint declaration, then one can
+fallback to <cite>Canvas</cite> class constraint API.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="item-api">
+<h3>Item API<a class="headerlink" href="#item-api" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="canvas-api">
+<h3>Canvas API<a class="headerlink" href="#canvas-api" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+<p>Theory and examples related to constraint solving</p>
+<ul class="simple">
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Declarative_programming">http://en.wikipedia.org/wiki/Declarative_programming</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Constraint_satisfaction_problem">http://en.wikipedia.org/wiki/Constraint_satisfaction_problem</a></li>
+<li><a class="reference external" href="http://norvig.com/sudoku.html">http://norvig.com/sudoku.html</a></li>
+</ul>
+<p>There are other projects providing constraint solvers</p>
+<ul class="simple">
+<li><a class="reference external" href="http://adaptagrams.sourceforge.net/">http://adaptagrams.sourceforge.net/</a></li>
+<li><a class="reference external" href="http://minion.sourceforge.net/">http://minion.sourceforge.net/</a></li>
+<li><a class="reference external" href="http://labix.org/python-constraint">http://labix.org/python-constraint</a></li>
+<li><a class="reference external" href="http://www.cs.washington.edu/research/constraints/cassowary/">http://www.cs.washington.edu/research/constraints/cassowary/</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Constraints</a><ul>
+<li><a class="reference external" href="#introduction">Introduction</a></li>
+<li><a class="reference external" href="#constraints-api">Constraints API</a></li>
+<li><a class="reference external" href="#examples">Examples</a><ul>
+<li><a class="reference external" href="#item-api">Item API</a></li>
+<li><a class="reference external" href="#canvas-api">Canvas API</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#further-reading">Further Reading</a></li>
+</ul>
+</li>
+</ul>
+
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/constraints.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li><a href="contents.html">Gaphas v0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

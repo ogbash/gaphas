@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Alignment helper: Guide &mdash; Gaphas v0.5 documentation</title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Gaphas v0.5 documentation" href="../index.html" />
+    <link rel="up" title="API reference" href="../api.html" />
+    <link rel="next" title="Tree structure" href="tree.html" />
+    <link rel="prev" title="Line segmentation" href="segment.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="tree.html" title="Tree structure"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="segment.html" title="Line segmentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" accesskey="U">API reference</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gaphas.guide">
+<h1>Alignment helper: Guide<a class="headerlink" href="#module-gaphas.guide" title="Permalink to this headline">¶</a></h1>
+<p>By importing this module Guide behaviour will be added to all views. Guides will help you align items next to each other.</p>
+<p>The guide module consists of a few aspects, triggered when items are moved, as well as a painter, so guides will be drawn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">mod:</th><td class="field-body"><cite>gaphor.guide</cite></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<dl class="class">
+<dt id="gaphas.guide.ItemGuide">
+<em class="property">class </em><tt class="descclassname">gaphas.guide.</tt><tt class="descname">ItemGuide</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.guide.ItemGuide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get edges on an item, on which we can align the items.</p>
+<dl class="method">
+<dt id="gaphas.guide.ItemGuide.horizontal">
+<tt class="descname">horizontal</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.ItemGuide.horizontal" title="Permalink to this definition">¶</a></dt>
+<dd>Return horizontal edges (on y axis)</dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.ItemGuide.vertical">
+<tt class="descname">vertical</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.ItemGuide.vertical" title="Permalink to this definition">¶</a></dt>
+<dd>Return vertical edges (on x axis)</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.guide.ElementGuide">
+<em class="property">class </em><tt class="descclassname">gaphas.guide.</tt><tt class="descname">ElementGuide</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.guide.ElementGuide" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="gaphas.guide.ElementGuide.horizontal">
+<tt class="descname">horizontal</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.ElementGuide.horizontal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.ElementGuide.vertical">
+<tt class="descname">vertical</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.ElementGuide.vertical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.guide.LineGuide">
+<em class="property">class </em><tt class="descclassname">gaphas.guide.</tt><tt class="descname">LineGuide</tt><big>(</big><em>item</em><big>)</big><a class="headerlink" href="#gaphas.guide.LineGuide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Support guides for orthogonal lines.</p>
+<dl class="method">
+<dt id="gaphas.guide.LineGuide.horizontal">
+<tt class="descname">horizontal</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.LineGuide.horizontal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.LineGuide.vertical">
+<tt class="descname">vertical</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.LineGuide.vertical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.guide.Guides">
+<em class="property">class </em><tt class="descclassname">gaphas.guide.</tt><tt class="descname">Guides</tt><big>(</big><em>v</em>, <em>h</em><big>)</big><a class="headerlink" href="#gaphas.guide.Guides" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="gaphas.guide.Guides.horizontal">
+<tt class="descname">horizontal</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.Guides.horizontal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.Guides.vertical">
+<tt class="descname">vertical</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.Guides.vertical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.guide.GuideMixin">
+<em class="property">class </em><tt class="descclassname">gaphas.guide.</tt><tt class="descname">GuideMixin</tt><a class="headerlink" href="#gaphas.guide.GuideMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper methods for guides.</p>
+<dl class="method">
+<dt id="gaphas.guide.GuideMixin.find_closest">
+<tt class="descname">find_closest</tt><big>(</big><em>item_edges</em>, <em>edges</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuideMixin.find_closest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.GuideMixin.find_horizontal_guides">
+<tt class="descname">find_horizontal_guides</tt><big>(</big><em>item_hedges</em>, <em>pdy</em>, <em>width</em>, <em>children_and_self</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuideMixin.find_horizontal_guides" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.GuideMixin.find_vertical_guides">
+<tt class="descname">find_vertical_guides</tt><big>(</big><em>item_vedges</em>, <em>pdx</em>, <em>height</em>, <em>children_and_self</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuideMixin.find_vertical_guides" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.GuideMixin.get_view_dimensions">
+<tt class="descname">get_view_dimensions</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.GuideMixin.get_view_dimensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.GuideMixin.queue_draw_guides">
+<tt class="descname">queue_draw_guides</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.GuideMixin.queue_draw_guides" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.guide.GuidedItemInMotion">
+<em class="property">class </em><tt class="descclassname">gaphas.guide.</tt><tt class="descname">GuidedItemInMotion</tt><big>(</big><em>item</em>, <em>view</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuidedItemInMotion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the item, lock position on any element that&#8217;s located at the same
+location.</p>
+<dl class="method">
+<dt id="gaphas.guide.GuidedItemInMotion.move">
+<tt class="descname">move</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuidedItemInMotion.move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.GuidedItemInMotion.stop_move">
+<tt class="descname">stop_move</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.GuidedItemInMotion.stop_move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.guide.GuidedItemHandleInMotion">
+<em class="property">class </em><tt class="descclassname">gaphas.guide.</tt><tt class="descname">GuidedItemHandleInMotion</tt><big>(</big><em>item</em>, <em>handle</em>, <em>view</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuidedItemHandleInMotion" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="gaphas.guide.GuidedItemHandleInMotion.move">
+<tt class="descname">move</tt><big>(</big><em>pos</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuidedItemHandleInMotion.move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gaphas.guide.GuidedItemHandleInMotion.stop_move">
+<tt class="descname">stop_move</tt><big>(</big><big>)</big><a class="headerlink" href="#gaphas.guide.GuidedItemHandleInMotion.stop_move" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="gaphas.guide.GuidePainter">
+<em class="property">class </em><tt class="descclassname">gaphas.guide.</tt><tt class="descname">GuidePainter</tt><big>(</big><em>item</em>, <em>view</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuidePainter" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="gaphas.guide.GuidePainter.paint">
+<tt class="descname">paint</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#gaphas.guide.GuidePainter.paint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="segment.html"
+                                  title="previous chapter">Line segmentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="tree.html"
+                                  title="next chapter">Tree structure</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/api/guide.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="../search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tree.html" title="Tree structure"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="segment.html" title="Line segmentation"
+             >previous</a> |</li>
+        <li><a href="../contents.html">Gaphas v0.5 documentation</a> &raquo;</li>
+          <li><a href="../api.html" >API reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright .
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>
